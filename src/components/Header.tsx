@@ -9,6 +9,7 @@ export type AbaAtiva =
   | 'comparar'
   | 'relatorio'
   | 'perguntar'
+  | 'decodificador'
   | 'catalogo'
   | 'documento';
 
@@ -132,6 +133,16 @@ export const Header: React.FC<HeaderProps> = ({
           data-testid="tab-perguntar"
         >
           Perguntar
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={abaAtiva === 'decodificador'}
+          className={`nav-tab ${abaAtiva === 'decodificador' ? 'active' : ''}`}
+          onClick={() => onSelecionarAba('decodificador')}
+          data-testid="tab-decodificador"
+        >
+          Decodificar Código
         </button>
         <button
           type="button"

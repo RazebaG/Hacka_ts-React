@@ -22,18 +22,28 @@ export interface DocumentoDetalhe extends DocumentoResumo {
   secoes: SecaoDocumento[];
 }
 
+export interface CamadaInfo {
+  sigla: string;
+  tipo_nome: string;
+  grupo: string;
+  subordinado_a?: string | null;
+}
+
 export interface Citacao {
   codigo: string;
   versao: string;
   secao: string;
   trecho: string;
+  camada?: CamadaInfo;
 }
 
 export interface RespostaPerguntar {
+  resposta_id?: string;
   resposta: string;
   consta: boolean;
   citacoes: Citacao[];
   avisos: string[];
+  proxima_acao?: string | null;
 }
 
 export type PerfilUsuario = 'empregado' | 'gestor' | 'ggc' | 'gfi' | 'gco' | null;

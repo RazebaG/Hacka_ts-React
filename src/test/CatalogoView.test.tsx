@@ -60,4 +60,22 @@ describe('CatalogoView', () => {
     fireEvent.click(screen.getByTestId('btn-abrir-NG_111-3.0.0'));
     expect(onNavegar).toHaveBeenCalledWith('NG_111', '3.0.0');
   });
+
+  it('aciona navegação para o decodificador ao clicar no botão Decodificar', async () => {
+    const onNavegar = vi.fn();
+    const onDecodificar = vi.fn();
+    render(
+      <CatalogoView
+        onNavegarDocumento={onNavegar}
+        onNavegarDecodificador={onDecodificar}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('btn-decodificar-NG_111-3.0.0')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId('btn-decodificar-NG_111-3.0.0'));
+    expect(onDecodificar).toHaveBeenCalledWith('NG_111');
+  });
 });

@@ -5,6 +5,7 @@ import { BadgeStatus } from './BadgeStatus';
 
 interface CatalogoViewProps {
   onNavegarDocumento: (codigo: string, versao?: string) => void;
+  onNavegarDecodificador?: (codigo: string) => void;
 }
 
 const NOMES_ASSUNTOS: Record<string, string> = {
@@ -13,7 +14,10 @@ const NOMES_ASSUNTOS: Record<string, string> = {
   locacao: 'Locação de Espaço de Coworking'
 };
 
-export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento }) => {
+export const CatalogoView: React.FC<CatalogoViewProps> = ({
+  onNavegarDocumento,
+  onNavegarDecodificador
+}) => {
   const [documentos, setDocumentos] = useState<DocumentoResumo[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -204,6 +208,18 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento }
                         >
                           Ler Documento
                         </button>
+                        {onNavegarDecodificador && (
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-secondary"
+                            style={{ marginLeft: '0.4rem' }}
+                            onClick={() => onNavegarDecodificador(doc.codigo)}
+                            data-testid={`btn-decodificar-${doc.codigo}-${doc.versao}`}
+                            title={`Decodificar metadados de ${doc.codigo}`}
+                          >
+                            Decodificar
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}

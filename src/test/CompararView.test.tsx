@@ -16,10 +16,8 @@ describe('CompararView', () => {
 
     await waitFor(() => {
       expect(screen.getByText('O Que Mudou entre Versões')).toBeInTheDocument();
+      expect(screen.getByText(/Resumo Executivo das Alterações \(NG_111\)/i)).toBeInTheDocument();
     });
-
-    // Resumo executivo
-    expect(screen.getByText(/Resumo Executivo das Alterações \(NG_111\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(/Antecedência mínima para solicitação de férias passou de 30 para 45 dias corridos/i)
     ).toBeInTheDocument();

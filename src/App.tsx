@@ -9,6 +9,7 @@ import { SimularView } from './components/SimularView';
 import { GrafoView } from './components/GrafoView';
 import { CompararView } from './components/CompararView';
 import { RelatorioView } from './components/RelatorioView';
+import { DecodificadorView } from './components/DecodificadorView';
 import './App.css';
 
 export function App() {
@@ -22,6 +23,7 @@ export function App() {
 
   // Estados de controle para atalhos da demo
   const [perspectivaSelecionada, setPerspectivaSelecionada] = useState<string>('pessoas');
+  const [codigoParaDecodificar, setCodigoParaDecodificar] = useState<string>('PX_1111-001');
 
   const handleNavegarDocumento = (codigo: string, versao?: string, secaoId?: string) => {
     setAbaAnterior(abaAtiva === 'documento' ? abaAnterior : abaAtiva);
@@ -29,6 +31,11 @@ export function App() {
     setDocVersao(versao);
     setSecaoDestacada(secaoId);
     setAbaAtiva('documento');
+  };
+
+  const handleNavegarDecodificador = (codigo: string) => {
+    setCodigoParaDecodificar(codigo);
+    setAbaAtiva('decodificador');
   };
 
   const handleVoltar = () => {
@@ -119,8 +126,18 @@ export function App() {
           <PerguntarView onNavegarDocumento={handleNavegarDocumento} />
         )}
 
+        {abaAtiva === 'decodificador' && (
+          <DecodificadorView
+            onNavegarDocumento={handleNavegarDocumento}
+            codigoInicial={codigoParaDecodificar}
+          />
+        )}
+
         {abaAtiva === 'catalogo' && (
-          <CatalogoView onNavegarDocumento={handleNavegarDocumento} />
+          <CatalogoView
+            onNavegarDocumento={handleNavegarDocumento}
+            onNavegarDecodificador={handleNavegarDecodificador}
+          />
         )}
 
         {abaAtiva === 'documento' && (
