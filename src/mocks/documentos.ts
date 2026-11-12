@@ -45,6 +45,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         texto: 'A solicitação formal é feita via Portal Raiz (FM_1111-001) com antecedência mínima de 45 dias corridos em relação à data de início do gozo. Solicitação com menos de 45 dias só é aceita por decisão expressa do diretor da área.'
       },
       {
+        id: '4.3.1',
+        titulo: 'Solicitação Formal (Antecedência 45 dias)',
+        texto: 'A antecedência mínima para solicitação de férias é de 45 (quarenta e cinco) dias corridos do início de gozo no Portal Raiz (FM_1111-001). Solicitações com prazo inferior exigem aprovação expressa do diretor da área.'
+      },
+      {
         id: '4.4',
         titulo: 'Fracionamento',
         texto: 'As férias podem ser divididas em até 3 períodos. Um dos períodos deve ter no mínimo 14 dias corridos; os demais, no mínimo 5 dias corridos cada.'
@@ -336,8 +341,8 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
       },
       {
         id: 'Apêndice B',
-        titulo: 'Tabela de Encargos e Alçadas',
-        texto: 'Fiscal técnico: GOC, com prazo de 5 dias úteis para ateste. Vistoria final agendada para 25/11/2026.'
+        titulo: 'Tabela de Encargos, Alçadas e Penalidades',
+        texto: 'Multa por inexecução contratual: 5% × R$ 18.250,00 = R$ 912,50. Multa por rescisão até 90º dia: R$ 3.650,00. Fiscal técnico: GOC, com prazo de 5 dias úteis para ateste. Vistoria final agendada para 25/11/2026.'
       }
     ]
   },

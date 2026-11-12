@@ -59,3 +59,119 @@ export interface CodigoInfo {
   existe_no_acervo: boolean;
   observacao: string;
 }
+
+// ==========================================
+// Tipos de Inteligência (Issue #3 / Adendo v0.1)
+// ==========================================
+
+export interface FonteCita {
+  codigo: string;
+  versao: string;
+  secao: string;
+  trecho: string;
+}
+
+export interface DestaqueItem {
+  titulo: string;
+  valor: string;
+  fonte: FonteCita;
+  fonte_anterior?: FonteCita;
+  aviso?: string;
+}
+
+export interface ValorItem {
+  rotulo: string;
+  numero: number;
+  unidade: string;
+  fonte: FonteCita;
+}
+
+export interface PrazoItem {
+  data: string;
+  evento: string;
+  marco?: string | null;
+  cenario?: string | null;
+  fonte: FonteCita;
+}
+
+export interface ResponsavelItem {
+  papel: string;
+  responsabilidade: string;
+  fonte: FonteCita;
+}
+
+export interface RiscoItem {
+  descricao: string;
+  fonte: FonteCita;
+}
+
+export interface PerspectivaResumo {
+  id: string;
+  nome: string;
+}
+
+export interface PerspectivaDetalhe {
+  id: string;
+  nome: string;
+  destaques: DestaqueItem[];
+  valores: ValorItem[];
+  prazos: PrazoItem[];
+  responsaveis: ResponsavelItem[];
+  riscos: RiscoItem[];
+}
+
+export interface GrafoNo {
+  id: string;
+  codigo: string;
+  tipo: string;
+  versao: string;
+  substituido: boolean;
+  existe_no_acervo: boolean;
+}
+
+export type GrafoArestaTipo = 'vinculado_a' | 'referencia' | 'substitui';
+
+export interface GrafoAresta {
+  de: string;
+  para: string;
+  tipo: GrafoArestaTipo;
+}
+
+export interface GrafoAcervo {
+  nos: GrafoNo[];
+  arestas: GrafoAresta[];
+}
+
+export type TipoMudanca = 'alterado' | 'incluido' | 'removido';
+
+export interface MudancaSecao {
+  secao: string;
+  tipo: TipoMudanca;
+  antes?: string;
+  depois?: string;
+}
+
+export interface CompararResultado {
+  codigo: string;
+  de: string;
+  para: string;
+  mudancas: MudancaSecao[];
+  resumo: string[];
+}
+
+export interface RelatorioItem {
+  texto: string;
+  fonte: FonteCita;
+}
+
+export interface RelatorioSecao {
+  titulo: string;
+  itens: RelatorioItem[];
+}
+
+export interface RelatorioExecutivo {
+  titulo: string;
+  gerado_em: string;
+  secoes: RelatorioSecao[];
+}
+
