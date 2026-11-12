@@ -41,20 +41,4 @@ describe('GrafoView', () => {
     fireEvent.click(btnLeitor);
     expect(onNavegar).toHaveBeenCalledWith('CTR_2026-012', '1.0.0');
   });
-
-  it('permite alternar para a tabela acessível do acervo', async () => {
-    const onNavegar = vi.fn();
-    render(<GrafoView onNavegarDocumento={onNavegar} />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('btn-toggle-modo-acessivel')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByTestId('btn-toggle-modo-acessivel'));
-
-    const tabela = screen.getByTestId('grafo-tabela-acessivel');
-    expect(tabela).toBeInTheDocument();
-    expect(tabela).toHaveTextContent('NG_111');
-    expect(tabela).toHaveTextContent('CTR_2026-012');
-  });
 });

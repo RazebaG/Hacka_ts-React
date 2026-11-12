@@ -152,8 +152,7 @@ const AJUDA: Partial<Record<string, string[]>> = {
     'O texto antigo aparece primeiro e o novo logo abaixo.'
   ],
   grafo: [
-    'Este desenho mostra quais documentos dependem de outros.',
-    'Prefere uma lista? Toque em “Ver como tabela”.'
+    'Este desenho mostra quais documentos dependem de outros.'
   ],
   relatorio: [
     'Monte um resumo para levar a uma reunião.',

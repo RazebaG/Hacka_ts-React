@@ -63,7 +63,6 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'vigente' | 'substituido'>('todos');
   const [termoBusca, setTermoBusca] = useState<string>('');
-  const [modoAcessivel, setModoAcessivel] = useState<boolean>(false);
 
   useEffect(() => {
     let ativo = true;
@@ -164,7 +163,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
     <div className="view-container grafo-view" data-testid="grafo-view">
       <CabecalhoTela
         titulo="Ligações entre Documentos"
-        descricao="Conexões e dependências entre normas, contratos e notas técnicas do acervo. Prefere uma lista? Use “Ver como tabela”."
+        descricao="Conexões e dependências entre normas, contratos e notas técnicas do acervo."
         acoes={
           <button type="button" className="btn btn-outline btn-sm" onClick={() => { setTermoBusca(''); setFiltroTipo('todos'); setFiltroStatus('todos'); }}>
             <Icon nome="atualizar" tamanho={16} /> Limpar filtros
@@ -199,101 +198,83 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
         </div>
       </div>
 
-      {/* Barra de Filtros e Ferramentas */}
-      <div className="grafo-toolbar" role="search" aria-label="Filtros do Mapa">
-        <div className="toolbar-campo">
-          <label htmlFor="busca-grafo">Buscar:</label>
+      {/* Barra de filtros: mesmo padrão de Documentos e Regras que mudaram */}
+      <div className="fg-card fg-barra-filtros" role="search" aria-label="Filtros do mapa">
+        <label className="fg-busca" htmlFor="busca-grafo">
+          <Icon nome="busca" tamanho={18} />
+          <span className="sr-only">Buscar documento</span>
           <input
             id="busca-grafo"
             type="search"
-            className="input-busca-small"
-            placeholder="Ex.: NG_111, CTR, 3.0.0..."
+            placeholder="Buscar norma ou código, ex.: NG_111"
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
             data-testid="input-busca-grafo"
           />
-        </div>
+        </label>
 
-        <div className="toolbar-campo">
-          <label htmlFor="filtro-tipo-grafo">Tipo:</label>
-          <select
-            id="filtro-tipo-grafo"
-            className="select-small"
-            value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value)}
-            data-testid="select-tipo-grafo"
-          >
-            <option value="todos">Todos os Tipos</option>
-            <option value="NG">NG — Normas Gerais</option>
-            <option value="PX">PX — Procedimentos</option>
-            <option value="FM">FM — Formulários</option>
-            <option value="TB">TB — Tabelas</option>
-            <option value="FL">FL — Fluxogramas</option>
-            <option value="CTR">CTR — Contratos</option>
-            <option value="NT">NT — Notas Técnicas</option>
-            <option value="RG">RG — Resoluções/Regulamentos</option>
-          </select>
-        </div>
+        <label htmlFor="filtro-tipo-grafo" className="sr-only">
+          Tipo de documento
+        </label>
+        <select id="filtro-tipo-grafo" className="fg-select" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)} data-testid="select-tipo-grafo">
+          <option value="todos">Tipo: Todos</option>
+          <option value="NG">Tipo: Normas gerais (NG)</option>
+          <option value="PX">Tipo: Procedimentos (PX)</option>
+          <option value="FM">Tipo: Formulários (FM)</option>
+          <option value="TB">Tipo: Tabelas (TB)</option>
+          <option value="FL">Tipo: Fluxogramas (FL)</option>
+          <option value="CTR">Tipo: Contratos (CTR)</option>
+          <option value="NT">Tipo: Notas técnicas (NT)</option>
+          <option value="RG">Tipo: Regulamentos (RG)</option>
+        </select>
 
-        <div className="toolbar-campo">
-          <label htmlFor="filtro-status-grafo">Vigência:</label>
-          <select
-            id="filtro-status-grafo"
-            className="select-small"
-            value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value as any)}
-            data-testid="select-status-grafo"
-          >
-            <option value="todos">Todas as Versões</option>
-            <option value="vigente">Apenas Vigentes</option>
-            <option value="substituido">Apenas Substituídas</option>
-          </select>
-        </div>
+        <label htmlFor="filtro-status-grafo" className="sr-only">
+          Vigência
+        </label>
+        <select
+          id="filtro-status-grafo"
+          className="fg-select"
+          value={filtroStatus}
+          onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'vigente' | 'substituido')}
+          data-testid="select-status-grafo"
+        >
+          <option value="todos">Vigência: Todas as versões</option>
+          <option value="vigente">Vigência: Só vigentes</option>
+          <option value="substituido">Vigência: Só versões antigas</option>
+        </select>
 
-        <div className="toolbar-toggle">
-          <button
-            type="button"
-            className="btn btn-outline btn-sm"
-            onClick={() => setModoAcessivel(!modoAcessivel)}
-            data-testid="btn-toggle-modo-acessivel"
-          >
-            <Icon nome={modoAcessivel ? 'mapa' : 'tabela'} tamanho={16} />
-            {modoAcessivel ? 'Ver grafo' : 'Ver como tabela'}
-          </button>
-        </div>
       </div>
 
       {/* Legenda do Mapa */}
       <div className="grafo-legenda" aria-label="Legenda das relações e convenções visuais">
         <div className="legenda-grupo">
-          <span className="legenda-titulo">Conexões:</span>
+          <span className="legenda-titulo">Ligações</span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-vinculado"></span> Vinculado a (subordinação)
+            <span className="linha-legenda linha-vinculado"></span> Segue outro documento
           </span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-referencia"></span> Referência / Citação
+            <span className="linha-legenda linha-referencia"></span> Cita outro documento
           </span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-substitui"></span> Substitui (linha temporal)
+            <span className="linha-legenda linha-substitui"></span> Substitui a versão anterior
           </span>
         </div>
         <div className="legenda-grupo">
-          <span className="legenda-titulo">Convenções:</span>
+          <span className="legenda-titulo">Documentos</span>
           <span className="legenda-item">
-            <span className="amostra-no no-vigente"></span> Vigente no Acervo
+            <span className="amostra-no no-vigente"></span> Vigente
           </span>
           <span className="legenda-item">
-            <span className="amostra-no no-substituido"></span> Versão Substituída (Tracejado)
+            <span className="amostra-no no-substituido"></span> Versão antiga (tracejado)
           </span>
           <span className="legenda-item">
-            <span className="amostra-no no-externo"></span> Doc. Fora do Acervo (Externo)
+            <span className="amostra-no no-externo"></span> Fora do acervo
           </span>
         </div>
       </div>
 
       <div className="grafo-layout-grid">
         {/* Painel Central: Grafo SVG Interativo */}
-        {!modoAcessivel ? (
           <div className="grafo-canvas-container" data-testid="grafo-canvas">
             <svg
               className="grafo-svg"
@@ -497,60 +478,6 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
               </g>
             </svg>
           </div>
-        ) : (
-          /* MODO TABELA ACESSÍVEL */
-          <div className="grafo-tabela-acessivel" data-testid="grafo-tabela-acessivel">
-            <table className="tabela-dados">
-              <caption className="sr-only">Relações documentais do acervo da ACME</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Código</th>
-                  <th scope="col">Tipo</th>
-                  <th scope="col">Versão</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Disponibilidade</th>
-                  <th scope="col">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {nosFiltrados.map((no) => (
-                  <tr
-                    key={no.id}
-                    className={no.id === noSelecionadoId ? 'linha-selecionada' : ''}
-                    onClick={() => setNoSelecionadoId(no.id)}
-                  >
-                    <td>
-                      <strong>{no.codigo}</strong>
-                    </td>
-                    <td>{no.tipo}</td>
-                    <td>{no.versao ? `v${no.versao}` : '—'}</td>
-                    <td>
-                      {no.substituido ? (
-                        <span className="badge-status-substituido">Substituído</span>
-                      ) : (
-                        <span className="badge-status-vigente">Vigente</span>
-                      )}
-                    </td>
-                    <td>{no.existe_no_acervo ? 'No Acervo' : 'Referência Externa'}</td>
-                    <td>
-                      {no.existe_no_acervo ? (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline"
-                          onClick={() => handleAbrirLeitor(no)}
-                        >
-                          Ler
-                        </button>
-                      ) : (
-                        <span className="text-muted">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
         {/* Painel Lateral: Detalhes do Nó Selecionado */}
         <aside

@@ -1649,12 +1649,6 @@ h3,
 }
 .grafo-canvas-container,
 .grafo-painel-detalhes,
-.grafo-tabela-acessivel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--fg-card-radius);
-  box-shadow: var(--fg-card-shadow);
-}
 .grafo-canvas-container {
   background: #f7f9fd;
 }
@@ -2579,4 +2573,92 @@ h3,
 .app-main .coluna-fonte h2,
 .app-main .coluna-fonte h3 {
   font-family: var(--font-titulo) !important;
+}
+
+/* Ligações: legenda no mesmo padrão de rótulos */
+.grafo-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+}
+.legenda-grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  color: #334155;
+}
+.legenda-titulo {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-cinza);
+}
+.legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fg-barra-filtros .fg-busca {
+  flex: 1 1 200px;
+}
+.fg-barra-filtros .fg-select {
+  max-width: 260px;
+}
+
+/* Ligações: tabela no padrão da tabela de Documentos */
+.fg-tabela tr.linha-selecionada td {
+  background: var(--fg-azul-suave);
+}
+.fg-tabela tr.linha-selecionada td:first-child {
+  box-shadow: inset 3px 0 0 var(--fg-azul);
+}
+.fg-codigo,
+.fg-tabela .col-versao {
+  white-space: nowrap;
+}
+
+/* Topo em tela estreita: no máximo duas linhas, sem avatar sozinho */
+@media (max-width: 860px) {
+  .avatar-topo {
+    display: none;
+  }
+  .app-topbar .topbar-actions {
+    gap: var(--space-2);
+  }
+  .perfil-topo select {
+    max-width: 190px;
+  }
+}
+@media (max-width: 520px) {
+  .demo-menu .demo-label {
+    display: none;
+  }
+}
+
+/* Busca: o destaque de foco vale para a caixa inteira (ícone + campo),
+ * não só para o campo de texto dentro dela. */
+.fg-busca input,
+.fg-busca input:focus,
+.fg-busca input:focus-visible,
+.fg-busca textarea,
+.fg-busca textarea:focus,
+.fg-busca textarea:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0;
+  background: transparent;
+}
+.fg-busca {
+  cursor: text;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.fg-busca:focus-within {
+  border-color: var(--fg-azul);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus-ring, var(--fg-azul-suave));
+  color: var(--fg-azul);
 }
