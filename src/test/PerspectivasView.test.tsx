@@ -98,4 +98,18 @@ describe('PerspectivasView', () => {
     expect(screen.getByText('Riscos Normativos e Pontos de Atenção')).toBeInTheDocument();
     expect(screen.getByText(/Inexecução contratual acarreta multa compensatória/i)).toBeInTheDocument();
   });
+
+  it('renderiza o selo NG_012 "citada, não está no acervo" ao lado da alçada no painel Financeiro', async () => {
+    const onNavegar = vi.fn();
+    render(<PerspectivasView onNavegarDocumento={onNavegar} perspectivaInicial="financeiro" />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alçada decisória de contratação')).toBeInTheDocument();
+    });
+
+    const seloNG012 = screen.getByTestId('selo-referencia-ausente-ng012');
+    expect(seloNG012).toBeInTheDocument();
+    expect(seloNG012).toHaveTextContent(/citada, não está no acervo/i);
+  });
 });
+

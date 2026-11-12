@@ -9,7 +9,11 @@ import {
   PerspectivaResumo,
   RelatorioExecutivo,
   RespostaPerguntar,
-  SaudeResponse
+  SaudeResponse,
+  RadarResponse,
+  RegraItem,
+  SimularRequest,
+  SimularResponse
 } from './types';
 import { getDocumentoByCodigo, getResumoDocumentos } from '../mocks/documentos';
 import { mockPerguntar } from '../mocks/perguntas';
@@ -22,6 +26,8 @@ import {
   MOCK_PERSPECTIVAS_DETALHE,
   MOCK_RELATORIOS
 } from '../mocks/inteligencia';
+import { getRadarMock } from '../mocks/radar';
+import { MOCK_REGRAS, mockSimular } from '../mocks/simular';
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 
@@ -221,4 +227,48 @@ export async function fetchRelatorio(params: {
   }
   return res.json();
 }
+
+export async function fetchRadar(perspectiva?: string): Promise<RadarResponse> {
+  if (isMockMode()) {
+    return Promise.resolve(getRadarMock(perspectiva));
+  }
+  const query =
+    perspectiva && perspectiva !== 'todos'
+      ? `?perspectiva=${encodeURIComponent(perspectiva)}`
+      : '';
+  const res = await fetch(`${API_BASE_URL}/api/radar${query}`);
+  if (!res.ok) {
+    throw new Error(`Falha ao consultar radar de contradições (${res.status} ${res.statusText})`);
+  }
+  return res.json();
+}
+
+export async function fetchRegras(): Promise<RegraItem[]> {
+  if (isMockMode()) {
+    return Promise.resolve(MOCK_REGRAS);
+  }
+  const res = await fetch(`${API_BASE_URL}/api/regras`);
+  if (!res.ok) {
+    throw new Error(`Falha ao carregar regras (${res.status} ${res.statusText})`);
+  }
+  return res.json();
+}
+
+export async function postSimular(dados: SimularRequest): Promise<SimularResponse> {
+  if (isMockMode()) {
+    return Promise.resolve(mockSimular(dados));
+  }
+  const res = await fetch(`${API_BASE_URL}/api/simular`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(dados)
+  });
+  if (!res.ok) {
+    throw new Error(`Falha ao simular regra (${res.status} ${res.statusText})`);
+  }
+  return res.json();
+}
+
 

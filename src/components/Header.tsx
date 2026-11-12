@@ -3,6 +3,8 @@ import { isMockMode, getApiBaseUrl } from '../api/client';
 
 export type AbaAtiva =
   | 'perspectivas'
+  | 'radar'
+  | 'simular'
   | 'grafo'
   | 'comparar'
   | 'relatorio'
@@ -70,6 +72,26 @@ export const Header: React.FC<HeaderProps> = ({
           data-testid="tab-perspectivas"
         >
           Perspectivas
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={abaAtiva === 'radar'}
+          className={`nav-tab ${abaAtiva === 'radar' ? 'active' : ''}`}
+          onClick={() => onSelecionarAba('radar')}
+          data-testid="tab-radar"
+        >
+          Radar de Contradições
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={abaAtiva === 'simular'}
+          className={`nav-tab ${abaAtiva === 'simular' ? 'active' : ''}`}
+          onClick={() => onSelecionarAba('simular')}
+          data-testid="tab-simular"
+        >
+          E se? (Simulação)
         </button>
         <button
           type="button"

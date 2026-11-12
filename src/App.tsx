@@ -4,6 +4,8 @@ import { PerguntarView } from './components/PerguntarView';
 import { CatalogoView } from './components/CatalogoView';
 import { DocumentoView } from './components/DocumentoView';
 import { PerspectivasView } from './components/PerspectivasView';
+import { RadarView } from './components/RadarView';
+import { SimularView } from './components/SimularView';
 import { GrafoView } from './components/GrafoView';
 import { CompararView } from './components/CompararView';
 import { RelatorioView } from './components/RelatorioView';
@@ -84,6 +86,20 @@ export function App() {
           <PerspectivasView
             onNavegarDocumento={handleNavegarDocumento}
             perspectivaInicial={perspectivaSelecionada}
+          />
+        )}
+
+        {abaAtiva === 'radar' && (
+          <RadarView
+            onNavegarDocumento={handleNavegarDocumento}
+            onNavegarSimular={() => setAbaAtiva('simular')}
+          />
+        )}
+
+        {abaAtiva === 'simular' && (
+          <SimularView
+            onNavegarDocumento={handleNavegarDocumento}
+            onNavegarRadar={() => setAbaAtiva('radar')}
           />
         )}
 

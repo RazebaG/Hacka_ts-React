@@ -175,3 +175,79 @@ export interface RelatorioExecutivo {
   secoes: RelatorioSecao[];
 }
 
+// ==========================================
+// Tipos de Radar e Simulação (Adendo v0.2 / Issue #5)
+// ==========================================
+
+export type RadarItemTipo = 'versao_substituida' | 'referencia_ausente';
+export type RadarItemStatus = 'divergente' | 'atencao';
+export type RadarItemSeveridade = 'alta' | 'media' | 'baixa';
+
+export interface RadarItem {
+  id: string;
+  tipo: RadarItemTipo;
+  status: RadarItemStatus;
+  severidade: RadarItemSeveridade;
+  titulo: string;
+  explicacao: string;
+  perspectivas: string[];
+  codigo_ausente: string | null;
+  citado_por?: string[];
+  fontes: FonteCita[];
+}
+
+export interface RadarResumo {
+  divergente: number;
+  atencao: number;
+}
+
+export interface RadarResponse {
+  gerado_em: string;
+  resumo: RadarResumo;
+  itens: RadarItem[];
+}
+
+export interface RegraItem {
+  id: string;
+  rotulo: string;
+  valor: number;
+  unidade: string;
+  fonte: FonteCita;
+}
+
+export interface SimularRequest {
+  regra: string;
+  novo_valor: number;
+  cenario?: string;
+}
+
+export interface MarcoLinhaDoTempo {
+  marco: string;
+  antes: string;
+  depois: string;
+  muda: boolean;
+  fonte: FonteCita;
+}
+
+export type TipoImpacto = 'conflito_interno' | 'revisar_documento';
+
+export interface ImpactoSimulacao {
+  tipo: TipoImpacto;
+  descricao: string;
+  codigo?: string;
+  versao?: string;
+  fontes: FonteCita[];
+}
+
+export interface SimularResponse {
+  regra: string;
+  valor_atual: number;
+  novo_valor: number;
+  unidade: string;
+  linha_do_tempo: MarcoLinhaDoTempo[];
+  impactos: ImpactoSimulacao[];
+  resumo: string[];
+  aviso: string;
+}
+
+

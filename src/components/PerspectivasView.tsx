@@ -162,6 +162,9 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
             <div className="destaques-grid">
               {detalhe.destaques.map((item, idx) => {
                 const temAlertaVersao = Boolean(item.aviso || item.fonte_anterior);
+                const isAlcadaNG012 =
+                  (detalhe.id === 'financeiro' && item.titulo.toLowerCase().includes('alçada')) ||
+                  item.valor.includes('NG_012');
                 return (
                   <article
                     key={idx}
@@ -173,6 +176,14 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                       {temAlertaVersao && (
                         <span className="badge-aviso-versao" data-testid="badge-aviso-versao">
                           ⚠️ {item.aviso || 'Versão Anterior Divergente'}
+                        </span>
+                      )}
+                      {isAlcadaNG012 && (
+                        <span
+                          className="badge-referencia-ausente"
+                          data-testid="selo-referencia-ausente-ng012"
+                        >
+                          citada, não está no acervo
                         </span>
                       )}
                     </div>
