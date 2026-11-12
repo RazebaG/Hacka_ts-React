@@ -13,7 +13,7 @@ export const EXEMPLOS_PERGUNTAS: ExemploPergunta[] = [
     pergunta: 'Qual a antecedência mínima para solicitar férias?',
     descricao: 'Demonstra citação da versão vigente e aviso de norma substituída',
     resposta: {
-      resposta: 'Conforme a norma vigente NG_111 versão 3.0.0 (item 4.3.1), a solicitação formal de férias deve ser registrada com antecedência mínima de 45 (quarenta e cinco) dias corridos em relação ao início do gozo. Solicitações com prazo inferior somente podem ser autorizadas por decisão excepcional do Diretor da área.',
+      resposta: 'Conforme a norma vigente NG_111 versão 3.0.0 (item 4.3.1), a solicitação formal de férias deve ser registrada com antecedência mínima de 45 (quarenta e cinco) dias corridos em relação ao primeiro dia de férias. Solicitações com prazo inferior somente podem ser autorizadas por decisão excepcional do Diretor da área.',
       consta: true,
       citacoes: [
         {
@@ -50,14 +50,14 @@ export const EXEMPLOS_PERGUNTAS: ExemploPergunta[] = [
     pergunta: 'Qual o valor global do contrato de coworking e a multa por inexecução?',
     descricao: 'Demonstra extração de valores e multas com múltiplas citações (painel financeiro)',
     resposta: {
-      resposta: 'O valor global do contrato de locação de coworking (CTR_2026-012) é de R$ 18.250,00, dividido em 12 parcelas mensais de R$ 1.520,83. A penalidade por descumprimento total ou rescisão injustificada é de 5% sobre o valor global, totalizando R$ 912,50.',
+      resposta: 'O valor global do contrato de locação de coworking (CTR_2026-012) é de R$ 18.250,00, pago em 5 aluguéis mensais de R$ 3.650,00. A penalidade por descumprimento total ou rescisão injustificada é de 5% sobre o valor global, totalizando R$ 912,50.',
       consta: true,
       citacoes: [
         {
           codigo: 'CTR_2026-012',
           versao: '1.0.0',
           secao: 'Cláusula Sétima',
-          trecho: 'O valor global estimado do presente instrumento é de R$ 18.250,00 (dezoito mil duzentos e cinquenta reais), correspondendo a 12 parcelas mensais de R$ 1.520,83.'
+          trecho: 'O aluguel mensal é de R$ 3.650,00, perfazendo o valor global de R$ 18.250,00 para os 5 meses de vigência.'
         },
         {
           codigo: 'CTR_2026-012',

@@ -8,7 +8,7 @@ describe('GrafoView', () => {
     render(<GrafoView onNavegarDocumento={onNavegar} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Mapa do Acervo de Normas')).toBeInTheDocument();
+      expect(screen.getByText('Como os documentos se ligam')).toBeInTheDocument();
     });
 
     expect(screen.getByTestId('grafo-canvas')).toBeInTheDocument();

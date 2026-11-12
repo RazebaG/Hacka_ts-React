@@ -9,7 +9,7 @@ describe('PerspectivasView', () => {
 
     // Aguarda carregar
     await waitFor(() => {
-      expect(screen.getByText('Painéis por Perspectiva')).toBeInTheDocument();
+      expect(screen.getByText('O que cada área precisa saber')).toBeInTheDocument();
     });
 
     // Hook da Cena 1: Antecedência mínima 45 dias
@@ -89,13 +89,13 @@ describe('PerspectivasView', () => {
     render(<PerspectivasView onNavegarDocumento={onNavegar} perspectivaInicial="financeiro" />);
 
     await waitFor(() => {
-      expect(screen.getByText('Matriz de Responsáveis e Competências')).toBeInTheDocument();
+      expect(screen.getByText('Quem faz o quê')).toBeInTheDocument();
     });
 
     expect(screen.getByText('GOC')).toBeInTheDocument();
     expect(screen.getByText(/Fiscal técnico do contrato/i)).toBeInTheDocument();
 
-    expect(screen.getByText('Riscos Normativos e Pontos de Atenção')).toBeInTheDocument();
+    expect(screen.getByText('Cuidados e riscos')).toBeInTheDocument();
     expect(screen.getByText(/Inexecução contratual acarreta multa compensatória/i)).toBeInTheDocument();
   });
 });

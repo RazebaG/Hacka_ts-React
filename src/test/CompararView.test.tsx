@@ -15,11 +15,11 @@ describe('CompararView', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('O Que Mudou entre Versões')).toBeInTheDocument();
+      expect(screen.getByText('O que mudou de uma versão para outra')).toBeInTheDocument();
     });
 
     // Resumo executivo
-    expect(screen.getByText(/Resumo Executivo das Alterações \(NG_111\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Resumo das mudanças \(NG_111\)/i)).toBeInTheDocument();
     expect(
       screen.getByText(/Antecedência mínima para solicitação de férias passou de 30 para 45 dias corridos/i)
     ).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe('CompararView', () => {
     fireEvent.click(screen.getByTestId('btn-comparar-FM_1111-001'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Resumo Executivo das Alterações \(FM_1111-001\)/i)).toBeInTheDocument();
+      expect(screen.getByText(/Resumo das mudanças \(FM_1111-001\)/i)).toBeInTheDocument();
     });
 
     expect(screen.getByText(/Inclusão do campo obrigatório de autorização da diretoria/i)).toBeInTheDocument();

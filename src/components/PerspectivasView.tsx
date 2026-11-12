@@ -1,18 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { FonteCita, PerspectivaDetalhe, PerspectivaResumo } from '../api/types';
 import { fetchPerspectivaDetalhe, fetchPerspectivas } from '../api/client';
+import { Icon, NomeIcone } from '../ui/Icon';
+import { navegar, url } from '../app/rotas';
+import { TEMAS, temaDe, DATA_REFERENCIA } from '../mocks/v2';
+import { IncluirRelatorio, ProximaAcao, SemQuebra } from '../ui/componentes';
+
+const PRAZOS: [string, string][] = [
+  ['30', 'Próximos 30 dias'],
+  ['90', 'Próximos 90 dias'],
+  ['180', 'Próximos 180 dias'],
+  ['vencidos', 'Vencidos']
+];
+const REF = Date.parse(DATA_REFERENCIA);
+const dentroDoPrazo = (dataIso: string, prazo: string) => {
+  if (!prazo) return true;
+  const t = Date.parse(dataIso);
+  if (Number.isNaN(t)) return false;
+  const dias = (t - REF) / 864e5;
+  return prazo === 'vencidos' ? dias < 0 : dias >= 0 && dias <= Number(prazo);
+};
+const dataBR = (iso: string) => (/^\d{4}-\d{2}-\d{2}$/.test(iso) ? iso.split('-').reverse().join('/') : iso);
+
+const ICONE_PERSPECTIVA: Record<string, NomeIcone> = {
+  pessoas: 'pessoas',
+  financeiro: 'financeiro',
+  juridico: 'juridico',
+  gestao: 'gestao'
+};
 
 interface PerspectivasViewProps {
   onNavegarDocumento: (codigo: string, versao?: string, secaoId?: string) => void;
   perspectivaInicial?: string;
+  /** Filtros do fluxo v2 (RF37), feitos só no frontend. */
+  tema?: string;
+  prazo?: string;
 }
 
 export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
   onNavegarDocumento,
-  perspectivaInicial = 'pessoas'
+  perspectivaInicial = 'pessoas',
+  tema = '',
+  prazo = ''
 }) => {
+  const temaOk = (codigo: string) => !tema || temaDe(codigo) === tema;
   const [perspectivas, setPerspectivas] = useState<PerspectivaResumo[]>([]);
   const [perspectivaAtiva, setPerspectivaAtiva] = useState<string>(perspectivaInicial);
+  const filtrar = (novo: { tema?: string; prazo?: string; p?: string }) =>
+    navegar(url.painel(novo.p ?? perspectivaAtiva, { tema: novo.tema ?? tema, prazo: novo.prazo ?? prazo }), true);
   const [detalhe, setDetalhe] = useState<PerspectivaDetalhe | null>(null);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -83,7 +118,7 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
         title={`Abrir ${fonte.codigo} v${fonte.versao} na seção ${fonte.secao}`}
         data-testid={`btn-fonte-${fonte.codigo}-${fonte.secao}`}
       >
-        <span className="fonte-icone">📄</span>
+        <span className="fonte-icone"><Icon nome="arquivo" tamanho={14} /></span>
         <span className="fonte-texto">
           {rotuloExtra && <strong>{rotuloExtra}: </strong>}
           {fonte.codigo} v{fonte.versao} · {fonte.secao}
@@ -96,12 +131,11 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
     <div className="view-container perspectivas-view" data-testid="perspectivas-view">
       <header className="view-header">
         <div className="header-meta">
-          <span className="badge-tag">Inteligência Empresarial</span>
-          <h1 className="view-title">Painéis por Perspectiva</h1>
+          <span className="badge-tag">Resumo por área</span>
+          <h1 className="view-title">O que cada área precisa saber</h1>
         </div>
         <p className="view-description">
-          Síntese executiva extraída do acervo normativo: cada número, prazo e alçada
-          é auditável com link direto para o trecho exato na fonte.
+          Escolha a área. Cada número, prazo e responsável mostra de qual documento veio.
         </p>
       </header>
 
@@ -120,13 +154,13 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
               role="tab"
               aria-selected={isAtiva}
               className={`perspectiva-tab-btn ${isAtiva ? 'active' : ''}`}
-              onClick={() => setPerspectivaAtiva(p.id)}
+              onClick={() => {
+                setPerspectivaAtiva(p.id);
+                if (typeof window !== 'undefined' && window.location.pathname.startsWith('/painel')) filtrar({ p: p.id });
+              }}
               data-testid={`tab-perspectiva-${p.id}`}
             >
-              {p.id === 'pessoas' && '👥 '}
-              {p.id === 'financeiro' && '💰 '}
-              {p.id === 'juridico' && '⚖️ '}
-              {p.id === 'gestao' && '🚀 '}
+              <Icon nome={ICONE_PERSPECTIVA[p.id] ?? 'painel'} tamanho={16} />
               {p.nome}
             </button>
           );
@@ -136,7 +170,7 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
       {carregando && (
         <div className="loading-state" data-testid="perspectivas-loading">
           <div className="spinner"></div>
-          <p>Carregando dados da perspectiva...</p>
+          <p>Carregando o resumo da área…</p>
         </div>
       )}
 
@@ -146,21 +180,69 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
         </div>
       )}
 
-      {!carregando && detalhe && (
+      <div className="filtros-linha" role="group" aria-label="Filtros do painel">
+        <label htmlFor="painel-tema">Assunto</label>
+        <select id="painel-tema" value={tema} onChange={(e) => filtrar({ tema: e.target.value })} data-testid="filtro-tema-painel">
+          <option value="">Todos</option>
+          {Object.entries(TEMAS).map(([id, nome]) => (
+            <option key={id} value={id}>
+              {nome}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="painel-prazo">Prazos</label>
+        <select id="painel-prazo" value={prazo} onChange={(e) => filtrar({ prazo: e.target.value })} data-testid="filtro-prazo-painel">
+          <option value="">Qualquer prazo</option>
+          {PRAZOS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
+          ))}
+        </select>
+        <span className="texto-apoio">a partir de {dataBR(DATA_REFERENCIA)}</span>
+        {tema && (
+          <button type="button" className="chip-filtro" onClick={() => filtrar({ tema: '' })} aria-label={`Remover filtro de tema ${TEMAS[tema]}`}>
+            Tema: {TEMAS[tema]} <span aria-hidden="true">×</span>
+          </button>
+        )}
+        {prazo && (
+          <button type="button" className="chip-filtro" onClick={() => filtrar({ prazo: '' })} aria-label="Remover filtro de prazo">
+            Prazo: {PRAZOS.find(([v]) => v === prazo)?.[1]} <span aria-hidden="true">×</span>
+          </button>
+        )}
+      </div>
+
+      {!carregando && detalhe && (() => {
+        const destaques = prazo ? [] : detalhe.destaques.filter((d) => temaOk(d.fonte.codigo));
+        const prazos = detalhe.prazos.filter((p) => temaOk(p.fonte.codigo) && dentroDoPrazo(p.data, prazo));
+        const responsaveis = prazo ? [] : detalhe.responsaveis.filter((r) => temaOk(r.fonte.codigo));
+        const riscos = prazo ? [] : detalhe.riscos.filter((r) => temaOk(r.fonte.codigo));
+        const valores = prazo ? [] : detalhe.valores.filter((v) => temaOk(v.fonte.codigo));
+        if (!destaques.length && !prazos.length && !responsaveis.length && !riscos.length && !valores.length)
+          return (
+            <div className="painel-secao" data-testid="painel-filtro-vazio">
+              <p>Nenhum item neste filtro. Remova um filtro ou amplie o prazo.</p>
+              <button type="button" className="btn btn-outline btn-sm" onClick={() => filtrar({ tema: '', prazo: '' })}>
+                Limpar filtros
+              </button>
+            </div>
+          );
+        return (
         <div className="perspectiva-conteudo" data-testid={`perspectiva-conteudo-${detalhe.id}`}>
           {/* SEÇÃO 1: CARTÕES DE DESTAQUE (Com gancho da versão anterior / Cena 1 e Cena 2) */}
+          {destaques.length > 0 && (
           <section className="painel-secao" aria-labelledby="secao-destaques-titulo">
             <div className="secao-titulo-wrap">
               <h2 id="secao-destaques-titulo" className="secao-titulo">
-                Destaques e Regras Principais
+                Regras principais
               </h2>
               <span className="secao-subtitulo">
-                Marcos normativos com rastreabilidade de versões
+                As regras mais importantes desta área, com a fonte
               </span>
             </div>
 
             <div className="destaques-grid">
-              {detalhe.destaques.map((item, idx) => {
+              {destaques.map((item, idx) => {
                 const temAlertaVersao = Boolean(item.aviso || item.fonte_anterior);
                 return (
                   <article
@@ -172,20 +254,20 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                       <span className="destaque-titulo">{item.titulo}</span>
                       {temAlertaVersao && (
                         <span className="badge-aviso-versao" data-testid="badge-aviso-versao">
-                          ⚠️ {item.aviso || 'Versão Anterior Divergente'}
+                          <Icon nome="alerta" tamanho={14} /> {item.aviso || 'A versão antiga dizia outra coisa'}
                         </span>
                       )}
                     </div>
 
                     <div className="destaque-valor-wrap">
                       <span className="destaque-valor-grande" data-testid="destaque-valor-principal">
-                        {item.valor}
+                        <SemQuebra texto={item.valor} />
                       </span>
                     </div>
 
                     {/* Fonte Vigente */}
                     <div className="destaque-fonte-row">
-                      <span className="fonte-rotulo">Regra Vigente:</span>
+                      <span className="fonte-rotulo">Regra em vigor:</span>
                       {renderBotaoFonte(item.fonte, undefined, 'btn-fonte-vigente')}
                     </div>
 
@@ -196,18 +278,18 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                         data-testid="box-alerta-versao-anterior"
                       >
                         <div className="alerta-versao-header">
-                          <span className="alerta-icone">⚠️</span>
-                          <strong>Armadilha de Versão:</strong>
+                          <span className="alerta-icone"><Icon nome="alerta" tamanho={16} /></span>
+                          <strong>Atenção: esta regra mudou</strong>
                         </div>
                         <p className="alerta-versao-texto">
                           A norma anterior <strong>{item.fonte_anterior.codigo} v{item.fonte_anterior.versao}</strong> previa{' '}
-                          <em>regra diferente</em>. Consultar documentos desatualizados induz a erros em auditorias.
+                          <em>uma regra diferente</em>. Use sempre a versão em vigor.
                         </p>
                         <div className="alerta-versao-acoes">
-                          <span className="fonte-rotulo">Regra Revogada/Substituída:</span>
+                          <span className="fonte-rotulo">Regra antiga:</span>
                           {renderBotaoFonte(
                             item.fonte_anterior,
-                            'Versão Anterior',
+                            'Versão antiga',
                             'btn-fonte-anterior'
                           )}
                         </div>
@@ -218,16 +300,17 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
               })}
             </div>
           </section>
+          )}
 
           {/* SEÇÃO 2: GRÁFICO DE VALORES E ALÇADAS (Acessível) */}
-          {detalhe.valores.length > 0 && (
+          {valores.length > 0 && (
             <section className="painel-secao" aria-labelledby="secao-valores-titulo">
               <div className="secao-titulo-wrap">
                 <h2 id="secao-valores-titulo" className="secao-titulo">
-                  Valores, Alçadas e Penalidades
+                  Valores e multas
                 </h2>
                 <span className="secao-subtitulo">
-                  Gráfico quantitativo de impacto orçamentário e multas com fontes citadas
+                  Valores em reais, com a fonte de cada um
                 </span>
               </div>
 
@@ -237,7 +320,7 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                 aria-label="Gráfico de barras de valores financeiros e penalidades"
               >
                 <div className="barras-lista" role="list">
-                  {detalhe.valores.map((v, i) => {
+                  {valores.map((v, i) => {
                     const percLargura = Math.max(
                       Math.round((v.numero / maiorValorNumerico) * 100),
                       8
@@ -281,7 +364,8 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                 </div>
 
                 {/* Tabela de acessibilidade para leitores de tela */}
-                <table className="sr-only" aria-label="Tabela acessível dos valores do gráfico">
+                <div className="sr-only">
+                <table aria-label="Tabela acessível dos valores do gráfico">
                   <thead>
                     <tr>
                       <th scope="col">Rótulo</th>
@@ -291,7 +375,7 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                     </tr>
                   </thead>
                   <tbody>
-                    {detalhe.valores.map((v, i) => (
+                    {valores.map((v, i) => (
                       <tr key={i}>
                         <td>{v.rotulo}</td>
                         <td>{formatarValorGrafico(v.numero, v.unidade)}</td>
@@ -303,24 +387,25 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </section>
           )}
 
           {/* SEÇÃO 3: LINHA DO TEMPO DE PRAZOS E MARCOS */}
-          {detalhe.prazos.length > 0 && (
+          {prazos.length > 0 && (
             <section className="painel-secao" aria-labelledby="secao-prazos-titulo">
               <div className="secao-titulo-wrap">
                 <h2 id="secao-prazos-titulo" className="secao-titulo">
-                  Linha do Tempo e Marcos Temporais
+                  Prazos em ordem
                 </h2>
                 <span className="secao-subtitulo">
-                  Cronologia de eventos normativos, prazos legais e régua de contagem
+                  Datas de cada etapa, da primeira à última
                 </span>
               </div>
 
               <ol className="timeline-container" data-testid="timeline-prazos">
-                {detalhe.prazos.map((p, idx) => (
+                {prazos.map((p, idx) => (
                   <li
                     key={idx}
                     className="timeline-item"
@@ -342,13 +427,14 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
                           {p.data}
                         </time>
                         {p.cenario && (
-                          <span className="badge-cenario">{p.cenario}</span>
+                          <span className="badge-cenario"><SemQuebra texto={p.cenario} /></span>
                         )}
                       </div>
-                      <h3 className="timeline-evento">{p.evento}</h3>
+                      <h3 className="timeline-evento"><SemQuebra texto={p.evento} /></h3>
                       <div className="timeline-fonte">
                         {renderBotaoFonte(p.fonte)}
                       </div>
+                      <IncluirRelatorio item={{ id: `prazo-${detalhe.id}-${idx}`, texto: `${dataBR(p.data)}: ${p.evento}.`, fonte: p.fonte }} />
                     </div>
                   </li>
                 ))}
@@ -357,19 +443,19 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
           )}
 
           {/* SEÇÃO 4: MATRIZ DE RESPONSÁVEIS */}
-          {detalhe.responsaveis.length > 0 && (
+          {responsaveis.length > 0 && (
             <section className="painel-secao" aria-labelledby="secao-responsaveis-titulo">
               <div className="secao-titulo-wrap">
                 <h2 id="secao-responsaveis-titulo" className="secao-titulo">
-                  Matriz de Responsáveis e Competências
+                  Quem faz o quê
                 </h2>
                 <span className="secao-subtitulo">
-                  Atribuições formais por área, cargo e comitê
+                  Cada área e o que ela precisa fazer
                 </span>
               </div>
 
               <div className="responsaveis-grid">
-                {detalhe.responsaveis.map((r, idx) => (
+                {responsaveis.map((r, idx) => (
                   <div
                     key={idx}
                     className="responsavel-card"
@@ -391,26 +477,26 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
           )}
 
           {/* SEÇÃO 5: RISCOS E DIRETRIZES DE MITIGAÇÃO */}
-          {detalhe.riscos.length > 0 && (
+          {riscos.length > 0 && (
             <section className="painel-secao" aria-labelledby="secao-riscos-titulo">
               <div className="secao-titulo-wrap">
                 <h2 id="secao-riscos-titulo" className="secao-titulo">
-                  Riscos Normativos e Pontos de Atenção
+                  Cuidados e riscos
                 </h2>
                 <span className="secao-subtitulo">
-                  Consequências do descumprimento de prazos e alçadas
+                  O que acontece se um prazo ou uma regra não for cumprido
                 </span>
               </div>
 
               <div className="riscos-lista">
-                {detalhe.riscos.map((risco, idx) => (
+                {riscos.map((risco, idx) => (
                   <div
                     key={idx}
                     className="risco-card"
                     data-testid={`risco-card-${idx}`}
                   >
                     <div className="risco-icone-wrap">
-                      <span className="risco-icone">⚠️</span>
+                      <span className="risco-icone"><Icon nome="alerta" tamanho={18} /></span>
                     </div>
                     <div className="risco-corpo">
                       <p className="risco-descricao">{risco.descricao}</p>
@@ -423,8 +509,18 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
               </div>
             </section>
           )}
+
+          <ProximaAcao>
+            <button type="button" className="btn btn-primary btn-sm" onClick={() => navegar(url.ese('ferias_antecedencia_dias', 30))}>
+              Simular regra
+            </button>
+            <button type="button" className="btn btn-outline btn-sm" onClick={() => navegar(url.relatorio({ perspectiva: detalhe.id }))}>
+              Gerar relatório
+            </button>
+          </ProximaAcao>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

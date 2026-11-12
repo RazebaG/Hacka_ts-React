@@ -36,7 +36,18 @@ export interface RespostaPerguntar {
   avisos: string[];
 }
 
-export type PerfilUsuario = 'empregado' | 'gestor' | 'ggc' | 'gfi' | 'gco' | null;
+/** Perfis do fluxo v2 (C1). ggc/gfi/gco seguem aceitos como apelidos da v0. */
+export type PerfilUsuario =
+  | 'empregado'
+  | 'gestor'
+  | 'diretoria'
+  | 'financeiro'
+  | 'juridico'
+  | 'rh'
+  | 'ggc'
+  | 'gfi'
+  | 'gco'
+  | null;
 
 export interface PerguntaRequest {
   pergunta: string;
@@ -46,6 +57,10 @@ export interface PerguntaRequest {
 export interface SaudeResponse {
   status: string;
   documentos: number;
+  /** Modo de IA (RF22): "bedrock" ou "extrativo". */
+  ia?: string;
+  /** Data de referência do acervo (C4), AAAA-MM-DD. */
+  data_referencia?: string;
 }
 
 export interface CodigoInfo {
@@ -175,3 +190,80 @@ export interface RelatorioExecutivo {
   secoes: RelatorioSecao[];
 }
 
+
+// ==========================================
+// Fluxo de telas v2 (adendos v0.2 e v0.3)
+// ==========================================
+
+/** Camada da norma (C15): grupo do catálogo e pai direto pelo "Vinculado a". */
+export interface Camada {
+  sigla: string;
+  tipo_nome: string;
+  grupo: string;
+  subordinado_a: string | null;
+}
+
+export interface FonteRadar extends FonteCita {
+  situacao: 'vigente' | 'substituida';
+}
+
+export interface RadarItem {
+  id: string;
+  tipo: 'versao_substituida' | 'divergencia' | 'referencia_ausente';
+  severidade: 'divergente' | 'atencao';
+  tema: string[];
+  titulo: string;
+  explicacao: string;
+  fontes: FonteRadar[];
+  codigo_ausente?: string;
+  citado_por?: FonteCita[];
+  precedencia?: FonteCita;
+  proxima_acao: string;
+  responsavel: string;
+  regra_simulavel?: string;
+}
+
+export interface RegraSimulavel {
+  id: string;
+  nome: string;
+  unidade: string;
+  valor_atual: number;
+  minimo: number;
+  maximo: number;
+  fonte: FonteCita;
+}
+
+export interface LinhaTempoSimulada {
+  etapa: string;
+  atual: string;
+  simulado: string;
+  muda: boolean;
+  conflito: boolean;
+}
+
+export interface ImpactoSimulacao {
+  tipo: 'conflito_interno' | 'conflito_aviso' | 'conflito_decisao_gestor' | 'conflito_assinatura' | 'revisar_documento';
+  descricao: string;
+  fonte: FonteCita;
+}
+
+export interface SimulacaoResultado {
+  regra: string;
+  valor: number;
+  exemplo: string;
+  linha_do_tempo: LinhaTempoSimulada[];
+  impactos: ImpactoSimulacao[];
+  resumo: string;
+  aviso: string[];
+  proxima_acao: string;
+}
+
+export interface ArquivoLote {
+  id: string;
+  nome: string;
+  tipo: 'digital' | 'foto' | 'desconhecido';
+  estado: 'enviando' | 'classificado' | 'sem-tema' | 'revisar' | 'publicado' | 'erro';
+  tema: string;
+  motivo: string;
+  erro: string;
+}

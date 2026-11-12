@@ -1,21 +1,33 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { GrafoAcervo, GrafoNo } from '../api/types';
 import { fetchGrafo } from '../api/client';
+import { Icon } from '../ui/Icon';
 
 interface GrafoViewProps {
   onNavegarDocumento: (codigo: string, versao?: string) => void;
 }
 
-// Cores temáticas por tipo documental
-const CORES_POR_TIPO: Record<string, { bg: string; border: string; text: string }> = {
-  NG: { bg: '#dbeafe', border: '#2563eb', text: '#1e3a8a' },
-  PX: { bg: '#dcfce7', border: '#16a34a', text: '#14532d' },
-  FM: { bg: '#f3e8ff', border: '#9333ea', text: '#581c87' },
-  TB: { bg: '#fef3c7', border: '#d97706', text: '#78350f' },
-  FL: { bg: '#cffafe', border: '#0891b2', text: '#164e63' },
-  CTR: { bg: '#ffedd5', border: '#ea580c', text: '#7c2d12' },
-  NT: { bg: '#e0e7ff', border: '#4f46e5', text: '#312e81' },
-  RG: { bg: '#f1f5f9', border: '#475569', text: '#0f172a' }
+// Cor do nó pela camada da norma (grupo do CATÁLOGO), com os tokens da paleta HACKA/TS Azul (src/index.css)
+type EsquemaCor = { bg: string; border: string; text: string };
+const camadaCor = (grupo: string): EsquemaCor => ({
+  bg: `var(--graph-${grupo}-bg)`,
+  border: `var(--graph-${grupo}-border)`,
+  text: `var(--graph-${grupo}-text)`
+});
+const CORES_POR_TIPO: Record<string, EsquemaCor> = {
+  NG: camadaCor('normativo'),
+  PX: camadaCor('normativo'),
+  FM: camadaCor('apoio'),
+  TB: camadaCor('apoio'),
+  FL: camadaCor('apoio'),
+  RG: camadaCor('programa'),
+  CTR: camadaCor('instrumento'),
+  NT: camadaCor('instrumento')
+};
+const COR_AUSENTE: EsquemaCor = {
+  bg: 'var(--color-warning-bg)',
+  border: 'var(--color-warning-text)', // âmbar escuro: o selo com texto branco precisa de 4,5:1
+  text: 'var(--color-warning-text)'
 };
 
 // Coordenadas calculadas para visualização esteticamente equilibrada do acervo
@@ -151,19 +163,19 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
     <div className="view-container grafo-view" data-testid="grafo-view">
       <header className="view-header">
         <div className="header-meta">
-          <span className="badge-tag">Topologia do Acervo</span>
-          <h1 className="view-title">Mapa do Acervo de Normas</h1>
+          <span className="badge-tag">Ligações entre documentos</span>
+          <h1 className="view-title">Como os documentos se ligam</h1>
         </div>
         <p className="view-description">
-          Visualização em grafo das relações de subordinação (vinculado a), citação (referência)
-          e vigência (substitui) entre as normas, procedimentos, contratos e notas técnicas.
+          Cada caixa é um documento. As linhas mostram qual documento segue outro, qual cita outro e
+          qual versão substituiu a anterior. Prefere uma lista? Use “Ver como tabela”.
         </p>
       </header>
 
       {/* Barra de Filtros e Ferramentas */}
       <div className="grafo-toolbar" role="search" aria-label="Filtros do Mapa">
         <div className="toolbar-campo">
-          <label htmlFor="busca-grafo">Buscar Documento:</label>
+          <label htmlFor="busca-grafo">Buscar:</label>
           <input
             id="busca-grafo"
             type="search"
@@ -218,7 +230,8 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
             onClick={() => setModoAcessivel(!modoAcessivel)}
             data-testid="btn-toggle-modo-acessivel"
           >
-            {modoAcessivel ? '👁️ Ver Grafo Visual' : '♿ Ver Tabela Acessível'}
+            <Icon nome={modoAcessivel ? 'mapa' : 'tabela'} tamanho={16} />
+            {modoAcessivel ? 'Ver grafo' : 'Ver como tabela'}
           </button>
         </div>
       </div>
@@ -273,7 +286,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   markerHeight="6"
                   orient="auto-start-reverse"
                 >
-                  <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563eb" />
+                  <path d="M 0 1 L 9 5 L 0 9 z" style={{ fill: 'var(--color-primary)' }} />
                 </marker>
                 <marker
                   id="seta-referencia"
@@ -284,7 +297,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   markerHeight="6"
                   orient="auto-start-reverse"
                 >
-                  <path d="M 0 1 L 9 5 L 0 9 z" fill="#9333ea" />
+                  <path d="M 0 1 L 9 5 L 0 9 z" style={{ fill: 'var(--color-text-muted)' }} />
                 </marker>
                 <marker
                   id="seta-substitui"
@@ -295,7 +308,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   markerHeight="6"
                   orient="auto-start-reverse"
                 >
-                  <path d="M 0 1 L 9 5 L 0 9 z" fill="#dc2626" />
+                  <path d="M 0 1 L 9 5 L 0 9 z" style={{ fill: 'var(--color-border-strong)' }} />
                 </marker>
               </defs>
 
@@ -311,15 +324,16 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   const isConectadaAoSelecionado =
                     aresta.de === noSelecionadoId || aresta.para === noSelecionadoId;
 
-                  let corLinha = '#94a3b8';
+                  let corLinha = 'var(--color-text-muted)';
                   let marker = 'url(#seta-referencia)';
                   let strokeDash = 'none';
 
                   if (aresta.tipo === 'vinculado_a') {
-                    corLinha = '#2563eb';
+                    corLinha = 'var(--color-primary)';
                     marker = 'url(#seta-vinculado)';
                   } else if (aresta.tipo === 'substitui') {
-                    corLinha = '#dc2626';
+                    // Substituição é neutra (cinza tracejado); vermelho fica só para conflito
+                    corLinha = 'var(--color-border-strong)';
                     marker = 'url(#seta-substitui)';
                     strokeDash = '4,4';
                   }
@@ -337,7 +351,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                         y1={pDe.y}
                         x2={pPara.x}
                         y2={pPara.y}
-                        stroke={corLinha}
+                        style={{ stroke: corLinha }}
                         strokeWidth={isConectadaAoSelecionado ? 3 : 1.8}
                         strokeDasharray={strokeDash}
                         markerEnd={marker}
@@ -354,11 +368,9 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   const isSelecionado = no.id === noSelecionadoId;
                   const isConectado = conexoesNoSelecionado.conectados.has(no.id);
                   const isVisivel = nosFiltradosIds.has(no.id);
-                  const esquemaCor = CORES_POR_TIPO[no.tipo] || {
-                    bg: '#f1f5f9',
-                    border: '#64748b',
-                    text: '#0f172a'
-                  };
+                  const esquemaCor = !no.existe_no_acervo
+                    ? COR_AUSENTE
+                    : CORES_POR_TIPO[no.tipo] || camadaCor('apoio');
 
                   const opacidade = !isVisivel
                     ? 0.15
@@ -395,16 +407,14 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                         width={largura}
                         height={altura}
                         rx={rx}
-                        fill={no.existe_no_acervo ? esquemaCor.bg : '#f8fafc'}
-                        stroke={
-                          isSelecionado
-                            ? '#0f172a'
+                        style={{
+                          fill: no.substituido ? 'var(--color-neutral-bg)' : esquemaCor.bg,
+                          stroke: isSelecionado
+                            ? 'var(--color-text)'
                             : no.substituido
-                            ? '#dc2626'
-                            : !no.existe_no_acervo
-                            ? '#94a3b8'
+                            ? 'var(--color-border-strong)'
                             : esquemaCor.border
-                        }
+                        }}
                         strokeWidth={isSelecionado ? 3 : 1.8}
                         strokeDasharray={
                           no.substituido ? '4,3' : !no.existe_no_acervo ? '3,3' : 'none'
@@ -418,12 +428,12 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                         width={22}
                         height={14}
                         rx={3}
-                        fill={esquemaCor.border}
+                        style={{ fill: esquemaCor.border }}
                       />
                       <text
                         x={largura - 15}
                         y={14}
-                        fill="#ffffff"
+                        style={{ fill: 'var(--color-on-primary)' }}
                         fontSize="9"
                         fontWeight="bold"
                         textAnchor="middle"
@@ -435,7 +445,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                       <text
                         x={10}
                         y={20}
-                        fill={esquemaCor.text}
+                        style={{ fill: esquemaCor.text }}
                         fontSize="11"
                         fontWeight="bold"
                       >
@@ -446,7 +456,7 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                       <text
                         x={10}
                         y={36}
-                        fill={no.substituido ? '#dc2626' : '#475569'}
+                        style={{ fill: no.substituido ? 'var(--color-neutral-text)' : 'var(--color-text-muted)' }}
                         fontSize="9"
                         fontWeight={no.substituido ? 'bold' : 'normal'}
                       >
@@ -589,7 +599,8 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                   onClick={() => handleAbrirLeitor(noSelecionado)}
                   data-testid="btn-abrir-no-leitor"
                 >
-                  📖 Abrir no Leitor de Documentos
+                  <Icon nome="livro" tamanho={16} />
+                  Abrir no leitor
                 </button>
               ) : (
                 <div className="alerta alerta-info mt-4">

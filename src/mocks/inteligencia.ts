@@ -39,7 +39,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
       },
       {
         titulo: 'Período concessivo e aquisitivo',
-        valor: '12 meses para gozo',
+        valor: '12 meses para tirar as férias',
         fonte: {
           codigo: 'NG_111',
           versao: '3.0.0',
@@ -49,7 +49,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
         }
       },
       {
-        titulo: 'Fracionamento do gozo',
+        titulo: 'Divisão das férias em períodos',
         valor: 'Até 3 períodos',
         fonte: {
           codigo: 'NG_111',
@@ -232,7 +232,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           versao: '1.0.0',
           secao: 'Cláusula Sétima',
           trecho:
-            'O valor global estimado do presente instrumento é de R$ 18.250,00 (dezoito mil duzentos e cinquenta reais), correspondendo a 12 parcelas mensais de R$ 1.520,83.'
+            'O aluguel mensal é de R$ 3.650,00, perfazendo o valor global de R$ 18.250,00 para os 5 meses de vigência.'
         }
       },
       {
@@ -243,7 +243,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           versao: '1.0.0',
           secao: '3',
           trecho:
-            'A contratação de R$ 18.250,00 enquadra-se na alçada decisória de Gerente Executivo e Diretor Administrativo e Financeiro conforme limites da NG_012.'
+            'O valor global de R$ 18.250,00 supera a alçada de gerente (R$ 18.000,00) e fica na alçada de diretor (até R$ 120.000,00), conforme a NG_012; por isso a DIRAF aprova.'
         }
       },
       {
@@ -304,7 +304,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           versao: '1.0.0',
           secao: 'Cláusula Sétima',
           trecho:
-            'Correspondendo a 12 parcelas mensais de R$ 1.520,83.'
+            'O aluguel mensal é de R$ 3.650,00, por 5 meses de vigência.'
         }
       },
       {
@@ -338,7 +338,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           codigo: 'CTR_2026-012',
           versao: '1.0.0',
           secao: 'Cláusula Primeira',
-          trecho: 'Vigência: 01/03/2026 a 28/02/2027.'
+          trecho: 'Vigência: 30/11/2026 a 29/04/2027.'
         }
       },
       {
@@ -348,7 +348,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           codigo: 'CTR_2026-012',
           versao: '1.0.0',
           secao: 'Cláusula Primeira',
-          trecho: 'Vigência: 01/03/2026 a 28/02/2027.'
+          trecho: 'Vigência: 30/11/2026 a 29/04/2027.'
         }
       }
     ],
@@ -384,7 +384,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           versao: '1.0.0',
           secao: '3',
           trecho:
-            'Enquadra-se na alçada decisória de Gerente Executivo e Diretor Administrativo e Financeiro conforme limites da NG_012.'
+            'Supera a alçada de gerente (R$ 18.000,00) e fica na alçada de diretor, conforme a NG_012; por isso a DIRAF aprova.'
         }
       }
     ],
@@ -446,7 +446,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           versao: '1.0.0',
           secao: '3',
           trecho:
-            'A contratação de R$ 18.250,00 enquadra-se na alçada decisória de Gerente Executivo e Diretor Administrativo e Financeiro conforme limites da NG_012.'
+            'O valor global de R$ 18.250,00 supera a alçada de gerente (R$ 18.000,00) e fica na alçada de diretor (até R$ 120.000,00), conforme a NG_012; por isso a DIRAF aprova.'
         }
       }
     ],
@@ -494,7 +494,7 @@ export const MOCK_PERSPECTIVAS_DETALHE: Record<string, PerspectivaDetalhe> = {
           codigo: 'CTR_2026-012',
           versao: '1.0.0',
           secao: 'Cláusula Primeira',
-          trecho: 'Vigência: 01/03/2026 a 28/02/2027.'
+          trecho: 'Vigência: 30/11/2026 a 29/04/2027.'
         }
       },
       {
@@ -937,7 +937,7 @@ export const MOCK_RELATORIOS: Record<string, RelatorioExecutivo> = {
         itens: [
           {
             texto:
-              'O contrato CTR_2026-012 rege a locação corporativa de espaço de coworking com vigência estipulada de 01/03/2026 a 28/02/2027.',
+              'O contrato CTR_2026-012 rege a locação corporativa de espaço de coworking com vigência estipulada de 30/11/2026 a 29/04/2027.',
             fonte: {
               codigo: 'CTR_2026-012',
               versao: '1.0.0',
@@ -948,13 +948,13 @@ export const MOCK_RELATORIOS: Record<string, RelatorioExecutivo> = {
           },
           {
             texto:
-              'A contratação possui amparo na Nota Técnica NT_2026-018, enquadrando-se nas alçadas de Gerente Executivo e Diretor Administrativo e Financeiro conforme a NG_012.',
+              'A contratação possui amparo na Nota Técnica NT_2026-018, que coloca o valor na alçada de diretor, conforme a NG_012; por isso a DIRAF aprova.',
             fonte: {
               codigo: 'NT_2026-018',
               versao: '1.0.0',
               secao: '3',
               trecho:
-                'A contratação de R$ 18.250,00 enquadra-se na alçada decisória de Gerente Executivo e Diretor Administrativo e Financeiro conforme limites da NG_012.'
+                'O valor global de R$ 18.250,00 supera a alçada de gerente (R$ 18.000,00) e fica na alçada de diretor (até R$ 120.000,00), conforme a NG_012; por isso a DIRAF aprova.'
             }
           }
         ]
@@ -997,13 +997,13 @@ export const MOCK_RELATORIOS: Record<string, RelatorioExecutivo> = {
         itens: [
           {
             texto:
-              'Valor global contratado de locação de coworking fixado em R$ 18.250,00, diluído em 12 parcelas mensais de R$ 1.520,83.',
+              'Valor global contratado de locação de coworking fixado em R$ 18.250,00, pago em 5 aluguéis mensais de R$ 3.650,00.',
             fonte: {
               codigo: 'CTR_2026-012',
               versao: '1.0.0',
               secao: 'Cláusula Sétima',
               trecho:
-                'O valor global estimado do presente instrumento é de R$ 18.250,00 (dezoito mil duzentos e cinquenta reais), correspondendo a 12 parcelas mensais de R$ 1.520,83.'
+                'O aluguel mensal é de R$ 3.650,00, perfazendo o valor global de R$ 18.250,00 para os 5 meses de vigência.'
             }
           },
           {
@@ -1127,7 +1127,7 @@ export const MOCK_RELATORIOS: Record<string, RelatorioExecutivo> = {
         itens: [
           {
             texto:
-              'Contrato de locação corporativa com valor global de R$ 18.250,00 e vigência de 12 meses (01/03/2026 a 28/02/2027).',
+              'Contrato de locação corporativa com valor global de R$ 18.250,00 e vigência de 150 dias (30/11/2026 a 29/04/2027).',
             fonte: {
               codigo: 'CTR_2026-012',
               versao: '1.0.0',

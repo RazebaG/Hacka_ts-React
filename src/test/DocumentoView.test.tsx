@@ -54,7 +54,7 @@ describe('DocumentoView', () => {
       expect(screen.getByTestId('alerta-doc-substituido')).toBeInTheDocument();
     });
 
-    expect(screen.getByTestId('badge-status-substituido')).toHaveTextContent('Substituído');
+    expect(screen.getByTestId('badge-status-substituido')).toHaveTextContent('Versão antiga');
     expect(
       screen.getByText(/Este documento é uma versão substituída ou revogada/i)
     ).toBeInTheDocument();

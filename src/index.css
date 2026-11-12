@@ -1,30 +1,136 @@
+/*
+ * Tokens globais de cor — paleta HACKA/TS Azul (decisão da equipe, 12/11/2026).
+ * Referência: Hack_ts---Python/docs/IDENTIDADE-VISUAL.md
+ *
+ * Regras:
+ * - Componentes usam só os tokens semânticos (--color-*), nunca hex direto.
+ * - Rosa (--brand-pink / --color-accent) é só marca, nunca estado.
+ * - Verde = vigente, âmbar = hipotético / não consta, vermelho = conflito.
+ *   Substituído é neutro (cinza), não vermelho.
+ * - Todos os pares texto/fundo abaixo passam WCAG AA (4,5:1).
+ */
 :root {
   --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  --color-primary: #1e3a8a;
-  --color-primary-hover: #1e40af;
-  --color-primary-light: #eff6ff;
-  --color-success-bg: #dcfce7;
-  --color-success-text: #166534;
-  --color-warning-bg: #fef3c7;
-  --color-warning-text: #92400e;
-  --color-danger-bg: #fee2e2;
-  --color-danger-text: #991b1b;
-  --color-info-bg: #e0f2fe;
-  --color-info-text: #075985;
-  --color-gray-50: #f8fafc;
-  --color-gray-100: #f1f5f9;
-  --color-gray-200: #e2e8f0;
-  --color-gray-300: #cbd5e1;
-  --color-gray-600: #475569;
-  --color-gray-700: #334155;
-  --color-gray-900: #0f172a;
+  --font-sans: 'IBM Plex Sans', var(--font-family);
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  /* Escala tipográfica (rem) */
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+
+  /* Espaçamento (múltiplos de 4 px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  /* Layout */
+  --sidebar-w: 248px;
+  --content-max: 1200px;
+
+  /* Marca (primitivos; não usar direto em componentes, exceto o logo) */
+  --brand-blue: #2373ff;
+  --brand-pink: #ff5c86;
+  --brand-navy: #0d1b3d;
+
+  /* Superfícies */
+  --color-bg: #f4f7fd;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef2fa;
+  --color-border: #dce3f0;
+  --color-border-strong: #b9c4da;
+
+  /* Texto */
+  --color-text: #0d1b3d;
+  --color-text-secondary: #34405c;
+  --color-text-muted: #56617a;
+
+  /* Ação primária */
+  --color-primary: #1d5fe0;
+  --color-primary-hover: #174db8;
+  --color-primary-soft: #e8f0ff;
+  --color-primary-border: #a9c4f7;
+  --color-on-primary: #ffffff;
+  --color-focus-ring: rgb(29 95 224 / 0.25);
+
+  /* Acento de marca */
+  --color-accent: var(--brand-pink);
+  --color-on-accent: #3a0614;
+
+  /* Navegação (cabeçalho escuro) */
+  --color-nav-bg: var(--brand-navy);
+  --color-nav-border: #1b2c55;
+  --color-nav-text: #eef3ff;
+  --color-nav-text-muted: #a9b6d3;
+  --color-nav-indicator: #5b93ff;
+
+  /* Semânticas: vigente / consta */
+  --color-success: #1e9e5a;
+  --color-success-text: #0b6b3a;
+  --color-success-bg: #e1f4e8;
+  --color-success-border: #9ed9b5;
+
+  /* Semânticas: hipotético / não consta / aviso */
+  --color-warning: #d99100;
+  --color-warning-text: #7a4f00;
+  --color-warning-bg: #fff1d4;
+  --color-warning-bg-subtle: #fff9ec;
+  --color-warning-border: #f5d08a;
+
+  /* Semânticas: conflito / erro */
+  --color-danger: #d6304f;
+  --color-danger-text: #a8173a;
+  --color-danger-bg: #ffe5eb;
+  --color-danger-border: #f5a9b9;
+
+  /* Semânticas: informação */
+  --color-info-text: #174db8;
+  --color-info-bg: var(--color-primary-soft);
+  --color-info-border: var(--color-primary-border);
+
+  /* Semânticas: substituído / neutro */
+  --color-neutral-text: var(--color-text-muted);
+  --color-neutral-bg: var(--color-surface-muted);
+  --color-neutral-border: var(--color-border);
+
+  /* Gráficos: categorias de valores (todas ≥ 3:1 sobre o trilho e o cartão) */
+  --chart-1: var(--color-primary);
+  --chart-2: var(--brand-navy);
+  --chart-3: #c2335e; /* rosa da marca escurecido para contraste */
+  --chart-4: var(--color-text-muted);
+
+  /* Mapa do acervo: cor do nó pela camada da norma (grupo do CATÁLOGO) */
+  --graph-normativo-bg: var(--color-primary-soft);
+  --graph-normativo-border: var(--color-primary);
+  --graph-normativo-text: var(--color-info-text);
+  --graph-apoio-bg: var(--color-surface-muted);
+  --graph-apoio-border: var(--color-text-muted);
+  --graph-apoio-text: var(--color-text);
+  --graph-programa-bg: #f3eefc;
+  --graph-programa-border: #6b4fbf;
+  --graph-programa-text: #45318a;
+  --graph-instrumento-bg: #e8f4f4;
+  --graph-instrumento-border: #1b7377;
+  --graph-instrumento-text: #0e4a4d;
+
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --color-overlay: rgb(13 27 61 / 0.5);
+  --scroll-thumb: rgb(13 27 61 / 0.12);
+  --scroll-thumb-hover: rgb(13 27 61 / 0.35);
+  --shadow-inset: inset 0 1px 2px rgb(0 0 0 / 0.06);
 }
 
 * {
@@ -34,9 +140,10 @@
 }
 
 body {
-  font-family: var(--font-family);
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-900);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }

@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { FonteCita, RelatorioExecutivo } from '../api/types';
 import { fetchRelatorio } from '../api/client';
+import { Icon } from '../ui/Icon';
+import { RelatorioSelecao } from './RelatorioSelecao';
 
 interface RelatorioViewProps {
   onNavegarDocumento: (codigo: string, versao?: string, secaoId?: string) => void;
   perspectivaInicial?: string;
   codigoDocumentoInicial?: string;
+  /** Rota /relatorio?selecao=1: relatório só com os itens marcados (RF41). */
+  modoSelecao?: boolean;
 }
 
-export const RelatorioView: React.FC<RelatorioViewProps> = ({
+export const RelatorioView: React.FC<RelatorioViewProps> = ({ modoSelecao, ...props }) =>
+  modoSelecao ? <RelatorioSelecao /> : <RelatorioPorFonte {...props} />;
+
+const RelatorioPorFonte: React.FC<Omit<RelatorioViewProps, 'modoSelecao'>> = ({
   onNavegarDocumento,
   perspectivaInicial = 'juridico',
   codigoDocumentoInicial
@@ -125,7 +132,8 @@ export const RelatorioView: React.FC<RelatorioViewProps> = ({
             onClick={handleImprimir}
             data-testid="btn-imprimir-relatorio"
           >
-            🖨️ Imprimir / Salvar PDF
+            <Icon nome="imprimir" tamanho={16} />
+            Imprimir ou salvar PDF
           </button>
         </div>
       </div>
@@ -155,7 +163,7 @@ export const RelatorioView: React.FC<RelatorioViewProps> = ({
                 </span>
               </div>
               <div className="relatorio-carimbo">
-                <span className="badge-auditado">✓ Rastreabilidade Verificada</span>
+                <span className="badge-auditado"><Icon nome="check" tamanho={14} /> Fontes verificadas</span>
                 <time className="relatorio-data" dateTime={relatorio.gerado_em}>
                   Emitido em: {new Date(relatorio.gerado_em).toLocaleDateString('pt-BR')} às{' '}
                   {new Date(relatorio.gerado_em).toLocaleTimeString('pt-BR')}
