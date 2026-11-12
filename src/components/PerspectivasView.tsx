@@ -4,7 +4,8 @@ import { fetchPerspectivaDetalhe, fetchPerspectivas } from '../api/client';
 import { Icon, NomeIcone } from '../ui/Icon';
 import { navegar, url } from '../app/rotas';
 import { TEMAS, temaDe, DATA_REFERENCIA } from '../mocks/v2';
-import { IncluirRelatorio, ProximaAcao, SemQuebra } from '../ui/componentes';
+import { CabecalhoTela, IncluirRelatorio, ProximaAcao, SemQuebra } from '../ui/componentes';
+import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 
 const PRAZOS: [string, string][] = [
   ['30', 'Próximos 30 dias'],
@@ -105,6 +106,8 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
     return `${numero} ${unidade}`;
   };
 
+  const proximos = detalhe ? detalhe.prazos.filter((p) => dentroDoPrazo(p.data, '90')).length : 0;
+
   const maiorValorNumerico = detalhe
     ? Math.max(...detalhe.valores.map((v) => v.numero), 1)
     : 1;
@@ -129,15 +132,49 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
 
   return (
     <div className="view-container perspectivas-view" data-testid="perspectivas-view">
-      <header className="view-header">
-        <div className="header-meta">
-          <span className="badge-tag">Resumo por área</span>
-          <h1 className="view-title">O que cada área precisa saber</h1>
+      <CabecalhoTela
+        etiqueta="Ciclo 2026/2027"
+        titulo="Resumo por Área"
+        descricao="Normas, responsabilidades e prazos vigentes consolidados por área. Cada número mostra de qual documento veio."
+        acoes={
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => window.print()}>
+            <Icon nome="baixar" tamanho={16} /> Exportar Painel (PDF)
+          </button>
+        }
+      />
+
+      <div className="fg-grid-3 fg-stats">
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Normas mapeadas</p>
+            <p className="fg-valor">{MOCK_DOCUMENTOS.length}</p>
+            <p className="fg-sub">Documentos no arquivo</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true">
+            <Icon nome="catalogo" tamanho={20} />
+          </span>
         </div>
-        <p className="view-description">
-          Escolha a área. Cada número, prazo e responsável mostra de qual documento veio.
-        </p>
-      </header>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Prazos próximos</p>
+            <p className={`fg-valor ${proximos ? "fg-valor-perigo" : ""}`}>{proximos} {proximos === 1 ? "alerta" : "alertas"}</p>
+            <p className="fg-sub">Nos próximos 90 dias desta área</p>
+          </div>
+          <span className="fg-icone perigo" aria-hidden="true">
+            <Icon nome="calendario" tamanho={20} />
+          </span>
+        </div>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Comprometido fixo</p>
+            <p className="fg-valor">R$ 18.250,00</p>
+            <p className="fg-sub">Contrato de coworking (CTR_2026-012)</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true">
+            <Icon nome="financeiro" tamanho={20} />
+          </span>
+        </div>
+      </div>
 
       {/* Abas das Perspectivas */}
       <nav

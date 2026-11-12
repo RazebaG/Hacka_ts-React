@@ -122,7 +122,77 @@ const PATHS: Record<string, React.ReactNode> = {
   ),
   seta: <path d="m9 6 6 6-6 6" />,
   recolher: <path d="m15 6-6 6 6 6" />,
-  menu: <path d="M4 7h16M4 12h16M4 17h16" />
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  // Ícones do layout do Figma (traço 1.75, mesmo estilo)
+  inicio: <path d="M4 11.5 12 5l8 6.5M6 10v9a1 1 0 0 0 1 1h3.5v-5h3v5H17a1 1 0 0 0 1-1v-9" />,
+  duvida: (
+    <>
+      <rect x="4" y="4" width="16" height="16" rx="2" />
+      <path d="M9.8 9.6a2.3 2.3 0 1 1 3.3 2.1c-.7.3-1.1.9-1.1 1.6M12 16.5h.01" />
+    </>
+  ),
+  regras: <path d="M19 8a7.5 7.5 0 0 0-13.3-1.5M5 4v3h3M5 16a7.5 7.5 0 0 0 13.3 1.5M19 20v-3h-3" />,
+  resumo: (
+    <>
+      <rect x="9.5" y="3" width="5" height="5" rx="1" />
+      <rect x="3" y="16" width="5" height="5" rx="1" />
+      <rect x="16" y="16" width="5" height="5" rx="1" />
+      <path d="M12 8v4M5.5 16v-2a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2" />
+    </>
+  ),
+  usuario: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" />
+    </>
+  ),
+  busca: (
+    <>
+      <circle cx="11" cy="11" r="6.5" />
+      <path d="m20 20-4.2-4.2" />
+    </>
+  ),
+  baixar: <path d="M12 4v11M7 10l5 5 5-5M4 19h16" />,
+  historico: <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6M3.5 4v4h4M12 8v4.5l3 2" />,
+  calendario: (
+    <>
+      <rect x="4" y="5" width="16" height="15" rx="2" />
+      <path d="M8 3v4M16 3v4M4 10h16" />
+    </>
+  ),
+  mais: <path d="M12 5v14M5 12h14" />,
+  copiar: (
+    <>
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+    </>
+  ),
+  link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
+  atualizar: <path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5" />,
+  util: <path d="M7 11v9H4v-9zM7 11l4-7a2 2 0 0 1 2 2v4h5.5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17.3 20H7" />,
+  escudo: <path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6zM9 12l2 2 4-4" />,
+  tendencia: <path d="m3 17 6-6 4 4 8-8M15 7h6v6" />,
+  raio: <path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" />,
+  fechar: <path d="M6 6l12 12M18 6 6 18" />,
+  info: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 11v5M12 8h.01" />
+    </>
+  ),
+  trocar: <path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7" />,
+  apresentacao: (
+    <>
+      <rect x="3" y="4" width="18" height="14" rx="2" />
+      <path d="m10 8.5 4.5 2.5-4.5 2.5z" />
+    </>
+  ),
+  marca: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m8.5 12.5 2.5 2.5 4.5-5" />
+    </>
+  )
 };
 
 export type NomeIcone = keyof typeof PATHS;

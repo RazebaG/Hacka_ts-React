@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { CabecalhoTela } from '../ui/componentes';
 import { GrafoAcervo, GrafoNo } from '../api/types';
 import { fetchGrafo } from '../api/client';
 import { Icon } from '../ui/Icon';
@@ -161,16 +162,42 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
   return (
     <div className="view-container grafo-view" data-testid="grafo-view">
-      <header className="view-header">
-        <div className="header-meta">
-          <span className="badge-tag">Ligações entre documentos</span>
-          <h1 className="view-title">Como os documentos se ligam</h1>
+      <CabecalhoTela
+        titulo="Ligações entre Documentos"
+        descricao="Conexões e dependências entre normas, contratos e notas técnicas do acervo. Prefere uma lista? Use “Ver como tabela”."
+        acoes={
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => { setTermoBusca(''); setFiltroTipo('todos'); setFiltroStatus('todos'); }}>
+            <Icon nome="atualizar" tamanho={16} /> Limpar filtros
+          </button>
+        }
+      />
+
+      <div className="fg-grid-3 fg-stats">
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Acervo total</p>
+            <p className="fg-valor">{grafo?.nos.filter((n) => n.existe_no_acervo).length ?? 0}</p>
+            <p className="fg-sub">Versões de documentos no mapa</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true"><Icon nome="catalogo" tamanho={20} /></span>
         </div>
-        <p className="view-description">
-          Cada caixa é um documento. As linhas mostram qual documento segue outro, qual cita outro e
-          qual versão substituiu a anterior. Prefere uma lista? Use “Ver como tabela”.
-        </p>
-      </header>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Vínculos ativos</p>
+            <p className="fg-valor">{grafo?.arestas.length ?? 0}</p>
+            <p className="fg-sub">Ligações entre documentos</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true"><Icon nome="mapa" tamanho={20} /></span>
+        </div>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Fora do acervo</p>
+            <p className="fg-valor fg-valor-perigo">{grafo?.nos.filter((n) => !n.existe_no_acervo).length ?? 0}</p>
+            <p className="fg-sub">{grafo?.nos.filter((n) => !n.existe_no_acervo).map((n) => n.codigo).join(' · ') || 'Nenhum'}</p>
+          </div>
+          <span className="fg-icone perigo" aria-hidden="true"><Icon nome="alerta" tamanho={20} /></span>
+        </div>
+      </div>
 
       {/* Barra de Filtros e Ferramentas */}
       <div className="grafo-toolbar" role="search" aria-label="Filtros do Mapa">

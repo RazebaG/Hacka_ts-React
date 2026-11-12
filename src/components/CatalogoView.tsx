@@ -4,13 +4,17 @@ import { fetchDocumentos } from '../api/client';
 import { BadgeStatus } from './BadgeStatus';
 import { camadaDe } from '../mocks/v2';
 import { useEstado } from '../app/store';
-import { SemQuebra } from '../ui/componentes';
+import { CabecalhoTela, SemQuebra } from '../ui/componentes';
+import { Icon } from '../ui/Icon';
+import { navegar, url } from '../app/rotas';
 
 interface CatalogoViewProps {
   onNavegarDocumento: (codigo: string, versao?: string) => void;
   /** Tema vindo da rota /catalogo?tema= (Visão geral, lote). */
   temaInicial?: string;
 }
+
+const NOMES_CURTOS: Record<string, string> = { ferias: 'Pessoas', inovacao: 'Gestão', locacao: 'Jurídico' };
 
 const NOMES_ASSUNTOS: Record<string, string> = {
   ferias: 'Férias (Gente e Cultura)',
@@ -26,6 +30,7 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'vigente' | 'substituido'>('todos');
   const digitalizados = useEstado((e) => e.digitalizados);
   const [filtroAssunto, setFiltroAssunto] = useState<string>(temaInicial || 'todos');
+  const [marcados, setMarcados] = useState<string[]>([]);
 
   useEffect(() => {
     let ativo = true;
@@ -83,69 +88,132 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
     return mapa;
   }, [documentosFiltrados]);
 
+  const total = documentos.length;
+  const nVigentes = documentos.filter((d) => !d.substituido).length;
+  const antigos = documentos.filter((d) => d.substituido);
+  const comVariasVersoes = (codigo: string) => documentos.filter((d) => d.codigo === codigo).length > 1;
+  const chave = (d: DocumentoResumo) => `${d.codigo}-${d.versao}`;
+  const alternar = (k: string) => setMarcados((m) => (m.includes(k) ? m.filter((x) => x !== k) : [...m, k]));
+
+  /** Exporta a lista (ou só os marcados) em CSV, que abre no Excel. */
+  const exportar = () => {
+    const linhas = documentosFiltrados.filter((d) => !marcados.length || marcados.includes(chave(d)));
+    const csv = ['Código;Documento;Tipo;Área;Versão;Status;Vigência']
+      .concat(
+        linhas.map((d) =>
+          [d.codigo, d.titulo, d.tipo_nome, NOMES_ASSUNTOS[d.assunto] ?? d.assunto, d.versao, d.substituido ? 'Versão antiga' : 'Vigente', d.vigencia].join(';')
+        )
+      )
+      .join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = 'documentos-arquivo-central.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
   return (
     <div className="view-container catalogo-view" data-testid="catalogo-view">
-      <div className="view-header">
-        <h1 className="view-title">Documentos do Arquivo Central</h1>
-        <p className="subtitle">
-          Normas, procedimentos, formulários e contratos da ACME. Os marcados “Em vigor” são os
-          que valem hoje.
-        </p>
+      <CabecalhoTela
+        titulo="Documentos e Normas"
+        descricao="Consulte o acervo de contratos, normas gerais e notas técnicas vigentes."
+        acoes={
+          <>
+            <button type="button" className="btn btn-outline btn-sm" onClick={exportar} disabled={!documentosFiltrados.length}>
+              <Icon nome="baixar" tamanho={16} /> Exportar
+            </button>
+            <a
+              className="btn btn-primary btn-sm"
+              href={url.enviar()}
+              onClick={(e) => {
+                e.preventDefault();
+                navegar(url.enviar());
+              }}
+            >
+              <Icon nome="mais" tamanho={16} /> Novo Documento
+            </a>
+          </>
+        }
+      />
+
+      <div className="fg-grid-3 fg-stats">
+        <div className="fg-card fg-stat">
+          <span className="fg-icone" aria-hidden="true">
+            <Icon nome="catalogo" tamanho={20} />
+          </span>
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Total de documentos</p>
+            <p className="fg-valor">{total}</p>
+          </div>
+          <span />
+        </div>
+        <div className="fg-card fg-stat">
+          <span className="fg-icone" aria-hidden="true">
+            <Icon nome="marca" tamanho={20} />
+          </span>
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Plena vigência</p>
+            <p className="fg-valor">{nVigentes}</p>
+          </div>
+          <span className="fg-pilula">Ativos</span>
+        </div>
+        <div className="fg-card fg-stat">
+          <span className="fg-icone aviso" aria-hidden="true">
+            <Icon nome="historico" tamanho={20} />
+          </span>
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Versões antigas</p>
+            <p className="fg-valor">{antigos.length}</p>
+          </div>
+          <span className="fg-pilula aviso">{[...new Set(antigos.map((d) => d.codigo))].join(' · ') || '—'}</span>
+        </div>
       </div>
 
-      <div className="catalogo-filtros-bar">
-        <div className="filtro-campo busca-input">
-          <label htmlFor="busca-catalogo">Buscar no catálogo:</label>
+      <div className="fg-card fg-barra-filtros">
+        <label className="fg-busca" htmlFor="busca-catalogo">
+          <Icon nome="busca" tamanho={18} />
+          <span className="sr-only">Buscar no catálogo</span>
           <input
             id="busca-catalogo"
             data-testid="busca-catalogo"
             type="search"
-            placeholder="Filtrar por código, título ou tipo (ex: NG_111, Férias)..."
+            placeholder="Buscar por código, título ou palavra-chave..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
           />
-        </div>
-
-        <div className="filtro-campo">
-          <label htmlFor="filtro-assunto">Assunto:</label>
-          <select
-            id="filtro-assunto"
-            data-testid="filtro-assunto"
-            value={filtroAssunto}
-            onChange={(e) => setFiltroAssunto(e.target.value)}
-          >
-            <option value="todos">Todos os assuntos</option>
-            <option value="ferias">Férias</option>
-            <option value="inovacao">Inovação</option>
-            <option value="locacao">Locação</option>
-          </select>
-        </div>
-
-        <div className="filtro-campo">
-          <label htmlFor="filtro-status">Status de Vigência:</label>
-          <select
-            id="filtro-status"
-            data-testid="filtro-status"
-            value={filtroStatus}
-            onChange={(e) =>
-              setFiltroStatus(e.target.value as 'todos' | 'vigente' | 'substituido')
-            }
-          >
-            <option value="todos">Todos ({documentos.length})</option>
-            <option value="vigente">
-              Vigentes ({documentos.filter((d) => !d.substituido).length})
-            </option>
-            <option value="substituido">
-              Substituídos ({documentos.filter((d) => d.substituido).length})
-            </option>
-          </select>
-        </div>
+        </label>
+        <label className="sr-only" htmlFor="filtro-assunto">
+          Área
+        </label>
+        <select id="filtro-assunto" className="fg-select" data-testid="filtro-assunto" value={filtroAssunto} onChange={(e) => setFiltroAssunto(e.target.value)}>
+          <option value="todos">Área: Todas</option>
+          <option value="ferias">Área: Pessoas (Férias)</option>
+          <option value="inovacao">Área: Gestão (Inovação)</option>
+          <option value="locacao">Área: Jurídico (Locação)</option>
+        </select>
+        <label className="sr-only" htmlFor="filtro-status">
+          Status
+        </label>
+        <select
+          id="filtro-status"
+          className="fg-select"
+          data-testid="filtro-status"
+          value={filtroStatus}
+          onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'vigente' | 'substituido')}
+        >
+          <option value="todos">Status: Todos</option>
+          <option value="vigente">Status: Vigentes ({nVigentes})</option>
+          <option value="substituido">Status: Versões antigas ({antigos.length})</option>
+        </select>
+        <span className="fg-sub" aria-live="polite">
+          <strong>{documentosFiltrados.length}</strong> documentos
+        </span>
       </div>
 
       {carregando && (
         <div className="loading-state" data-testid="loading-catalogo">
           <div className="spinner"></div>
-          <p>Carregando acervo do catálogo...</p>
+          <p>Carregando documentos...</p>
         </div>
       )}
 
@@ -156,76 +224,113 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
       )}
 
       {!carregando && !erro && documentosFiltrados.length === 0 && (
-        <div className="empty-state" data-testid="empty-catalogo">
+        <div className="fg-card empty-state" data-testid="empty-catalogo">
           <p>Nenhum documento encontrado para os filtros selecionados.</p>
         </div>
       )}
 
-      {!carregando &&
-        !erro &&
-        Object.entries(documentosPorAssunto).map(([assunto, docs]) => (
-          <div key={assunto} className="assunto-grupo" data-testid={`grupo-assunto-${assunto}`}>
-            <h3 className="assunto-titulo">
-              {NOMES_ASSUNTOS[assunto] || assunto.toUpperCase()} ({docs.length})
-            </h3>
-
-            <div className="tabela-responsiva">
-              <table className="tabela-documentos">
-                <thead>
-                  <tr>
-                    <th>Código</th>
-                    <th>Título</th>
-                    <th>Tipo</th>
-                    <th>Versão</th>
-                    <th>Status</th>
-                    <th>Vigência</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
+      {!carregando && !erro && documentosFiltrados.length > 0 && (
+        <div className="fg-card fg-tabela-card">
+          <div className="tabela-responsiva">
+            <table className="tabela-documentos fg-tabela">
+              <thead>
+                <tr>
+                  <th className="col-marcar">
+                    <input
+                      type="checkbox"
+                      aria-label="Marcar todos"
+                      checked={marcados.length > 0 && marcados.length === documentosFiltrados.length}
+                      onChange={(e) => setMarcados(e.target.checked ? documentosFiltrados.map(chave) : [])}
+                    />
+                  </th>
+                  <th>Identificador</th>
+                  <th>Documento</th>
+                  <th>Área</th>
+                  <th>Status / Vigência</th>
+                  <th>Versão</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              {Object.entries(documentosPorAssunto).map(([assunto, docs]) => (
+                <tbody key={assunto} data-testid={`grupo-assunto-${assunto}`}>
                   {docs.map((doc) => (
                     <tr
-                      key={`${doc.codigo}-${doc.versao}`}
+                      key={chave(doc)}
                       data-testid={`linha-doc-${doc.codigo}-${doc.versao}`}
-                      className={doc.substituido ? 'linha-substituido' : 'linha-vigente'}
+                      className={`${doc.substituido ? 'linha-substituido' : 'linha-vigente'} ${marcados.includes(chave(doc)) ? 'linha-marcada' : ''}`}
                     >
-                      <td className="col-codigo">
-                        <strong>{doc.codigo}</strong>
+                      <td className="col-marcar">
+                        <input
+                          type="checkbox"
+                          aria-label={`Marcar ${doc.codigo} versão ${doc.versao}`}
+                          checked={marcados.includes(chave(doc))}
+                          onChange={() => alternar(chave(doc))}
+                        />
                       </td>
-                      <td className="col-titulo">{doc.titulo}</td>
-                      <td>
-                        <span className="tipo-tag">{doc.tipo_nome}</span>
-                        <span className="fonte-camada">
-                          <SemQuebra
-                            texto={`${camadaDe(doc.codigo).grupo}${camadaDe(doc.codigo).subordinado_a ? ` · subordinado à ${camadaDe(doc.codigo).subordinado_a}` : ''}`}
-                          />
+                      <td className="col-codigo">
+                        <span className="fg-codigo">
+                          <Icon nome="documento" tamanho={14} />
+                          <SemQuebra texto={doc.codigo} />
                         </span>
-                        {digitalizados.includes(doc.codigo) && (
-                          <span className="fonte-camada fonte-digital">Digitalizado e revisado por pessoa</span>
-                        )}
+                      </td>
+                      <td className="col-titulo">
+                        <strong className="fg-doc-titulo">{doc.titulo}</strong>
+                        <span className="fg-doc-sub">
+                          {doc.tipo_nome}
+                          {camadaDe(doc.codigo).subordinado_a ? `, segue a ${camadaDe(doc.codigo).subordinado_a}` : ''}
+                        </span>
+                        {digitalizados.includes(doc.codigo) && <span className="fonte-camada fonte-digital">Lido de uma foto e conferido por uma pessoa</span>}
+                      </td>
+                      <td>
+                        <span className="fg-pilula neutra">{NOMES_CURTOS[doc.assunto] ?? doc.assunto}</span>
+                      </td>
+                      <td>
+                        <BadgeStatus substituido={doc.substituido} fase={doc.fase} />
+                        <span className="fg-doc-sub col-vigencia">{doc.vigencia}</span>
                       </td>
                       <td className="col-versao">v{doc.versao}</td>
                       <td>
-                        <BadgeStatus substituido={doc.substituido} fase={doc.fase} />
-                      </td>
-                      <td className="col-vigencia">{doc.vigencia}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline"
-                          onClick={() => onNavegarDocumento(doc.codigo, doc.versao)}
-                          data-testid={`btn-abrir-${doc.codigo}-${doc.versao}`}
-                        >
-                          Ler Documento
-                        </button>
+                        <div className="fg-acoes">
+                          <button
+                            type="button"
+                            className="fg-acao"
+                            onClick={() => onNavegarDocumento(doc.codigo, doc.versao)}
+                            data-testid={`btn-abrir-${doc.codigo}-${doc.versao}`}
+                            aria-label={`Ler ${doc.titulo}, versão ${doc.versao}`}
+                            title="Ler documento"
+                          >
+                            <Icon nome="olho" tamanho={18} />
+                          </button>
+                          {comVariasVersoes(doc.codigo) && (
+                            <a
+                              className="fg-acao"
+                              href={url.comparar(doc.codigo)}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                navegar(url.comparar(doc.codigo));
+                              }}
+                              aria-label={`Comparar versões de ${doc.codigo}`}
+                              title="Comparar versões"
+                            >
+                              <Icon nome="historico" tamanho={18} />
+                            </a>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
+              ))}
+            </table>
           </div>
-        ))}
+          <div className="fg-paginacao">
+            <span className="fg-sub">
+              Registros 1–{documentosFiltrados.length} de {documentosFiltrados.length}
+              {marcados.length > 0 && ` · ${marcados.length} marcados para exportar`}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

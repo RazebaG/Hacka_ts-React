@@ -8,7 +8,7 @@ describe('GrafoView', () => {
     render(<GrafoView onNavegarDocumento={onNavegar} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Como os documentos se ligam')).toBeInTheDocument();
+      expect(screen.getByText('Ligações entre Documentos')).toBeInTheDocument();
     });
 
     expect(screen.getByTestId('grafo-canvas')).toBeInTheDocument();
