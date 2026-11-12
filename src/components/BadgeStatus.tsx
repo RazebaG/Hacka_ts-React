@@ -11,9 +11,9 @@ export const BadgeStatus: React.FC<BadgeStatusProps> = ({ substituido, fase }) =
       <span
         data-testid="badge-status-substituido"
         className="badge badge-substituido"
-        title="Documento revogado ou substituído por versão mais recente"
+        title="Existe uma versão mais nova deste documento"
       >
-        Substituído
+        Versão antiga
       </span>
     );
   }
@@ -22,9 +22,9 @@ export const BadgeStatus: React.FC<BadgeStatusProps> = ({ substituido, fase }) =
     <span
       data-testid="badge-status-vigente"
       className="badge badge-vigente"
-      title="Documento atualmente em vigor"
+      title="Esta é a versão que vale hoje"
     >
-      {fase || 'Vigente'}
+      {fase && fase !== 'Vigente' ? fase : 'Em vigor'}
     </span>
   );
 };

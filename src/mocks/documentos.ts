@@ -45,6 +45,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         texto: 'A solicitação formal é feita via Portal Raiz (FM_1111-001) com antecedência mínima de 45 dias corridos em relação à data de início do gozo. Solicitação com menos de 45 dias só é aceita por decisão expressa do diretor da área.'
       },
       {
+        id: '4.3.1',
+        titulo: 'Solicitação Formal (Antecedência 45 dias)',
+        texto: 'A antecedência mínima para solicitação de férias é de 45 (quarenta e cinco) dias corridos do início de gozo no Portal Raiz (FM_1111-001). Solicitações com prazo inferior exigem aprovação expressa do diretor da área.'
+      },
+      {
         id: '4.4',
         titulo: 'Fracionamento',
         texto: 'As férias podem ser divididas em até 3 períodos. Um dos períodos deve ter no mínimo 14 dias corridos; os demais, no mínimo 5 dias corridos cada.'
@@ -113,6 +118,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         id: '1',
         titulo: 'Finalidade',
         texto: 'Instruir passo a passo o processo de programação, solicitação, aprovação e homologação de férias no Portal Raiz.'
+      },
+      {
+        id: '2.2',
+        titulo: 'Subordinação',
+        texto: 'O procedimento herda a numeração da NG_111 e a ela se subordina. Em divergência, prevalece a NG_111.'
       },
       {
         id: '3.1',
@@ -204,7 +214,7 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
     versao: '1.0.0',
     fase: 'Vigente',
     vigencia: '03/08/2026 a 03/02/2028',
-    vinculado_a: 'NG_111',
+    vinculado_a: 'PX_1111-001',
     referencia: null,
     assunto: 'ferias',
     substituido: false,
@@ -238,6 +248,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         id: '3',
         titulo: 'Governança da Inovação',
         texto: 'O Comitê de Inovação coordena as rodadas temáticas e aprova a transição de ideias pelo funil de inovação.'
+      },
+      {
+        id: '4.9',
+        titulo: 'Alçadas e Orçamento',
+        texto: 'Gastos com inovação respeitam as alçadas da NG_012 e o orçamento anual descrito em nota técnica.'
       }
     ]
   },
@@ -258,6 +273,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         id: '1',
         titulo: 'Fases do Funil',
         texto: 'Fase 1: Triagem e Elegibilidade; Fase 2: Avaliação Técnica; Fase 3: Prova de Conceito (PoC); Fase 4: Homologação e Premiação.'
+      },
+      {
+        id: '8.3.2',
+        titulo: 'Gasto de Prototipagem',
+        texto: 'O gasto de prototipagem observa as alçadas da NG_012 e o orçamento da NT vigente.'
       }
     ]
   },
@@ -303,6 +323,11 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
         id: '2',
         titulo: 'Dotação Orçamentária',
         texto: 'O orçamento anual alocado para desenvolvimento de PoCs e premiações do ciclo 2027 é de R$ 180.000,00.'
+      },
+      {
+        id: 'Anexo G',
+        titulo: 'Documentos Relacionados',
+        texto: 'NG_012 — Norma das alçadas de aprovação.'
       }
     ]
   },
@@ -313,7 +338,7 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
     tipo_nome: 'Contrato',
     versao: '1.0.0',
     fase: 'Vigente',
-    vigencia: '01/03/2026 a 28/02/2027',
+    vigencia: '30/11/2026 a 29/04/2027',
     vinculado_a: null,
     referencia: 'NT_2026-018',
     assunto: 'locacao',
@@ -327,7 +352,7 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
       {
         id: 'Cláusula Sétima',
         titulo: 'Do Preço e Valor Global',
-        texto: 'O valor global estimado do presente instrumento é de R$ 18.250,00 (dezoito mil duzentos e cinquenta reais), correspondendo a 12 parcelas mensais de R$ 1.520,83.'
+        texto: 'O aluguel mensal é de R$ 3.650,00, perfazendo o valor global de R$ 18.250,00 para os 5 meses de vigência.'
       },
       {
         id: 'Cláusula Décima Primeira',
@@ -336,8 +361,13 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
       },
       {
         id: 'Apêndice B',
-        titulo: 'Tabela de Encargos e Alçadas',
-        texto: 'Fiscal técnico: GOC, com prazo de 5 dias úteis para ateste. Vistoria final agendada para 25/11/2026.'
+        titulo: 'Tabela de Encargos, Alçadas e Penalidades',
+        texto: 'Multa por inexecução contratual: 5% × R$ 18.250,00 = R$ 912,50. Multa por rescisão até 90º dia: R$ 3.650,00. Fiscal técnico: GOC, com prazo de 5 dias úteis para ateste. Vistoria final agendada para 25/11/2026.'
+      },
+      {
+        id: 'Apêndice J',
+        titulo: 'Documentos Relacionados',
+        texto: 'NG_012 — Estabelece as alçadas de aprovação aplicáveis à contratação.'
       }
     ]
   },
@@ -349,15 +379,15 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
     versao: '1.0.0',
     fase: 'Vigente',
     vigencia: '15/02/2026 a 15/02/2027',
-    vinculado_a: 'CTR_2026-012',
-    referencia: null,
+    vinculado_a: null,
+    referencia: 'CTR_2026-012',
     assunto: 'locacao',
     substituido: false,
     secoes: [
       {
         id: '3',
         titulo: 'Justificativa de Preço e Alçadas',
-        texto: 'A contratação de R$ 18.250,00 enquadra-se na alçada decisória de Gerente Executivo e Diretor Administrativo e Financeiro conforme limites da NG_012.'
+        texto: 'O valor global de R$ 18.250,00 supera a alçada de gerente (R$ 18.000,00) e fica na alçada de diretor (até R$ 120.000,00), conforme a NG_012; por isso a DIRAF aprova.'
       }
     ]
   }

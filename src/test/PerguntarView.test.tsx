@@ -7,7 +7,7 @@ describe('PerguntarView', () => {
     const onNavegar = vi.fn();
     render(<PerguntarView onNavegarDocumento={onNavegar} />);
 
-    expect(screen.getByText('Pergunte ao Acervo Central de Normas')).toBeInTheDocument();
+    expect(screen.getByText('Tire sua dúvida')).toBeInTheDocument();
     expect(screen.getByTestId('input-pergunta')).toBeInTheDocument();
     expect(screen.getByTestId('select-perfil')).toBeInTheDocument();
     expect(screen.getByTestId('btn-enviar-pergunta')).toBeInTheDocument();
@@ -32,8 +32,8 @@ describe('PerguntarView', () => {
       expect(screen.getByTestId('alerta-nao-consta')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Informação Não Consta nas Fontes')).toBeInTheDocument();
-    expect(screen.getByText('Abstenção Segura')).toBeInTheDocument();
+    expect(screen.getByText('Os documentos não tratam deste assunto')).toBeInTheDocument();
+    expect(screen.getByText('Sem resposta inventada')).toBeInTheDocument();
     expect(
       screen.getByText(/Não consta nas fontes do acervo que uma mesma pessoa/i)
     ).toBeInTheDocument();

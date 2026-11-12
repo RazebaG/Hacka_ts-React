@@ -1,0 +1,295 @@
+/*
+ * Camada de leitura confortável (pessoas mais velhas, baixa visão, pouca familiaridade).
+ * Carregada por último: ajusta tamanho de letra, rótulos e áreas de toque em todo o app.
+ * Base: guia de Legal Design e UX Writing da equipe (Lei 15.263/2025, NN/g, Stanford Legal Design Lab).
+ */
+
+/* Tamanho do texto escolhido no topo (A−, A, A+). Tudo em rem acompanha. */
+html {
+  font-size: 106.25%; /* 17 px */
+}
+html[data-tamanho='grande'] {
+  font-size: 118.75%; /* 19 px */
+}
+html[data-tamanho='maior'] {
+  font-size: 131.25%; /* 21 px */
+}
+
+body {
+  line-height: 1.6;
+}
+
+/* Tamanhos mínimos: nada abaixo de ~14 px na escala padrão */
+:root {
+  --text-xs: 0.8125rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+}
+
+/* Rótulos sem maiúsculas e sem espaçamento largo: mais fáceis de ler */
+.badge-tag,
+.side-group-title,
+.proxima-acao-rotulo,
+.tabela-documentos th,
+.badge,
+.badge-diff,
+.doc-tipo-badge,
+.exemplos-title,
+.lbl,
+.secao-subtitulo {
+  text-transform: none;
+  letter-spacing: 0;
+}
+.badge-tag {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.side-group-title {
+  font-size: var(--text-xs);
+}
+.proxima-acao-rotulo {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.tabela-documentos th {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+.badge,
+.status-tag,
+.fonte-camada {
+  font-size: var(--text-sm);
+}
+
+/* Botões e links-botão: área de toque de pelo menos 44 px */
+.btn {
+  min-height: 44px;
+  font-size: var(--text-md);
+}
+.btn-sm {
+  min-height: 40px;
+  font-size: var(--text-sm);
+}
+.side-link {
+  min-height: 44px;
+  font-size: var(--text-md);
+}
+
+/* Texto corrido com largura confortável */
+.view-description,
+.secao-texto,
+.resposta-texto {
+  max-width: 70ch;
+}
+.resposta-texto {
+  font-size: var(--text-lg);
+}
+
+/* Foco do teclado bem visível */
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Controle de tamanho do texto ---------- */
+.tamanho-texto {
+  display: inline-flex;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.tamanho-texto button {
+  min-width: 40px;
+  min-height: 38px;
+  border: 0;
+  border-left: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+}
+.tamanho-texto button:first-child {
+  border-left: 0;
+}
+.tamanho-texto button[aria-pressed='true'] {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+/* ---------- Início: o que você quer fazer? ---------- */
+.tarefas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+.tarefa {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  align-items: start;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  text-decoration: none;
+  min-height: 120px;
+}
+.tarefa:hover,
+.tarefa:focus-visible {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+.tarefa-icone {
+  display: inline-grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  grid-row: span 2;
+}
+.tarefa:hover .tarefa-icone {
+  background: var(--color-surface);
+}
+.tarefa strong {
+  font-size: var(--text-lg);
+  line-height: 1.3;
+}
+.tarefa span:last-child {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Ajuda da tela ---------- */
+.ajuda-tela {
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-md);
+  background: var(--color-info-bg);
+  color: var(--color-text);
+}
+.ajuda-tela summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-4);
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-info-text);
+  list-style: none;
+}
+.ajuda-tela summary::-webkit-details-marker {
+  display: none;
+}
+.ajuda-tela summary::after {
+  content: '+';
+  margin-left: auto;
+  font-size: var(--text-xl);
+  line-height: 1;
+}
+.ajuda-tela[open] summary::after {
+  content: '−';
+}
+.ajuda-tela ol {
+  margin: 0;
+  padding: 0 var(--space-5) var(--space-4) calc(var(--space-5) + var(--space-4));
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* ---------- Menu: sempre com nome. No celular vira gaveta lateral ---------- */
+.btn-menu {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+}
+.menu-fundo {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .btn-menu {
+    display: inline-flex;
+  }
+  /* Desfaz o modo só-ícones: no celular o menu é uma gaveta com os nomes */
+  .app-sidebar,
+  .app-sidebar.recolhido {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 90;
+    width: min(300px, 86vw);
+    flex-basis: auto;
+    padding: var(--space-5) var(--space-3);
+    align-items: stretch;
+    transform: translateX(-105%);
+    transition: transform 0.2s ease;
+    visibility: hidden;
+  }
+  .app-sidebar.aberto {
+    transform: none;
+    visibility: visible;
+  }
+  .app-sidebar .side-group-title,
+  .app-sidebar .side-foot,
+  .app-sidebar .side-brand-text,
+  .app-sidebar .side-link span,
+  .app-sidebar .side-count {
+    display: revert;
+  }
+  .app-sidebar .side-link span:first-of-type {
+    display: block;
+  }
+  .app-sidebar .side-link {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 var(--space-3);
+  }
+  .menu-fundo.aberto {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 80;
+    background: var(--color-overlay);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
+  }
+}
+
+/* Fonte legível: nome do documento em cima, código discreto embaixo */
+.fonte-chip-btn { display: inline-grid; grid-template-columns: auto 1fr; column-gap: 6px; row-gap: 1px; align-items: center; text-align: left; min-height: 44px; }
+.fonte-chip-btn > svg { grid-row: span 2; }
+.fonte-nome { font-weight: 600; color: var(--color-text-primary, inherit); line-height: 1.3; }
+.fonte-codigo { font-size: 0.875rem; color: var(--color-text-secondary, inherit); line-height: 1.3; }
+.secao-titulo-inicio { font-size: 1.25rem; font-weight: 700; margin: 2rem 0 0.75rem; }
+
+/* Nomes do menu aparecem inteiros: quebram em duas linhas em vez de cortar com "…" */
+.side-link span:first-of-type { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+
+/* Celular e tablet: a barra do topo quebra em linhas, nunca empurra a tela para o lado */
+@media (max-width: 860px) {
+  .app-topbar { flex-wrap: wrap !important; row-gap: 8px; height: auto; min-height: 56px; padding-block: 8px; }
+  .topbar-actions { flex-wrap: wrap; width: 100%; justify-content: flex-start; gap: 8px; min-width: 0; }
+  .topbar-actions > * { flex-shrink: 1; min-width: 0; }
+  .topbar-actions select { max-width: 100%; }
+  .app-topbar .crumbs { flex: 1; }
+}

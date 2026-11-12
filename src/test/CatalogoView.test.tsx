@@ -20,7 +20,7 @@ describe('CatalogoView', () => {
 
     const selosSubstituidos = screen.getAllByTestId('badge-status-substituido');
     expect(selosSubstituidos.length).toBeGreaterThan(0);
-    expect(selosSubstituidos[0]).toHaveTextContent('Substituído');
+    expect(selosSubstituidos[0]).toHaveTextContent('Versão antiga');
 
     // Linha do documento substituído
     expect(screen.getByTestId('linha-doc-NG_111-2.0.0')).toHaveClass('linha-substituido');

@@ -2,9 +2,14 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { DocumentoResumo } from '../api/types';
 import { fetchDocumentos } from '../api/client';
 import { BadgeStatus } from './BadgeStatus';
+import { camadaDe } from '../mocks/v2';
+import { useEstado } from '../app/store';
+import { SemQuebra } from '../ui/componentes';
 
 interface CatalogoViewProps {
   onNavegarDocumento: (codigo: string, versao?: string) => void;
+  /** Tema vindo da rota /catalogo?tema= (Visão geral, lote). */
+  temaInicial?: string;
 }
 
 const NOMES_ASSUNTOS: Record<string, string> = {
@@ -13,13 +18,14 @@ const NOMES_ASSUNTOS: Record<string, string> = {
   locacao: 'Locação de Espaço de Coworking'
 };
 
-export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento }) => {
+export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, temaInicial }) => {
   const [documentos, setDocumentos] = useState<DocumentoResumo[]>([]);
   const [carregando, setCarregando] = useState<boolean>(true);
   const [erro, setErro] = useState<string | null>(null);
   const [busca, setBusca] = useState<string>('');
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'vigente' | 'substituido'>('todos');
-  const [filtroAssunto, setFiltroAssunto] = useState<string>('todos');
+  const digitalizados = useEstado((e) => e.digitalizados);
+  const [filtroAssunto, setFiltroAssunto] = useState<string>(temaInicial || 'todos');
 
   useEffect(() => {
     let ativo = true;
@@ -80,10 +86,10 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento }
   return (
     <div className="view-container catalogo-view" data-testid="catalogo-view">
       <div className="view-header">
-        <h2>Catálogo do Arquivo Central de Normas</h2>
+        <h1 className="view-title">Documentos do Arquivo Central</h1>
         <p className="subtitle">
-          Acervo corporativo da ACME contendo normas gerais, procedimentos, formulários e notas
-          técnicas com rastreabilidade entre versões vigentes e substituídas.
+          Normas, procedimentos, formulários e contratos da ACME. Os marcados “Em vigor” são os
+          que valem hoje.
         </p>
       </div>
 
@@ -189,6 +195,14 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento }
                       <td className="col-titulo">{doc.titulo}</td>
                       <td>
                         <span className="tipo-tag">{doc.tipo_nome}</span>
+                        <span className="fonte-camada">
+                          <SemQuebra
+                            texto={`${camadaDe(doc.codigo).grupo}${camadaDe(doc.codigo).subordinado_a ? ` · subordinado à ${camadaDe(doc.codigo).subordinado_a}` : ''}`}
+                          />
+                        </span>
+                        {digitalizados.includes(doc.codigo) && (
+                          <span className="fonte-camada fonte-digital">Digitalizado e revisado por pessoa</span>
+                        )}
                       </td>
                       <td className="col-versao">v{doc.versao}</td>
                       <td>

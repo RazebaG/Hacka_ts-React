@@ -1,5 +1,7 @@
 import React from 'react';
 import { Citacao } from '../api/types';
+import { camadaDe } from '../mocks/v2';
+import { SemQuebra } from '../ui/componentes';
 
 interface CitacaoCardProps {
   citacao: Citacao;
@@ -7,6 +9,7 @@ interface CitacaoCardProps {
 }
 
 export const CitacaoCard: React.FC<CitacaoCardProps> = ({ citacao, onSelect }) => {
+  const c = camadaDe(citacao.codigo);
   return (
     <div
       data-testid={`citacao-${citacao.codigo}-${citacao.secao}`}
@@ -28,7 +31,10 @@ export const CitacaoCard: React.FC<CitacaoCardProps> = ({ citacao, onSelect }) =
         </span>
         <span className="citacao-link-action">Abrir no texto &rarr;</span>
       </div>
-      <p className="citacao-trecho">"{citacao.trecho}"</p>
+      <span className="fonte-camada">
+        <SemQuebra texto={`${c.sigla} ${c.tipo_nome} · ${c.grupo}${c.subordinado_a ? ` · subordinado à ${c.subordinado_a}` : ''}`} />
+      </span>
+      <p className="citacao-trecho">"<SemQuebra texto={citacao.trecho} />"</p>
     </div>
   );
 };
