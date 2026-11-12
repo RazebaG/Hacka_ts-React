@@ -307,76 +307,79 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
   );
 };
 
-/** T5 Comparação lado a lado. */
+/** T5 Comparação lado a lado (mesmo visual de "Comparar versões"). */
 const LadoALado: React.FC<{ item?: RadarItem }> = ({ item }) => {
+  const voltar = (
+    <a className="btn btn-outline btn-sm" href={url.radar()} onClick={ir(url.radar())}>
+      <Icon nome="recolher" tamanho={15} /> Voltar aos avisos
+    </a>
+  );
+
   if (!item)
     return (
       <div className="view-container" data-testid="lado-inexistente">
-        <CabecalhoTela etiqueta="Lado a lado" titulo="Item não encontrado" />
-        <p>Não encontramos este item. Ele pode ter sido resolvido.</p>
-        <a className="btn btn-outline" href={url.radar()} onClick={ir(url.radar())}>
-          Voltar aos avisos
-        </a>
+        <CabecalhoTela etiqueta="Lado a lado" titulo="Item não encontrado" acoes={voltar} />
+        <div className="fg-card">
+          <p>Não encontramos este item. Ele pode ter sido resolvido.</p>
+        </div>
       </div>
     );
 
   return (
     <div className="view-container lado-view" data-testid="lado-a-lado">
-      <CabecalhoTela
-        etiqueta="Texto antigo e texto novo"
-        titulo={item.titulo}
-        acoes={
-          <a className="btn btn-outline btn-sm" href={url.radar()} onClick={ir(url.radar())}>
-            Voltar aos avisos
-          </a>
-        }
-      />
+      <CabecalhoTela etiqueta="Texto antigo e texto novo" titulo={item.titulo} acoes={voltar} />
 
       {item.tipo === 'referencia_ausente' ? (
         <>
           <Aviso>
             <strong>{item.codigo_ausente} não está no acervo.</strong> {item.explicacao}
           </Aviso>
-          <div className="grade-cartoes grade-2">
+          <div className="fg-grid-2 fg-lado">
             {(item.citado_por ?? []).map((f) => (
-              <article key={f.codigo} className="coluna-fonte">
-                <div className="coluna-topo">
-                  <strong>{f.codigo}</strong>
-                  <span className="status-tag status-vigente">Em vigor</span>
+              <article key={f.codigo} className="fg-card coluna-fonte">
+                <div className="fg-cabeca-card">
+                  <h2>{f.codigo}</h2>
+                  <span className="fg-pilula ok ponto">Em vigor</span>
                 </div>
-                <FonteChip fonte={f} />
-                <blockquote className="trecho">{f.trecho}</blockquote>
+                <blockquote className="fg-trecho">{f.trecho}</blockquote>
+                <FonteLink fonte={f} comSecao />
               </article>
             ))}
           </div>
         </>
       ) : (
         <>
-          <div className="grade-cartoes grade-2">
-            {item.fontes.map((f) => (
-              <article key={f.versao} className={`coluna-fonte ${f.situacao === 'substituida' ? 'coluna-antiga' : ''}`} data-testid={`coluna-${f.situacao}`}>
-                <div className="coluna-topo">
-                  <strong>
-                    {f.codigo} · v{f.versao}
-                  </strong>
-                  <span className={`status-tag ${f.situacao === 'vigente' ? 'status-vigente' : 'status-neutro'}`}>
-                    {f.situacao === 'vigente' ? 'Em vigor' : 'Versão antiga'}
-                  </span>
-                </div>
-                <FonteChip fonte={f} />
-                <blockquote className="trecho">{f.trecho}</blockquote>
-                <IncluirRelatorio item={{ id: `lado-${item.id}-${f.versao}`, texto: `${f.codigo} v${f.versao}, ${f.secao}: ${f.trecho}`, fonte: f }} />
-              </article>
-            ))}
-          </div>
+          <article className="fg-card fg-diff">
+            <div className="fg-diff-colunas">
+              {item.fontes.map((f) => {
+                const antiga = f.situacao === 'substituida';
+                return (
+                  <div key={f.versao} className={antiga ? 'fg-diff-antes coluna-antiga' : 'fg-diff-depois'} data-testid={`coluna-${f.situacao}`}>
+                    <p className="fg-diff-rotulo">
+                      <Icon nome={antiga ? 'fechar' : 'marca'} tamanho={13} /> {f.codigo} · v{f.versao} · {antiga ? 'Versão antiga' : 'Em vigor'}
+                    </p>
+                    <p className="fg-diff-texto">{f.trecho}</p>
+                    <div className="fg-diff-pe">
+                      <FonteLink fonte={f} comSecao />
+                      <IncluirRelatorio item={{ id: `lado-${item.id}-${f.versao}`, texto: `${f.codigo} v${f.versao}, ${f.secao}: ${f.trecho}`, fonte: f }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </article>
           <Aviso tipo="info">
             <strong>{item.explicacao}</strong> As duas versões ficam à vista para você conferir.
           </Aviso>
           {item.precedencia && (
-            <section className="painel-secao">
-              <span className="badge-tag">O que o próprio documento diz</span>
-              <p>{item.precedencia.trecho}</p>
-              <FonteChip fonte={item.precedencia} />
+            <section className="fg-card">
+              <div className="fg-cabeca-card">
+                <h2>
+                  <Icon nome="escudo" tamanho={18} /> O que o próprio documento diz
+                </h2>
+              </div>
+              <blockquote className="fg-trecho">{item.precedencia.trecho}</blockquote>
+              <FonteLink fonte={item.precedencia} comSecao />
             </section>
           )}
         </>

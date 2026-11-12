@@ -164,8 +164,9 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
           <div className="fg-stat-texto">
             <p className="fg-rotulo">Versões antigas</p>
             <p className="fg-valor">{antigos.length}</p>
+            <p className="fg-sub">{[...new Set(antigos.map((d) => d.codigo))].join(' · ') || 'Nenhuma'}</p>
           </div>
-          <span className="fg-pilula aviso">{[...new Set(antigos.map((d) => d.codigo))].join(' · ') || '—'}</span>
+          <span />
         </div>
       </div>
 
