@@ -97,7 +97,13 @@ export function useRota(): Rota {
 
 /** Construtores de endereço, para não espalhar strings pelo código. */
 export const url = {
-  inicio: (doc?: string) => (doc ? `/?doc=${encodeURIComponent(doc)}` : '/'),
+  inicio: (doc?: string, bloco?: string) => {
+    const qs = new URLSearchParams();
+    if (doc) qs.set('doc', doc);
+    if (bloco) qs.set('bloco', bloco);
+    const t = qs.toString();
+    return `/${t ? '?' + t : ''}`;
+  },
   perguntar: (q?: string, documentos?: string[]) => {
     const qs = new URLSearchParams();
     if (q) qs.set('q', q);
@@ -105,11 +111,20 @@ export const url = {
     const t = qs.toString();
     return `/perguntar${t ? '?' + t : ''}`;
   },
-  ficha: (codigo: string, versao?: string) => `/documento/${encodeURIComponent(codigo)}/ficha${versao ? `?versao=${versao}` : ''}`,
-  apresentar: (codigo: string, versao?: string, cartao?: number) => {
+  ficha: (codigo: string, versao?: string, bloco?: string) => {
+    const qs = new URLSearchParams();
+    if (versao) qs.set('versao', versao);
+    if (bloco) qs.set('bloco', bloco);
+    const t = qs.toString();
+    return `/documento/${encodeURIComponent(codigo)}/ficha${t ? '?' + t : ''}`;
+  },
+  /** `de` e `bloco`: "Sair" volta à Mesa (Início) ou à Ficha no bloco que estava escolhido (MODO-APRESENTACAO §2). */
+  apresentar: (codigo: string, versao?: string, cartao?: number, origem: { de?: 'inicio' | 'ficha'; bloco?: string | null } = {}) => {
     const qs = new URLSearchParams();
     if (versao) qs.set('versao', versao);
     if (cartao) qs.set('cartao', String(cartao));
+    if (origem.de) qs.set('de', origem.de);
+    if (origem.bloco) qs.set('bloco', origem.bloco);
     const t = qs.toString();
     return `/documento/${encodeURIComponent(codigo)}/apresentar${t ? '?' + t : ''}`;
   },

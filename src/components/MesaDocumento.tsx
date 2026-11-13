@@ -64,9 +64,17 @@ const Bloco: React.FC<{
   </button>
 );
 
+/** Mínimo para existir apresentação: capa, frase e "De onde vem" (MODO-APRESENTACAO §3). */
+export const SEM_RESUMO = 'Este documento ainda não tem resumo pronto.';
+
 export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compacta' | 'completa' }> = ({ ficha, variante }) => {
   const blocos = ficha.blocos ?? [];
-  const [ativoId, setAtivoId] = useState<string | null>(null);
+  // ?bloco= (volta da apresentação) reabre o bloco que estava escolhido
+  const [ativoId, setAtivoId] = useState<string | null>(() => {
+    const b = new URLSearchParams(window.location.search).get('bloco');
+    return b && blocos.some((x) => x.id === b) ? b : null;
+  });
+  const chaveDoc = useRef(`${ficha.codigo}@${ficha.versao}`);
   const [secaoFoco, setSecaoFoco] = useState<string | null>(null);
   const [pergunta, setPergunta] = useState('');
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -75,9 +83,13 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
   const celulas = [...ficha.mapa_calor].sort((a, b) => a.ordem - b.ordem);
   const acao = [...ficha.acoes].sort((a, b) => ['alta', 'media', 'baixa'].indexOf(a.urgencia) - ['alta', 'media', 'baixa'].indexOf(b.urgencia))[0];
   const gerando = ficha.estado === 'gerando' || ficha.estado === 'parcial';
+  const linkApresentar = url.apresentar(ficha.codigo, ficha.versao, undefined, { de: variante === 'compacta' ? 'inicio' : 'ficha', bloco: ativoId });
 
   // Trocou de documento: fecha o detalhe
   useEffect(() => {
+    const chave = `${ficha.codigo}@${ficha.versao}`;
+    if (chave === chaveDoc.current) return;
+    chaveDoc.current = chave;
     setAtivoId(null);
     setSecaoFoco(null);
   }, [ficha.codigo, ficha.versao]);
@@ -357,9 +369,20 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
           </label>
           <input id={`mesa-pergunta-${variante}`} type="search" placeholder="Pergunte a este documento…" value={pergunta} onChange={(e) => setPergunta(e.target.value)} data-testid="mesa-pergunta" />
         </form>
-        <a className="btn btn-outline btn-sm" href={url.apresentar(ficha.codigo, ficha.versao)} onClick={ir(url.apresentar(ficha.codigo, ficha.versao))}>
-          <Icon nome="apresentacao" tamanho={15} /> Apresentar em 5 min
-        </a>
+        {ficha.bluf ? (
+          <a className="btn btn-outline btn-sm" href={linkApresentar} onClick={ir(linkApresentar)} data-testid="mesa-apresentar">
+            <Icon nome="apresentacao" tamanho={15} /> Apresentar em 5 min
+          </a>
+        ) : (
+          <span className="mesa-apresentar-off">
+            <button type="button" className="btn btn-outline btn-sm" disabled aria-describedby={`mesa-apresentar-motivo-${variante}`} data-testid="mesa-apresentar">
+              <Icon nome="apresentacao" tamanho={15} /> Apresentar em 5 min
+            </button>
+            <span id={`mesa-apresentar-motivo-${variante}`} className="fg-sub">
+              {SEM_RESUMO}
+            </span>
+          </span>
+        )}
         {variante === 'compacta' && (
           <a className="btn btn-primary btn-sm" href={url.ficha(ficha.codigo, ficha.versao)} onClick={ir(url.ficha(ficha.codigo, ficha.versao))} data-testid="mesa-abrir-ficha">
             Abrir ficha completa <Icon nome="seta" tamanho={15} />

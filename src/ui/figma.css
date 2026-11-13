@@ -4246,3 +4246,7 @@ h3,
     box-shadow: 0 -12px 32px rgb(15 27 51 / 0.18);
   }
 }
+
+/* "Apresentar" sem resumo: botão desativado com o motivo ao lado (MODO-APRESENTACAO §3) */
+.mesa-apresentar-off { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mesa-apresentar-off .btn:disabled { opacity: 0.55; cursor: not-allowed; }

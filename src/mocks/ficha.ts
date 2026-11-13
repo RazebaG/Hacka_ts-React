@@ -368,14 +368,18 @@ const PESO_NIVEL = { critico: 0, atencao: 1, ok: 2 } as const;
 
 /** Próximo prazo futuro da ficha (ações, números e prazos com data). */
 function proximoPrazo(f: FichaDocumento): TriagemItem['proximo_prazo'] {
-  const datas: { data: string; evento: string }[] = [];
-  f.acoes.forEach((a) => a.prazo?.data && datas.push({ data: a.prazo.data, evento: a.acao }));
+  const datas: { data: string; evento: string; fonte?: FonteFicha; acao?: boolean }[] = [];
+  f.acoes.forEach((a) => a.prazo?.data && datas.push({ data: a.prazo.data, evento: a.acao, fonte: a.fontes[0], acao: true }));
   [...f.numeros, ...f.pontos.prazos].forEach((p) => {
     const iso = dataIso(p.valor ?? '') ?? dataIso(p.titulo);
-    if (iso) datas.push({ data: iso, evento: p.titulo.length > 70 ? p.titulo.slice(0, 67) + '…' : p.titulo });
+    if (iso) datas.push({ data: iso, evento: p.titulo.length > 70 ? p.titulo.slice(0, 67) + '…' : p.titulo, fonte: p.fontes[0] });
   });
   if (f.identidade.vigencia.fim) datas.push({ data: f.identidade.vigencia.fim, evento: 'Fim da vigência' });
-  return datas.filter((d) => d.data >= DATA_REFERENCIA).sort((a, b) => a.data.localeCompare(b.data))[0] ?? null;
+  const futuros = datas.filter((d) => d.data >= DATA_REFERENCIA).sort((a, b) => a.data.localeCompare(b.data));
+  const p = futuros[0];
+  if (!p) return null;
+  const fonte = futuros.find((d) => d.data === p.data && !d.acao && d.fonte)?.fonte ?? p.fonte;
+  return { data: p.data, evento: p.evento, ...(fonte ? { fonte } : {}) };
 }
 
 /** Motivo curto do chip (RF71): o fato que puxa o documento para a lista. */

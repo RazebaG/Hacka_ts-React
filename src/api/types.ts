@@ -405,7 +405,8 @@ export interface TriagemItem {
   tema: string;
   semaforo: { nivel: 'ok' | 'atencao' | 'critico'; motivos: string[] };
   bluf_curto: string | null;
-  proximo_prazo: { data: string; evento: string } | null;
+  /** `fonte` é opcional: com ela, o Início cita a linha exata do cronograma (RF08). */
+  proximo_prazo: { data: string; evento: string; fonte?: FonteFicha } | null;
   alertas: number;
   leitura_integral_min: number;
   leitura_ficha_min: number;

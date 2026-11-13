@@ -5,7 +5,8 @@ import { VisaoGeralView } from '../components/VisaoGeralView';
 import { mockFicha, mockTriagem, familiaDe } from '../mocks/ficha';
 import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { acoes } from '../app/store';
-import { lerRota, url } from '../app/rotas';
+import { lerRota, navegar, url } from '../app/rotas';
+import { ApresentacaoView } from '../components/ApresentacaoView';
 
 afterEach(() => acoes.definirPerfil(null));
 
@@ -100,5 +101,35 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('mesa-detalhe')).toBeInTheDocument();
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(screen.queryByTestId('mesa-detalhe')).not.toBeInTheDocument();
+  });
+
+  it('RF08/RF31: próximo prazo calculado pela data de referência, citando o cronograma (Apêndice C)', async () => {
+    render(<VisaoGeralView />);
+    expect(await screen.findByTestId('inicio-proximo-prazo')).toHaveTextContent('25/11/2026');
+    expect(screen.getAllByText(/Apêndice C/).length).toBeGreaterThan(0);
+    expect(screen.getByTestId('inicio-atencao')).toHaveTextContent('Perfil: todos');
+  });
+
+  it('Apresentar: desativado sem resumo, com o motivo; com resumo leva a origem e o bloco escolhido', () => {
+    const { unmount } = render(<MesaDocumento ficha={mockFicha('NG_111')!} variante="compacta" />);
+    expect(screen.getByTestId('mesa-apresentar')).toBeDisabled();
+    expect(screen.getByText('Este documento ainda não tem resumo pronto.')).toBeInTheDocument();
+    unmount();
+    render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
+    fireEvent.click(screen.getByTestId('bloco-b-custo'));
+    expect(screen.getByTestId('mesa-apresentar')).toHaveAttribute('href', '/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo');
+  });
+
+  it('Apresentação: Sair volta à Mesa no mesmo bloco; sem resumo a tela não abre', async () => {
+    navegar('/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo', true);
+    const { unmount } = render(<ApresentacaoView codigo="CTR_2026-012" versao="1.0.0" />);
+    fireEvent.click(await screen.findByTestId('apresentacao-sair'));
+    expect(window.location.pathname + window.location.search).toBe('/?doc=CTR_2026-012&bloco=b-custo');
+    unmount();
+    render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
+    expect(screen.getByTestId('bloco-b-custo')).toHaveAttribute('aria-pressed', 'true');
+    navegar('/', true);
+    render(<ApresentacaoView codigo="NG_111" />);
+    expect(await screen.findByTestId('apresentacao-sem-resumo')).toHaveTextContent('ainda não tem resumo pronto');
   });
 });

@@ -41,9 +41,17 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
   const [erroMesa, setErroMesa] = useState(false);
   const [tentativa, setTentativa] = useState(0);
 
+  const [prazos, setPrazos] = useState<TriagemResposta | null>(null);
+  const [erroPrazo, setErroPrazo] = useState(false);
+
   useEffect(() => {
     fetchRadar().then(setRadar).catch(() => setErro(true));
+    // RF08/RF31: o próximo prazo é calculado pela data de referência, entre todos os documentos em vigor
+    fetchTriagem({ limite: 20 }).then(setPrazos).catch(() => setErroPrazo(true));
   }, []);
+  const proximo = (prazos?.itens ?? [])
+    .filter((i) => i.proximo_prazo)
+    .sort((a, b) => a.proximo_prazo!.data.localeCompare(b.proximo_prazo!.data))[0];
 
   // RF71: lista curta (até 5) ordenada por urgência e pelo perfil escolhido
   useEffect(() => {
@@ -93,7 +101,7 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
           <div>
             <h2 id="t-atencao">Documentos que pedem sua atenção</h2>
             <p className="fg-sub">
-              Para: {perfil ? PERFIS.find((p) => p.id === perfil)?.nome ?? perfil : 'qualquer pessoa'} · escolha um documento para ver o que decidir
+              Perfil: {perfil ? PERFIS.find((p) => p.id === perfil)?.nome ?? perfil : 'todos'} · escolha um documento para ver o que decidir
             </p>
           </div>
           <a className="fg-link" href={url.atencao()} onClick={ir(url.atencao())}>
@@ -240,18 +248,35 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
             </h2>
             <span className="fg-pilula neutra">Cronograma</span>
           </div>
-          <p className="fg-valor">25/11/2026</p>
-          <p className="fg-texto">Vistoria presencial do espaço de coworking.</p>
-          <div className="fg-rodape-card">
-            <FonteLink fonte={{ codigo: 'CTR_2026-012', versao: '1.0.0', secao: 'Apêndice B' }} comSecao />
-            <a
-              className="fg-link"
-              href={url.documento('CTR_2026-012', '1.0.0', 'Apêndice B')}
-              onClick={ir(url.documento('CTR_2026-012', '1.0.0', 'Apêndice B'))}
-            >
-              Ver detalhes <Icon nome="seta" tamanho={14} />
-            </a>
-          </div>
+          {proximo?.proximo_prazo ? (
+            (() => {
+              const p = proximo.proximo_prazo;
+              const fonte = p.fonte ?? { codigo: proximo.codigo, versao: proximo.versao, secao: '' };
+              const destino = p.fonte ? url.documento(fonte.codigo, fonte.versao, fonte.secao || undefined) : url.ficha(proximo.codigo, proximo.versao);
+              return (
+                <>
+                  <p className="fg-valor" data-testid="inicio-proximo-prazo">
+                    {p.data.split('-').reverse().join('/')}
+                  </p>
+                  <p className="fg-texto">
+                    {p.evento} · {proximo.titulo}
+                  </p>
+                  <div className="fg-rodape-card">
+                    <FonteLink fonte={fonte} comSecao={!!p.fonte} />
+                    <a className="fg-link" href={destino} onClick={ir(destino)}>
+                      Ver detalhes <Icon nome="seta" tamanho={14} />
+                    </a>
+                  </div>
+                </>
+              );
+            })()
+          ) : erroPrazo ? (
+            <p className="fg-texto">Não conseguimos calcular o próximo prazo agora.</p>
+          ) : !prazos ? (
+            <p className="fg-texto" aria-busy="true">Calculando o próximo prazo…</p>
+          ) : (
+            <p className="fg-texto">Nenhum prazo futuro nos documentos em vigor.</p>
+          )}
         </section>
 
         <section className="fg-card">

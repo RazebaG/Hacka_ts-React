@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AcaoFicha, CampoGov, FichaDocumento, ItemFicha } from '../api/types';
 import { SeloOrigem } from './FichaPecas';
-import { MesaDocumento } from './MesaDocumento';
+import { MesaDocumento, SEM_RESUMO } from './MesaDocumento';
 import { fetchFicha, isMockMode } from '../api/client';
 import { acoes as acoesEstado, useEstado } from '../app/store';
 import { PERFIS } from './perfis';
@@ -510,17 +510,23 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
             >
               <Icon nome="documento" tamanho={16} /> Ler o texto completo
             </a>
-            <a
-              className="btn btn-outline btn-sm fg-largo"
-              href={url.apresentar(ficha.codigo, ficha.versao)}
-              data-testid="ficha-apresentar"
-              onClick={(e) => {
-                e.preventDefault();
-                navegar(url.apresentar(ficha.codigo, ficha.versao));
-              }}
-            >
-              <Icon nome="apresentacao" tamanho={16} /> Apresentar em 5 min
-            </a>
+            {ficha.bluf ? (
+              <a
+                className="btn btn-outline btn-sm fg-largo"
+                href={url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' })}
+                data-testid="ficha-apresentar"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navegar(url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' }));
+                }}
+              >
+                <Icon nome="apresentacao" tamanho={16} /> Apresentar em 5 min
+              </a>
+            ) : (
+              <button type="button" className="btn btn-outline btn-sm fg-largo" disabled title={SEM_RESUMO} aria-label={`Apresentar em 5 min: ${SEM_RESUMO}`} data-testid="ficha-apresentar">
+                <Icon nome="apresentacao" tamanho={16} /> Apresentar em 5 min
+              </button>
+            )}
             <button type="button" className="btn btn-outline btn-sm fg-largo" onClick={() => window.print()}>
               <Icon nome="baixar" tamanho={16} /> Exportar (PDF)
             </button>

@@ -6,6 +6,13 @@ import { DATA_REFERENCIA } from '../mocks/v2';
 import { SemaforoSituacao, SeloOrigem } from './FichaView';
 import { Icon } from '../ui/Icon';
 
+/** De onde a apresentação foi aberta (Mesa no Início ou Ficha) e o bloco que estava escolhido. */
+function origemDaUrl(): { de?: 'inicio' | 'ficha'; bloco: string | null } {
+  const q = new URLSearchParams(window.location.search);
+  const de = q.get('de');
+  return { de: de === 'inicio' || de === 'ficha' ? de : undefined, bloco: q.get('bloco') };
+}
+
 /**
  * T16 · Modo apresentação (RF58, P1): o "pitch do documento" em até 8 cartões e 5 minutos.
  * Os cartões são montados a partir da ficha, sem nova chamada de IA (FLUXO-DE-TELAS-FICHA §3).
@@ -128,7 +135,8 @@ export const ApresentacaoView: React.FC<{ codigo: string; versao?: string; carta
   const total = cartoes.length;
   const sair = useCallback(() => {
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => undefined);
-    navegar(url.ficha(codigo, versao));
+    const { de, bloco } = origemDaUrl();
+    navegar(de === 'inicio' ? url.inicio(codigo, bloco ?? undefined) : url.ficha(codigo, versao, bloco ?? undefined));
   }, [codigo, versao]);
 
   const ir = useCallback(
@@ -137,7 +145,7 @@ export const ApresentacaoView: React.FC<{ codigo: string; versao?: string; carta
       const n = Math.min(total - 1, Math.max(0, i));
       setAtual(n);
       setFonteAberta(null);
-      navegar(url.apresentar(codigo, versao, n + 1), true);
+      navegar(url.apresentar(codigo, versao, n + 1, origemDaUrl()), true);
     },
     [total, codigo, versao]
   );
@@ -179,6 +187,18 @@ export const ApresentacaoView: React.FC<{ codigo: string; versao?: string; carta
           <h1>{erro}</h1>
           <button type="button" className="btn btn-primary" onClick={() => navegar(url.catalogo())}>
             Ir para Documentos
+          </button>
+        </div>
+      </div>
+    );
+  if (ficha && !ficha.bluf)
+    return (
+      <div className="apresentacao" data-testid="apresentacao-sem-resumo">
+        <div className="apresentacao-cartao">
+          <h1>Este documento ainda não tem resumo pronto.</h1>
+          <p className="apresentacao-detalhe">A apresentação precisa ao menos da capa, do resumo em uma frase e da cobertura. Sem resumo, use a ficha.</p>
+          <button type="button" className="btn btn-primary" onClick={sair}>
+            Voltar
           </button>
         </div>
       </div>
