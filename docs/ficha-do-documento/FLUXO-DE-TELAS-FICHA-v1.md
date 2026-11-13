@@ -6,6 +6,97 @@
 
 ---
 
+## 0. Revisão 13/11: a Mesa de decisão na tela inicial (leia esta seção primeiro)
+
+**Decisão da equipe:** a experiência principal acontece **na tela inicial (T1)**, não numa tela separada. O topo atual do frontend fica como está; a Mesa entra logo abaixo.
+
+```
+┌ T1 Início ───────────────────────────────────────────────────────────────────────────────┐
+│ Arquivo Central de Normas                                          (CabecalhoTela, existe)│
+│ Acesse normas, consulte regras e acompanhe prazos institucionais.                         │
+│ [Tirar Dúvida] [Regras que Mudaram] [Consultar Acervo] [Montar Relatório]  (fg-atalhos, existe) │
+├ NOVO ─────────────────────────────────────────────────────────────────────────────────────┤
+│ Documentos que pedem sua atenção            Perfil: Gestor                                  │
+│ (● CTR_2026-012 · vistoria em 13 dias) (● NG_111 · v2 em uso) (● NT_2026-021 · em dia)       │
+│ ┌ MesaDocumento ─────────────────────────────────────────────────────────────────────────┐ │
+│ │ Cabeçalho: tipo · vigência · classificação · governança · leitura 12 min → ficha 3 min   │ │
+│ │ [!] Precisa de você: fazer a vistoria até 25/11/2026 (GOC e locadora)                    │ │
+│ │ Frase-resumo (1 a 2 linhas)                                                              │ │
+│ │ Mapa de posição: ▒▒▓▒░░▓▓░░▒ … (uma célula por seção; acende ao escolher um bloco)        │ │
+│ │ ┌ Quanto custa ┐ ┌ Até quando ┐ ┌ Quem faz o quê ┐   blocos por família, 4 a 6,          │ │
+│ │ ┌ Onde pode doer ┐ ┌ Regras ┐ ┌ Falta no acervo ┐    cada um com selo "1º · maior valor"│ │
+│ │ Detalhe: trecho exato + cláusula + origem + [Abrir no texto completo]                    │ │
+│ │ [ Pergunte a este documento… ]  [Apresentar em 5 min]  [Abrir ficha completa]            │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────┘ │
+├ continua como hoje ───────────────────────────────────────────────────────────────────────┤
+│ Faixa do radar · Resumo normativo por área · Próximo prazo · Dúvidas frequentes            │
+└──────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Referência visual:** um protótipo interativo foi apresentado à equipe em 13/11 (ao escolher outro chip, contrato e norma trocam os blocos); os números do protótipo são ilustrativos. O frontend decide o acabamento usando o design system atual (`fg-card`, `fg-pilula`, `fg-atalho`, `fg-grid-*`).
+
+### 0.1 O que fica, o que entra e o que muda na T1
+
+| Parte da T1 | Situação | Observação |
+|---|---|---|
+| Título e descrição (`CabecalhoTela`) | **Fica** | |
+| 4 atalhos (`fg-atalhos`) | **Fica** | |
+| **Documentos que pedem sua atenção** | **Novo (P0)** | Chips; lê `GET /api/ficha/triagem?limite=5&perfil=` (C25). Sem dados: "Nada pede sua atenção agora" |
+| **Mesa de decisão** (`MesaDocumento`) | **Novo (P0)** | Lê `GET /api/documentos/{codigo}/ficha` (C22); abre sozinha no primeiro chip |
+| Faixa do radar (`fg-faixa-alerta`) | Fica | Pode virar uma linha mais compacta para a Mesa ter destaque |
+| Resumo normativo por área (4 cartões) | Fica, **desce** | Já existe; sem mudança de dados |
+| Próximo prazo e Dúvidas frequentes | Fica, **desce** | |
+
+### 0.2 Mesa (T1) e Ficha (T14): o mesmo componente
+
+| Elemento | Na T1 (Mesa) | Na T14 (Ficha, página inteira) |
+|---|---|---|
+| Faixa "Precisa de você", frase-resumo, mapa, blocos, detalhe, pergunta | Sim | Sim |
+| Governança completa (todos os selos) | Linha resumida | Bloco completo |
+| Pontos-chave por tema (lista longa) | Não | Sim |
+| Alertas do radar, cobertura declarada, perguntas sugeridas | Resumo em uma linha | Sim |
+| Versão e "o que mudou" | Selo | Bloco |
+| Apresentar em 5 min, exportar, compartilhar | Botão "Apresentar" | Todos |
+
+Regra de implementação: `MesaDocumento` recebe `variante="compacta" | "completa"`. A T14 é a rota `/documento/:codigo/ficha` renderizando a variante completa.
+
+### 0.3 Blocos por família (resumo; a tabela completa está nos requisitos, seção 2.2)
+
+- **Contrato:** Quanto custa · Até quando · Quem faz o quê · Onde pode doer · Regras que valem · Falta no acervo.
+- **Norma:** O que muda para você · Prazos que valem · Quem faz o quê · Limites e valores · Penalidades e exceções · Versão em vigor · Documentos ligados.
+- **Procedimento (P1):** Passo a passo em 5 linhas · Quem faz cada etapa · Prazos por etapa · Formulários e tabelas · Onde costuma travar · Norma de origem.
+- **Nota técnica (P1):** Decisão e o porquê · Valores e alçada · Prazo e vigência · Impacto · Documentos citados e ausentes.
+
+O componente `BlocoDecisao` é **um só**: recebe `titulo`, `destaque`, `apoio`, `relevancia` (posição e motivo), `sinal`, `secoes_mapa` e `itens`. O que muda por família é só o dado vindo da API, não o componente.
+
+### 0.4 Interações da Mesa
+
+1. Escolher um chip da lista de atenção troca o documento sem recarregar a página e atualiza o endereço (`?doc=CTR_2026-012`, para compartilhar o link).
+2. Escolher um bloco: borda de destaque, seções acesas no mapa (cor do sinal), detalhe com o trecho exato. Escolher de novo o mesmo bloco fecha.
+3. Passar o mouse numa seção do mapa: dica com o título e os sinais; clicar abre o texto completo (T8) na seção.
+4. Teclado: setas entre blocos, `Enter` abre o detalhe, `Esc` fecha. O mapa tem a alternativa em lista (RNF26).
+5. Estados: `gerando` (blocos em esqueleto com o progresso por etapa, a faixa "Precisa de você" e o mapa já aparecem pelo relance extrativo), `parcial`, `pronta`, `erro` com "Tentar de novo".
+6. Celular (375 px): chips em rolagem horizontal; faixa "Precisa de você" e frase em cima; mapa em 2 linhas; blocos em coluna única; detalhe abre como gaveta.
+
+### 0.5 Telas, depois da revisão
+
+| Tela | Mudança em relação à primeira versão |
+|---|---|
+| **T1 Início** | **Passa a ser a tela principal da funcionalidade** (lista de atenção + Mesa) |
+| **T14 Ficha** | Versão completa da mesma Mesa; destino de "Abrir ficha completa" e dos links do Slack/Teams |
+| **T16 Apresentação** | Igual (P1); abre por "Apresentar em 5 min" na Mesa |
+| **T17 Fila de atenção** | Vira a página completa da lista que a T1 mostra em versão curta (P1) |
+| Painel de Fontes (T2) | Igual (P0) |
+
+### 0.6 Ordem de entrega do frontend, revisada
+
+1. **Fatia 1 (P0):** `MesaDocumento` compacta na T1 com o mock `mock-ficha-CTR_2026-012.json` (faixa, frase, blocos, detalhe), mantendo o topo e o restante da T1.
+2. **Fatia 2 (P0):** mapa de posição ligado aos blocos; lista "Documentos que pedem sua atenção" com 2 mocks (contrato e norma, para provar a troca de blocos).
+3. **Fatia 3 (P0):** Painel de Fontes e escopo no T2; botão "Abrir ficha completa" (T14, variante completa).
+4. **Fatia 4 (P1):** apresentação, fila de atenção completa, perfil, linguagem simples.
+
+---
+
 ## 1. Visão geral: onde as telas novas entram
 
 ```
