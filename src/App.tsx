@@ -62,7 +62,7 @@ export function App() {
   let conteudo: JSX.Element;
   switch (rota.tela) {
     case 'inicio':
-      conteudo = <VisaoGeralView />;
+      conteudo = <VisaoGeralView docSelecionado={q.get('doc') ?? undefined} />;
       break;
     case 'perguntar':
       conteudo = (

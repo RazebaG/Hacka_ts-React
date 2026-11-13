@@ -97,7 +97,7 @@ export function useRota(): Rota {
 
 /** Construtores de endereço, para não espalhar strings pelo código. */
 export const url = {
-  inicio: () => '/',
+  inicio: (doc?: string) => (doc ? `/?doc=${encodeURIComponent(doc)}` : '/'),
   perguntar: (q?: string, documentos?: string[]) => {
     const qs = new URLSearchParams();
     if (q) qs.set('q', q);

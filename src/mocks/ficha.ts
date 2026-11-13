@@ -6,7 +6,7 @@
  *   texto das seções do acervo. Cada item é uma frase copiada da seção, então a fonte é
  *   verificada por construção. Nada é gerado: sem IA, BLUF e ações ficam vazios e a tela avisa.
  */
-import { AlertaFicha, CampoGov, CelulaMapa, DocumentoDetalhe, FichaDocumento, FiltrosTriagem, FonteFicha, ItemFicha, TriagemItem, TriagemResposta } from '../api/types';
+import { AlertaFicha, BlocoDecisao, CampoGov, CelulaMapa, DocumentoDetalhe, FamiliaDocumento, FichaDocumento, FiltrosTriagem, FonteFicha, ItemFicha, SinalBloco, TriagemItem, TriagemResposta } from '../api/types';
 import { MOCK_DOCUMENTOS } from './documentos';
 import { EXEMPLOS_PERGUNTAS } from './perguntas';
 import { DATA_REFERENCIA, MOCK_RADAR, cadeiaDe, camadaDe } from './v2';
@@ -20,6 +20,7 @@ const REF = Date.parse(DATA_REFERENCIA);
 const RE_PRAZO = /\b\d{2}\/\d{2}\/\d{4}\b|\b\d+\s*(?:\([^)]*\)\s*)?dias?\b|\bprazo\b|\bD-\d+\b/gi;
 const RE_VALOR = /R\$\s?[\d.]+,\d{2}|\b\d+(?:,\d+)?\s?%/g;
 const RE_OBRIGACAO = /\b(?:deve|devem|deverá|deverão|obrigatóri[oa]s?|compete|cabe a|é responsável)\b/gi;
+const RE_RESPONSAVEL = /\b(?:GGC|GFI|GCO|GOC|GJU|DIRAF|gestor(?:a|es)?|empregad[oa]s?|diretor(?:ia)?|RH|comit[êe](?: de [A-ZÁÉÍÓÚ][\wçãõáéíóú]+)?|fiscal(?: técnico)?)\b/gi;
 const RE_RISCO = /\b(?:multa|vedad[oa]s?|proibid[oa]s?|penalidade|sanç(?:ão|ões)|rescis(?:ão|ória)|descumprimento|conflito)\b/gi;
 
 const contar = (re: RegExp, t: string) => (t.match(re) || []).length;
@@ -143,7 +144,8 @@ function fichaExtrativa(d: DocumentoDetalhe): FichaDocumento {
   }
 
   const perguntas = EXEMPLOS_PERGUNTAS.filter((e) => e.resposta.citacoes.some((c) => c.codigo === d.codigo)).map((e) => e.pergunta);
-  const pontos = { obrigacoes, prazos, valores, riscos, responsaveis: [], condicoes: [] };
+  const responsaveis = itensPorSinal(d, RE_RESPONSAVEL, 'q', 3);
+  const pontos = { obrigacoes, prazos, valores, riscos, responsaveis, condicoes: [] };
   const verificados = numeros.length + Object.values(pontos).reduce((t, l) => t + l.length, 0);
 
   return {
@@ -202,7 +204,148 @@ export function mockFicha(codigo: string, versao?: string): FichaDocumento | nul
     MOCK_DOCUMENTOS.find((d) => d.codigo === codigo);
   if (!doc) return null;
   const ficha = codigo === 'CTR_2026-012' && doc.versao === (fichaCtr as FichaDocumento).versao ? (fichaCtr as unknown as FichaDocumento) : fichaExtrativa(doc);
-  return { ...ficha, delta: deltaReal(doc) };
+  const comDelta = { ...ficha, delta: deltaReal(doc) };
+  // Mock oficial já traz familia e blocos; os demais saem por regra (RF73/RF74)
+  return comDelta.blocos ? comDelta : { ...comDelta, familia: familiaDe(doc.codigo), blocos: blocosPorRegra(comDelta, doc) };
+}
+
+/* ---------- Revisão 13/11 · blocos por família (RF73) e relevância por regra (RF74) ---------- */
+
+/** Família pela taxonomia do catálogo (sigla), nunca pela IA. */
+export function familiaDe(codigo: string): FamiliaDocumento {
+  const sigla = codigo.split('_')[0];
+  if (sigla === 'CTR') return 'contrato';
+  if (sigla === 'NG' || sigla === 'RG') return 'norma';
+  if (sigla === 'NT' || sigla === 'CT') return 'nota_tecnica';
+  return 'procedimento';
+}
+
+const RE_DATA = /\b(\d{2})\/(\d{2})\/(\d{4})\b/;
+const RE_REAIS = /R\$\s?([\d.]+,\d{2})/;
+const reais = (t: string) => {
+  const m = RE_REAIS.exec(t);
+  return m ? Number(m[1].replace(/\./g, '').replace(',', '.')) : 0;
+};
+const curto = (t: string, n = 140) => (t.length > n ? t.slice(0, n - 1).trimEnd() + '…' : t);
+
+interface Candidato {
+  id: string;
+  titulo: string;
+  itens: ItemFicha[];
+  sinal: SinalBloco;
+  destaque?: string;
+  apoio?: string;
+  alerta?: number;
+  secoesExtra?: string[];
+}
+
+/** Pontuação por regra: prazo mais próximo > versão substituída > valor > risco > responsável > regra. */
+function pontuar(c: Candidato): { pontuacao: number; motivo: string } {
+  const texto = c.itens.map((i) => `${i.valor ?? ''} ${i.titulo}`).join(' ');
+  if (c.sinal === 'prazo') {
+    const datas = c.itens
+      .map((i) => RE_DATA.exec(`${i.valor ?? ''} ${i.titulo}`))
+      .filter(Boolean)
+      .map((m) => `${m![3]}-${m![2]}-${m![1]}`)
+      .filter((iso) => iso >= DATA_REFERENCIA)
+      .sort();
+    if (datas.length) {
+      const dias = Math.round((Date.parse(datas[0]) - REF) / DIA);
+      return { pontuacao: 0.5 + 0.5 * (1 - Math.min(dias, 365) / 365), motivo: dias === 0 ? 'vence hoje' : `vence em ${dias} dias` };
+    }
+    return { pontuacao: 0.45, motivo: c.destaque && /dias/.test(c.destaque) ? `prazo da regra: ${c.destaque}` : 'prazo da regra' };
+  }
+  if (c.sinal === 'alerta') return c.id === 'b-versao' ? { pontuacao: 0.55, motivo: 'regra mudou nesta versão' } : { pontuacao: 0.2, motivo: 'referência ausente no acervo' };
+  if (c.sinal === 'valor') {
+    const maior = Math.max(...c.itens.map((i) => reais(`${i.valor ?? ''} ${i.titulo}`)));
+    return { pontuacao: maior ? 0.5 : 0.3, motivo: maior ? `maior valor do documento: R$ ${maior.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'limites do documento' };
+  }
+  if (c.sinal === 'risco') return { pontuacao: /multa|R\$/i.test(texto) ? 0.42 : 0.34, motivo: /multa|R\$/i.test(texto) ? 'risco financeiro' : 'penalidade ou proibição' };
+  if (c.sinal === 'responsavel') return { pontuacao: 0.3, motivo: 'quem executa cada parte' };
+  return { pontuacao: 0.18, motivo: 'consulte quando surgir dúvida' };
+}
+
+
+export function blocosPorRegra(f: FichaDocumento, doc: DocumentoDetalhe): BlocoDecisao[] {
+  const fam = familiaDe(doc.codigo);
+  const p = f.pontos;
+  const comResp = p.responsaveis;
+  const nomeResp = (x: string) =>
+    /^gestor/i.test(x) ? 'Gestor' : /^empregad/i.test(x) ? 'Empregado' : /^diretor/i.test(x) ? 'Diretoria' : /^comit/i.test(x) ? x.charAt(0).toUpperCase() + x.slice(1) : /^fiscal/i.test(x) ? 'Fiscal técnico' : x.toUpperCase();
+  const quem = [...new Set(comResp.flatMap((i) => i.titulo.match(RE_RESPONSAVEL) ?? []).map(nomeResp))];
+  const ausente = f.alertas.findIndex((a) => a.tipo === 'referencia_ausente');
+  const versoes = MOCK_DOCUMENTOS.filter((d) => d.codigo === doc.codigo).length;
+  const ligados = [f.governanca.vinculado_a.valor, ...f.governanca.referencias].filter(Boolean) as string[];
+  const primeiro = (l: ItemFicha[]) => l[0];
+  const destaqueDe = (l: ItemFicha[]) => primeiro(l)?.valor ?? `${l.length} ${l.length === 1 ? 'item' : 'itens'}`;
+  /** Prazo em destaque: a data mais próxima ou, sem data, o prazo em dias mais citado (ex.: NG_111 → 45 dias). */
+  const destaquePrazo = (l: ItemFicha[]) => {
+    const datas = l.map((i) => RE_DATA.exec(`${i.valor ?? ''} ${i.titulo}`)).filter(Boolean).map((m) => m![0]);
+    if (datas.length) return datas.sort((a, b) => a.split('/').reverse().join('').localeCompare(b.split('/').reverse().join('')))[0];
+    const conta = new Map<string, number>();
+    l.forEach((i) => (i.titulo.match(/\b(\d+)\s*(?:\([^)]*\)\s*)?dias?\b/gi) ?? []).forEach((x) => {
+      const n = /\d+/.exec(x)![0];
+      conta.set(n, (conta.get(n) ?? 0) + 1);
+    }));
+    const mais = [...conta.entries()].sort((a, b) => b[1] - a[1])[0];
+    return mais ? `${mais[0]} dias` : destaqueDe(l);
+  };
+
+  const cand: Candidato[] = [];
+  const add = (c: Candidato | null) => c && (c.itens.length || c.alerta !== undefined || c.secoesExtra) && cand.push(c);
+
+  if (fam === 'norma') {
+    add({ id: 'b-muda', titulo: 'O que muda para você', itens: p.obrigacoes.slice(0, 3), sinal: 'regra', destaque: `${p.obrigacoes.length} ${p.obrigacoes.length === 1 ? 'regra' : 'regras'}` });
+    add({ id: 'b-prazos', titulo: 'Prazos que valem', itens: p.prazos, sinal: 'prazo', destaque: destaquePrazo(p.prazos) });
+    if (quem.length) add({ id: 'b-quem', titulo: 'Quem faz o quê', itens: comResp.slice(0, 3), sinal: 'responsavel', destaque: quem.slice(0, 3).join(' · ') });
+    add({ id: 'b-limites', titulo: 'Limites e valores', itens: p.valores, sinal: 'valor', destaque: destaqueDe(p.valores) });
+    add({ id: 'b-penal', titulo: 'Penalidades e exceções', itens: p.riscos, sinal: 'risco', destaque: destaqueDe(p.riscos) });
+    if (versoes > 1 && f.delta) add({ id: 'b-versao', titulo: 'Versão em vigor e o que mudou', itens: [], sinal: 'alerta', destaque: `v${f.delta.para}`, apoio: f.delta.resumo[0], alerta: f.alertas.findIndex((a) => a.tipo === 'versao_substituida'), secoesExtra: [] });
+    if (ligados.length || ausente >= 0)
+      add({
+        id: 'b-ligados',
+        titulo: 'Documentos ligados',
+        itens: [],
+        sinal: ausente >= 0 ? 'alerta' : 'regra',
+        destaque: ligados.slice(0, 2).join(' · ') || (ausente >= 0 ? 'NG_012 ausente' : ''),
+        apoio: ausente >= 0 ? f.alertas[ausente].titulo : `${ligados.length} ${ligados.length === 1 ? 'documento ligado' : 'documentos ligados'} pelo cabeçalho.`,
+        alerta: ausente >= 0 ? ausente : undefined,
+        secoesExtra: []
+      });
+  } else if (fam === 'procedimento') {
+    add({ id: 'b-prazos', titulo: 'Prazos por etapa', itens: p.prazos, sinal: 'prazo', destaque: destaquePrazo(p.prazos) });
+    if (quem.length) add({ id: 'b-quem', titulo: 'Quem faz cada etapa', itens: comResp.slice(0, 3), sinal: 'responsavel', destaque: quem.slice(0, 3).join(' · ') });
+    const formularios = ligados.filter((c) => /^(FM|TB)_/.test(c));
+    if (formularios.length) add({ id: 'b-form', titulo: 'Formulários e tabelas usados', itens: [], sinal: 'regra', destaque: formularios.join(' · '), apoio: 'Citados no cabeçalho do documento.', secoesExtra: [] });
+    add({ id: 'b-trava', titulo: 'Onde costuma travar', itens: p.riscos, sinal: 'risco', destaque: destaqueDe(p.riscos) });
+    if (f.governanca.vinculado_a.valor) add({ id: 'b-origem', titulo: 'Norma de origem', itens: [], sinal: 'regra', destaque: f.governanca.vinculado_a.valor, apoio: `Segue: ${f.governanca.cadeia.join(' → ')}.`, secoesExtra: [] });
+  } else {
+    add({ id: 'b-valores', titulo: fam === 'contrato' ? 'Quanto custa' : 'Valores e alçada', itens: p.valores, sinal: 'valor', destaque: destaqueDe(p.valores) });
+    add({ id: 'b-prazos', titulo: fam === 'contrato' ? 'Até quando' : 'Prazo e vigência', itens: p.prazos, sinal: 'prazo', destaque: destaquePrazo(p.prazos) });
+    if (quem.length) add({ id: 'b-quem', titulo: 'Quem faz o quê', itens: comResp.slice(0, 3), sinal: 'responsavel', destaque: quem.slice(0, 3).join(' · ') });
+    add({ id: 'b-risco', titulo: fam === 'contrato' ? 'Onde pode doer' : 'Riscos', itens: p.riscos, sinal: 'risco', destaque: destaqueDe(p.riscos) });
+    if (ligados.length || ausente >= 0)
+      add({ id: 'b-citados', titulo: fam === 'contrato' ? 'Falta no acervo' : 'Documentos citados e ausentes', itens: [], sinal: 'alerta', destaque: ligados.slice(0, 2).join(' · ') || '—', apoio: ausente >= 0 ? f.alertas[ausente].titulo : 'Documentos citados no cabeçalho.', alerta: ausente >= 0 ? ausente : undefined, secoesExtra: [] });
+  }
+
+  const blocos = cand.slice(0, 6).map((c) => {
+    const r = pontuar(c);
+    const secoes = [...new Set(c.itens.flatMap((i) => i.fontes.map((x) => x.secao)))];
+    return {
+      id: c.id,
+      titulo: c.titulo,
+      destaque: curto(c.destaque ?? '', 40),
+      apoio: c.apoio ? curto(c.apoio) : c.itens[0] ? curto(c.itens[0].titulo) : null,
+      relevancia: { posicao: 0, motivo: r.motivo, pontuacao: Math.round(r.pontuacao * 100) / 100 },
+      sinal: c.sinal,
+      secoes_mapa: secoes,
+      itens: c.itens.map((i) => i.id),
+      ...(c.alerta !== undefined && c.alerta >= 0 ? { alerta: c.alerta } : {})
+    } as BlocoDecisao;
+  });
+  return blocos
+    .sort((a, b) => b.relevancia.pontuacao - a.relevancia.pontuacao)
+    .map((b, i) => ({ ...b, relevancia: { ...b.relevancia, posicao: i + 1 } }));
 }
 
 /** C26: delta só quando existe a comparação de verdade (nada de diferença inventada). */
@@ -235,6 +378,17 @@ function proximoPrazo(f: FichaDocumento): TriagemItem['proximo_prazo'] {
   return datas.filter((d) => d.data >= DATA_REFERENCIA).sort((a, b) => a.data.localeCompare(b.data))[0] ?? null;
 }
 
+/** Motivo curto do chip (RF71): o fato que puxa o documento para a lista. */
+function motivoCurto(f: FichaDocumento, prazo: TriagemItem['proximo_prazo']): string {
+  if (f.semaforo.nivel === 'critico') return f.semaforo.motivos[0] ?? 'versão antiga';
+  const dias = prazo ? Math.round((Date.parse(prazo.data) - REF) / DIA) : null;
+  const evento = prazo ? prazo.evento.replace(/^(Fazer|Fim d[ae]|Próximo prazo:?)\s*/i, '').replace(/^(?:a|o|as|os)\s+/i, '').split(/[ ,;]/)[0].toLowerCase() : '';
+  if (dias !== null && dias <= 30) return `${evento || 'prazo'} em ${dias} dias`;
+  if (f.alertas.some((a) => a.tipo === 'versao_substituida')) return 'regra mudou de versão';
+  if (f.alertas.some((a) => a.tipo === 'referencia_ausente')) return 'cita norma fora do acervo';
+  return 'em dia';
+}
+
 export function mockTriagem(filtros: FiltrosTriagem = {}): TriagemResposta {
   const itens: TriagemItem[] = MOCK_DOCUMENTOS.filter((d) => !d.substituido).map((d) => {
     const f = mockFicha(d.codigo, d.versao)!;
@@ -252,7 +406,9 @@ export function mockTriagem(filtros: FiltrosTriagem = {}): TriagemResposta {
       leitura_integral_min: f.identidade.metricas.leitura_integral_min,
       leitura_ficha_min: f.identidade.metricas.leitura_ficha_min,
       ficha: 'pronta',
-      sinais: { multa: /multa/i.test(textoRiscos), divergencia: f.alertas.some((a) => a.tipo !== 'referencia_ausente') }
+      sinais: { multa: /multa/i.test(textoRiscos), divergencia: f.alertas.some((a) => a.tipo !== 'referencia_ausente') },
+      motivo_curto: motivoCurto(f, proximoPrazo(f)),
+      familia: f.familia ?? familiaDe(d.codigo)
     };
   });
 
@@ -277,6 +433,19 @@ export function mockTriagem(filtros: FiltrosTriagem = {}): TriagemResposta {
     return PESO_NIVEL[a.semaforo.nivel] - PESO_NIVEL[b.semaforo.nivel] || b.alertas - a.alertas || pa.localeCompare(pb);
   });
 
+  // Perfil (RF71): Jurídico, Financeiro e Diretoria veem contratos primeiro; Empregado, RH e Gestor, normas
+  if (filtros.perfil && (!filtros.ordenar || filtros.ordenar === 'urgencia')) {
+    const preferida: FamiliaDocumento = ['juridico', 'financeiro', 'diretoria'].includes(filtros.perfil) ? 'contrato' : 'norma';
+    const perto = (i: TriagemItem) => (i.proximo_prazo && dias(i.proximo_prazo.data) <= 30 ? 0 : 1);
+    filtrados.sort(
+      (a, b) =>
+        PESO_NIVEL[a.semaforo.nivel] - PESO_NIVEL[b.semaforo.nivel] ||
+        perto(a) - perto(b) ||
+        Number(b.familia === preferida) - Number(a.familia === preferida) ||
+        (a.proximo_prazo?.data ?? '9999').localeCompare(b.proximo_prazo?.data ?? '9999')
+    );
+  }
   const pedem = itens.filter((i) => i.semaforo.nivel === 'critico' || (i.proximo_prazo && dias(i.proximo_prazo.data) <= 7)).length;
-  return { total: filtrados.length, pagina: 1, tamanho: 50, pedem_acao: pedem, itens: filtrados.slice(0, 50) };
+  const limite = Math.min(Math.max(filtros.limite ?? 50, 1), 50);
+  return { total: filtrados.length, pagina: 1, tamanho: limite, pedem_acao: pedem, itens: filtrados.slice(0, limite) };
 }

@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { RadarItem, TriagemResposta } from '../api/types';
-import { fetchRadar, fetchTriagem } from '../api/client';
+import { FichaDocumento, RadarItem, TriagemResposta } from '../api/types';
+import { fetchFicha, fetchRadar, fetchTriagem } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { useEstado } from '../app/store';
 import { CabecalhoTela, FonteLink, ProximaAcao } from '../ui/componentes';
 import { TEMAS } from '../mocks/v2';
 import { Icon, NomeIcone } from '../ui/Icon';
 import { SUGESTOES_POR_PERFIL } from './perfis';
-import { SemaforoSituacao } from './FichaView';
+import { MesaDocumento } from './MesaDocumento';
+import { PERFIS } from './perfis';
 
 /** T1 Início (layout do Figma): atalhos, pendências, resumo por área, prazo e dúvidas. */
 const CARTOES = [
@@ -29,17 +30,39 @@ const ir = (destino: string) => (e: React.MouseEvent) => {
   navegar(destino);
 };
 
-export const VisaoGeralView: React.FC = () => {
+export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelecionado }) => {
   const [radar, setRadar] = useState<RadarItem[] | null>(null);
   const [erro, setErro] = useState(false);
   const perfil = useEstado((e) => e.perfil);
   const avaliacoes = useEstado((e) => e.avaliacoes);
   const [fila, setFila] = useState<TriagemResposta | null>(null);
 
+  const [fichaMesa, setFichaMesa] = useState<FichaDocumento | null>(null);
+  const [erroMesa, setErroMesa] = useState(false);
+  const [tentativa, setTentativa] = useState(0);
+
   useEffect(() => {
     fetchRadar().then(setRadar).catch(() => setErro(true));
-    fetchTriagem().then(setFila).catch(() => undefined);
   }, []);
+
+  // RF71: lista curta (até 5) ordenada por urgência e pelo perfil escolhido
+  useEffect(() => {
+    fetchTriagem({ limite: 5, perfil }).then(setFila).catch(() => setFila({ total: 0, pagina: 1, tamanho: 5, pedem_acao: 0, itens: [] }));
+  }, [perfil]);
+
+  // A Mesa abre sozinha no primeiro chip; ?doc= escolhe outro (link compartilhável)
+  const escolhido = docSelecionado ?? fila?.itens[0]?.codigo;
+  useEffect(() => {
+    if (!escolhido) return;
+    let vivo = true;
+    setErroMesa(false);
+    fetchFicha(escolhido, undefined, { perfil })
+      .then((f) => vivo && setFichaMesa(f))
+      .catch(() => vivo && setErroMesa(true));
+    return () => {
+      vivo = false;
+    };
+  }, [escolhido, perfil, tentativa]);
 
   const sugestoes = (SUGESTOES_POR_PERFIL[perfil ?? 'diretoria'] ?? SUGESTOES_POR_PERFIL.diretoria).slice(0, 2);
   const nRegras = radar?.filter((i) => i.tipo !== 'referencia_ausente').length ?? 0;
@@ -63,6 +86,62 @@ export const VisaoGeralView: React.FC = () => {
           </a>
         ))}
       </nav>
+
+      {/* Revisão 13/11 (RF71/RF72): documentos que pedem atenção + Mesa de decisão */}
+      <section className="inicio-mesa" aria-labelledby="t-atencao" data-testid="inicio-atencao">
+        <div className="fg-secao-titulo inicio-mesa-titulo">
+          <div>
+            <h2 id="t-atencao">Documentos que pedem sua atenção</h2>
+            <p className="fg-sub">
+              Para: {perfil ? PERFIS.find((p) => p.id === perfil)?.nome ?? perfil : 'qualquer pessoa'} · escolha um documento para ver o que decidir
+            </p>
+          </div>
+          <a className="fg-link" href={url.atencao()} onClick={ir(url.atencao())}>
+            Ver fila completa <Icon nome="seta" tamanho={14} />
+          </a>
+        </div>
+        {!fila ? (
+          <div className="mesa-chips" aria-busy="true">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <span key={i} className="mesa-chip triagem-esqueleto" />
+            ))}
+          </div>
+        ) : fila.itens.length === 0 ? (
+          <p className="fg-card">Nada pede sua atenção agora.</p>
+        ) : (
+          <>
+            <div className="mesa-chips" role="tablist" aria-label="Documentos que pedem sua atenção">
+              {fila.itens.map((i) => (
+                <button
+                  key={i.codigo}
+                  type="button"
+                  role="tab"
+                  aria-selected={i.codigo === escolhido}
+                  className={`mesa-chip nivel-${i.semaforo.nivel}`}
+                  onClick={() => navegar(url.inicio(i.codigo), true)}
+                  data-testid={`chip-${i.codigo}`}
+                >
+                  <span className={`mesa-chip-ponto nivel-${i.semaforo.nivel}`} aria-hidden="true" />
+                  <strong>{i.codigo}</strong>
+                  <span>· {i.motivo_curto ?? i.semaforo.motivos[0] ?? 'em dia'}</span>
+                </button>
+              ))}
+            </div>
+            {fichaMesa ? (
+              <MesaDocumento ficha={fichaMesa} variante="compacta" />
+            ) : erroMesa ? (
+              <div className="alerta alerta-erro" role="alert">
+                Não conseguimos abrir este documento agora.{' '}
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => setTentativa((t) => t + 1)}>
+                  Tentar de novo
+                </button>
+              </div>
+            ) : (
+              <div className="fg-card triagem-esqueleto mesa-carregando" aria-busy="true" />
+            )}
+          </>
+        )}
+      </section>
 
       {erro ? (
         <div className="alerta alerta-erro" role="alert">
@@ -91,33 +170,6 @@ export const VisaoGeralView: React.FC = () => {
         </section>
       )}
 
-      {fila && fila.itens.length > 0 && (
-        <section className="fg-card inicio-atencao" aria-labelledby="t-precisa" data-testid="inicio-atencao">
-          <div className="fg-cabeca-card">
-            <h2 id="t-precisa">
-              <Icon nome="raio" tamanho={18} /> Precisa de atenção
-            </h2>
-            <a className="fg-link" href={url.atencao()} onClick={ir(url.atencao())}>
-              Ver fila completa <Icon nome="seta" tamanho={14} />
-            </a>
-          </div>
-          <ul className="fg-lista">
-            {fila.itens.slice(0, 3).map((i) => (
-              <li key={i.codigo}>
-                <a className="fg-lista-item" href={url.ficha(i.codigo, i.versao)} onClick={ir(url.ficha(i.codigo, i.versao))}>
-                  <span className="fg-lista-texto">
-                    <span>
-                      <strong>{i.codigo}</strong> · {i.titulo}
-                    </span>
-                    <small>{i.semaforo.motivos[0] ?? (i.proximo_prazo ? `${i.proximo_prazo.evento}: ${i.proximo_prazo.data.split('-').reverse().join('/')}` : '')}</small>
-                  </span>
-                  <SemaforoSituacao nivel={i.semaforo.nivel} />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       <div className="fg-secao-titulo">
         <div>

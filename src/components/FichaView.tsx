@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AcaoFicha, CampoGov, CelulaMapa, FichaDocumento, ItemFicha, OrigemItem } from '../api/types';
+import { AcaoFicha, CampoGov, FichaDocumento, ItemFicha } from '../api/types';
+import { SeloOrigem } from './FichaPecas';
+import { MesaDocumento } from './MesaDocumento';
 import { fetchFicha, isMockMode } from '../api/client';
 import { acoes as acoesEstado, useEstado } from '../app/store';
 import { PERFIS } from './perfis';
@@ -12,31 +14,7 @@ import { Icon } from '../ui/Icon';
 
 /* ---------- Peças pequenas (inventário do FLUXO-DE-TELAS-FICHA §7) ---------- */
 
-const ORIGEM: Record<OrigemItem, { texto: string; icone: string; dica: string }> = {
-  literal: { texto: 'Trecho literal', icone: '“”', dica: 'Texto copiado da seção' },
-  resumo: { texto: 'Resumo da IA', icone: '✦', dica: 'Resumo da IA, confira o trecho' },
-  calculado: { texto: 'Calculado', icone: '=', dica: 'Conta feita com valores do documento' }
-};
-
-/** Selo de origem (RF51): de onde veio cada afirmação. */
-export const SeloOrigem: React.FC<{ origem: OrigemItem }> = ({ origem }) => (
-  <span className={`fg-pilula selo-origem selo-${origem}`} title={ORIGEM[origem].dica}>
-    <span aria-hidden="true">{ORIGEM[origem].icone}</span> {ORIGEM[origem].texto}
-  </span>
-);
-
-const SEMAFORO = {
-  ok: { classe: 'ok', icone: 'marca', texto: 'Em vigor' },
-  atencao: { classe: 'aviso', icone: 'alerta', texto: 'Pede atenção' },
-  critico: { classe: 'perigo', icone: 'alerta', texto: 'Não use para decidir' }
-} as const;
-
-/** Semáforo de situação (RF45): cor sempre com ícone e texto. */
-export const SemaforoSituacao: React.FC<{ nivel: FichaDocumento['semaforo']['nivel']; compacto?: boolean }> = ({ nivel, compacto }) => (
-  <span className={`fg-pilula semaforo semaforo-${nivel} ${SEMAFORO[nivel].classe}`}>
-    <Icon nome={SEMAFORO[nivel].icone} tamanho={13} /> {compacto ? SEMAFORO[nivel].texto : SEMAFORO[nivel].texto}
-  </span>
-);
+export { SeloOrigem, SemaforoSituacao } from './FichaPecas';
 
 const Fontes: React.FC<{ item: { fontes: ItemFicha['fontes'] } }> = ({ item }) => (
   <span className="ficha-fontes">
@@ -47,107 +25,6 @@ const Fontes: React.FC<{ item: { fontes: ItemFicha['fontes'] } }> = ({ item }) =
 );
 
 const dataBR = (iso: string | null) => (iso ? iso.split('-').reverse().join('/') : '');
-
-/* ---------- Mapa de calor (RF53) ---------- */
-
-type Sinal = 'tudo' | 'prazo' | 'valor' | 'obrigacao' | 'risco';
-const SINAIS: [Sinal, string][] = [
-  ['tudo', 'Tudo'],
-  ['prazo', 'Prazo'],
-  ['valor', 'Valor'],
-  ['obrigacao', 'Obrigação'],
-  ['risco', 'Risco']
-];
-
-const forca = (c: CelulaMapa, s: Sinal, maxPorSinal: Record<string, number>) =>
-  s === 'tudo' ? c.intensidade : c.sinais[s] / (maxPorSinal[s] || 1);
-
-const descreverSinais = (c: CelulaMapa) =>
-  [
-    c.sinais.prazo && `${c.sinais.prazo} de prazo`,
-    c.sinais.valor && `${c.sinais.valor} de valor`,
-    c.sinais.obrigacao && `${c.sinais.obrigacao} de obrigação`,
-    c.sinais.risco && `${c.sinais.risco} de risco`
-  ]
-    .filter(Boolean)
-    .join(', ') || 'sem sinais';
-
-const MapaCalor: React.FC<{ ficha: FichaDocumento }> = ({ ficha }) => {
-  const [sinal, setSinal] = useState<Sinal>('tudo');
-  const celulas = [...ficha.mapa_calor].sort((a, b) => a.ordem - b.ordem);
-  const maxPorSinal = { prazo: 0, valor: 0, obrigacao: 0, risco: 0 } as Record<string, number>;
-  celulas.forEach((c) => (Object.keys(maxPorSinal) as (keyof CelulaMapa['sinais'])[]).forEach((k) => (maxPorSinal[k] = Math.max(maxPorSinal[k], c.sinais[k]))));
-  const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const mover = (i: number, e: React.KeyboardEvent) => {
-    const alvo = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : e.key === 'End' ? celulas.length - 1 : -1;
-    if (alvo >= 0 && alvo < celulas.length) {
-      e.preventDefault();
-      refs.current[alvo]?.focus();
-    }
-  };
-  const top = [...celulas].sort((a, b) => forca(b, sinal, maxPorSinal) - forca(a, sinal, maxPorSinal)).filter((c) => forca(c, sinal, maxPorSinal) > 0).slice(0, 5);
-  const abrir = (c: CelulaMapa) => navegar(url.documento(ficha.codigo, ficha.versao, c.secao_id));
-
-  return (
-    <section className="fg-card ficha-mapa" aria-labelledby="t-mapa">
-      <div className="fg-cabeca-card">
-        <h2 id="t-mapa">
-          <Icon nome="mapa" tamanho={18} /> Mapa do documento
-          <span className="fg-sub">
-            {' '}
-            · {ficha.identidade.metricas.secoes} seções · ~{ficha.identidade.metricas.paginas_estimadas}{' '}
-            {ficha.identidade.metricas.paginas_estimadas === 1 ? 'página' : 'páginas'}
-            {celulas.length < ficha.identidade.metricas.secoes && ` · mostrando ${celulas.length} de ${ficha.identidade.metricas.secoes}`}
-          </span>
-        </h2>
-        <div className="fg-alternador" role="group" aria-label="Mostrar no mapa">
-          {SINAIS.map(([id, nome]) => (
-            <button key={id} type="button" aria-pressed={sinal === id} onClick={() => setSinal(id)}>
-              {nome}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mapa-faixa" role="list" aria-label="Seções do documento, da primeira à última">
-        {celulas.map((c, i) => {
-          const f = forca(c, sinal, maxPorSinal);
-          return (
-            <button
-              key={c.secao_id}
-              ref={(el) => (refs.current[i] = el)}
-              type="button"
-              role="listitem"
-              className={`mapa-celula ${f > 0 ? 'com-sinal' : ''}`}
-              style={{ flexGrow: Math.max(c.peso, 0.01) * 100, ['--forca' as string]: f.toFixed(2) }}
-              onClick={() => abrir(c)}
-              onKeyDown={(e) => mover(i, e)}
-              title={`${c.secao_id} · ${c.titulo}: ${descreverSinais(c)}`}
-              aria-label={`${c.secao_id}, ${c.titulo}: ${descreverSinais(c)}. Abrir a seção.`}
-            />
-          );
-        })}
-      </div>
-      <p className="fg-sub mapa-dica">Cada faixa é uma seção, na ordem do documento. Quanto mais escura, mais sinais. Toque para abrir a seção.</p>
-      <details className="mapa-lista">
-        <summary>Ver em lista: seções com mais sinais</summary>
-        {top.length ? (
-          <ol>
-            {top.map((c) => (
-              <li key={c.secao_id}>
-                <button type="button" className="fg-link" onClick={() => abrir(c)}>
-                  {c.secao_id} · {c.titulo}
-                </button>{' '}
-                <span className="fg-sub">({descreverSinais(c)})</span>
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="fg-sub">Nenhuma seção com este sinal.</p>
-        )}
-      </details>
-    </section>
-  );
-};
 
 /* ---------- Blocos ---------- */
 
@@ -329,8 +206,6 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
 
   const id = ficha.identidade;
   const extrativo = ficha.modo.ia === 'extrativo';
-  const dias = id.vigencia.dias_restantes;
-  const semIA = ficha.estado === 'gerando' || ficha.estado === 'parcial';
   const perguntarAqui = url.perguntar(undefined, [ficha.codigo]);
   const ausentes = ficha.governanca.referencias.filter((r) => !MOCK_DOCUMENTOS.some((d) => d.codigo === r));
   const enfase = ENFASE[perfil ?? ''] ?? ENFASE[''];
@@ -466,64 +341,8 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
         </div>
       )}
 
-      {/* NÍVEL 1 · RELANCE */}
-      <section className="fg-card ficha-relance" aria-labelledby="t-relance" data-testid="ficha-relance">
-        <h2 id="t-relance" className="sr-only">
-          Resumo em 10 segundos
-        </h2>
-        <div className="ficha-relance-topo">
-          <span className="ficha-situacao">
-            <SemaforoSituacao nivel={ficha.semaforo.nivel} />
-            <span>
-              {id.substituido
-                ? `Substituída em ${id.vigencia.fim ? dataBR(id.vigencia.fim) : 'versão posterior'}`
-                : id.vigencia.fim
-                ? `Em vigor até ${dataBR(id.vigencia.fim)}${dias !== null && dias >= 0 ? ` (faltam ${dias} dias)` : ''}`
-                : `Vigência: ${id.vigencia.texto}`}
-            </span>
-          </span>
-          <span className="fg-sub ficha-tempo" data-testid="ficha-tempo">
-            <Icon nome="historico" tamanho={14} /> Leitura ~{id.metricas.leitura_integral_min} min · Ficha {id.metricas.leitura_ficha_min} min
-          </span>
-        </div>
-        {ficha.semaforo.motivos.length > 0 && (
-          <ul className="ficha-motivos">
-            {ficha.semaforo.motivos.map((m) => (
-              <li key={m}>{m}</li>
-            ))}
-          </ul>
-        )}
-
-        {ficha.bluf ? (
-          <blockquote className="ficha-bluf" data-testid="ficha-bluf">
-            <p>{ficha.bluf.texto}</p>
-            <footer>
-              <SeloOrigem origem={ficha.bluf.origem} />
-              <Fontes item={ficha.bluf} />
-            </footer>
-          </blockquote>
-        ) : (
-          <p className="ficha-bluf ficha-bluf-vazio">
-            {semIA ? 'Resumo da IA a caminho…' : 'Resumo em uma frase indisponível sem IA. Os números e prazos abaixo vêm direto do texto.'}
-          </p>
-        )}
-
-        {ficha.numeros.length > 0 && (
-          <div className="ficha-numeros">
-            {ficha.numeros.map((n) => (
-              <div key={n.id} className="ficha-numero">
-                <p className="fg-valor">{n.valor}</p>
-                <p className="ficha-numero-titulo">{n.titulo}</p>
-                {n.calculo && <p className="fg-sub">{n.calculo}</p>}
-                <div className="ficha-item-pe">
-                  <Fontes item={n} />
-                  <SeloOrigem origem={n.origem} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Mesa de decisão, variante completa (revisão 13/11): relance, mapa e blocos */}
+      <MesaDocumento ficha={ficha} variante="completa" />
 
       {/* GOVERNANÇA (lida do documento, nunca pela IA) */}
       <section className="fg-card ficha-gov" aria-labelledby="t-gov" data-testid="ficha-governanca">
@@ -569,7 +388,6 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
         )}
       </section>
 
-      <MapaCalor ficha={ficha} />
 
       <div className="fg-layout-lateral ficha-corpo">
         <div className="fg-coluna">

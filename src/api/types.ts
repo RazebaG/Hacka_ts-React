@@ -374,6 +374,9 @@ export interface FichaDocumento {
   alertas: AlertaFicha[];
   perguntas_sugeridas: string[];
   cobertura: { secoes_lidas: number; secoes_total: number; itens_verificados: number; itens_descartados: number; motivos_descarte: string[] };
+  /** Revisão 13/11 (RF73/RF74): família pela taxonomia e blocos ordenados por relevância. */
+  familia?: FamiliaDocumento;
+  blocos?: BlocoDecisao[];
   /** C26 (P1): o que mudou desde a versão anterior. */
   delta?: { de: string; para: string; resumo: string[]; mudancas: number } | null;
 }
@@ -408,6 +411,9 @@ export interface TriagemItem {
   leitura_ficha_min: number;
   ficha: 'pronta' | 'gerando' | 'sem_ficha';
   sinais?: { multa: boolean; divergencia: boolean };
+  /** Revisão 13/11 (RF71): motivo curto do chip, ex.: "vistoria em 13 dias". */
+  motivo_curto?: string;
+  familia?: FamiliaDocumento;
 }
 
 export interface TriagemResposta {
@@ -419,9 +425,28 @@ export interface TriagemResposta {
 }
 
 export interface FiltrosTriagem {
+  /** RF71: lista curta da tela inicial (1 a 20, padrão 5 na T1). */
+  limite?: number;
+  perfil?: string | null;
   tema?: string;
   tipo?: string;
   situacao?: string;
   sinal?: string;
   ordenar?: string;
+}
+
+/* ---------- Revisão 13/11: Mesa de decisão e blocos por família (C22/C25) ---------- */
+export type FamiliaDocumento = 'contrato' | 'norma' | 'procedimento' | 'nota_tecnica';
+export type SinalBloco = 'valor' | 'prazo' | 'responsavel' | 'risco' | 'regra' | 'alerta';
+
+export interface BlocoDecisao {
+  id: string;
+  titulo: string;
+  destaque: string;
+  apoio: string | null;
+  relevancia: { posicao: number; motivo: string; pontuacao: number };
+  sinal: SinalBloco;
+  secoes_mapa: string[];
+  itens: string[];
+  alerta?: number;
 }
