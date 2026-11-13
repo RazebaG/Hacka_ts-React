@@ -57,7 +57,7 @@ const Bloco: React.FC<{
   >
     <span className="mesa-bloco-topo">
       <span className="mesa-bloco-titulo">{b.titulo}</span>
-      <span className={`mesa-bloco-relevancia tom-${TOM[b.sinal]}`}>
+      <span className={`mesa-bloco-relevancia tom-${TOM[b.sinal]}`} title={`${b.relevancia.posicao}º · ${b.relevancia.motivo}`}>
         {b.relevancia.posicao}º · {b.relevancia.motivo}
       </span>
     </span>

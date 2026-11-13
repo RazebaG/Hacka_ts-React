@@ -4232,8 +4232,11 @@ a.mesa-cab-ficha:hover {
 .mesa-celula.vazia { cursor: default; }
 .mesa-rodape .btn svg { display: none; }
 .mesa-rodape .btn::after { content: ' ↗'; }
-.mesa-bloco-topo { flex-wrap: wrap; }
-.mesa-bloco-titulo { white-space: nowrap; }
+/* Como no protótipo: título à esquerda e selo de relevância à direita, na mesma linha.
+   Selo longo corta com reticências (o texto inteiro fica no title do bloco). */
+.mesa-bloco-topo { flex-wrap: nowrap; }
+.mesa-bloco-titulo { flex: none; white-space: nowrap; }
+.mesa-bloco-relevancia { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 
 /* Faixa do radar: quebra pelo espaço do conteúdo (com o menu aberto a área é estreita) */
 .fg-faixa-alerta { flex-wrap: wrap; }
