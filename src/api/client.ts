@@ -14,11 +14,17 @@ import {
   RegraSimulavel,
   SimulacaoResultado,
   ArquivoLote,
-  FonteCita
+  FonteCita,
+  FichaDocumento,
+  DocumentoConsultado,
+  FiltrosTriagem,
+  TriagemResposta
 } from './types';
 import { MOCK_RADAR, MOCK_REGRAS, simularFerias, classificarArquivo, temaDe } from '../mocks/v2';
 import { getDocumentoByCodigo, getResumoDocumentos } from '../mocks/documentos';
 import { mockPerguntar } from '../mocks/perguntas';
+import { mockFicha, mockTriagem } from '../mocks/ficha';
+import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { MOCK_SAUDE } from '../mocks/saude';
 import { getCodigoInfoMock } from '../mocks/codigos';
 import {
@@ -79,10 +85,12 @@ export async function fetchDocumentoDetalhe(
 
 export async function postPerguntar(
   pergunta: string,
-  perfil?: PerfilUsuario
+  perfil?: PerfilUsuario,
+  documentos?: string[]
 ): Promise<RespostaPerguntar> {
+  const escopo = documentos && documentos.length ? documentos : undefined;
   if (isMockMode()) {
-    return Promise.resolve(mockPerguntar(pergunta, perfil));
+    return Promise.resolve(comFontesEmEvidencia(aplicarEscopo(mockPerguntar(pergunta, perfil), escopo), escopo));
   }
   const res = await fetch(`${API_BASE_URL}/api/perguntar`, {
     method: 'POST',
@@ -91,12 +99,106 @@ export async function postPerguntar(
     },
     body: JSON.stringify({
       pergunta,
-      perfil: perfilParaContrato(perfil)
+      perfil: perfilParaContrato(perfil),
+      ...(escopo ? { documentos: escopo } : {})
     })
   });
   if (!res.ok) {
     throw new Error(`Falha ao enviar pergunta (${res.status} ${res.statusText})`);
   }
+  // Backend ainda sem C23: o cliente monta as fontes a partir das citações
+  return comFontesEmEvidencia(await res.json(), escopo);
+}
+
+/** Mock do escopo (RF63): com documentos fixados, só vale o que vem deles. */
+function aplicarEscopo(r: RespostaPerguntar, escopo?: string[]): RespostaPerguntar {
+  if (!escopo) return r;
+  const citacoes = r.citacoes.filter((c) => escopo.includes(c.codigo));
+  if (citacoes.length) return { ...r, citacoes };
+  return {
+    resposta: `Não consta nas fontes de ${escopo.join(', ')}. Tente perguntar em todo o acervo.`,
+    consta: false,
+    citacoes: [],
+    avisos: []
+  };
+}
+
+/**
+ * Fontes em evidência (C23). Se a resposta já traz `consultados`, usa. Senão, monta pelo que a
+ * resposta comprova: documentos citados (com as seções e trechos usados) e versões substituídas
+ * apontadas nos avisos ("NG_111 v2.0.0 foi substituída pela v3.0.0"), que entram como consultadas.
+ */
+export function comFontesEmEvidencia(r: RespostaPerguntar, escopo?: string[]): RespostaPerguntar {
+  const pesquisados = escopo ? escopo.length : MOCK_DOCUMENTOS.filter((d) => !d.substituido).length;
+  const base = {
+    ...r,
+    escopo: r.escopo ?? { fixado: Boolean(escopo), documentos: escopo ?? [] },
+    documentos_pesquisados: r.documentos_pesquisados ?? pesquisados
+  };
+  if (r.consultados) return base;
+  const doc = (codigo: string, versao: string) => MOCK_DOCUMENTOS.find((d) => d.codigo === codigo && d.versao === versao);
+  const vigenteDe = (codigo: string) => MOCK_DOCUMENTOS.find((d) => d.codigo === codigo && !d.substituido);
+  const lista: DocumentoConsultado[] = [];
+  for (const c of r.citacoes) {
+    let item = lista.find((x) => x.codigo === c.codigo && x.versao === c.versao);
+    if (!item) {
+      const d = doc(c.codigo, c.versao);
+      const vig = vigenteDe(c.codigo);
+      item = {
+        codigo: c.codigo,
+        versao: c.versao,
+        titulo: d?.titulo ?? c.codigo,
+        fase: d?.fase ?? 'Vigente',
+        substituido: d?.substituido ?? false,
+        vigente_em: d?.substituido && vig ? { codigo: vig.codigo, versao: vig.versao } : null,
+        citado: true,
+        secoes_usadas: [],
+        trechos: []
+      };
+      lista.push(item);
+    }
+    if (!item.secoes_usadas.includes(c.secao)) item.secoes_usadas.push(c.secao);
+    item.trechos!.push({ secao: c.secao, trecho: c.trecho });
+  }
+  for (const aviso of r.avisos ?? []) {
+    const m = /([A-Z]{2,3}_\d+(?:-\d+)?) v(\d+\.\d+\.\d+) foi substituída pela v(\d+\.\d+\.\d+)/.exec(aviso);
+    if (m && !lista.some((x) => x.codigo === m[1] && x.versao === m[2])) {
+      const d = doc(m[1], m[2]);
+      lista.push({
+        codigo: m[1],
+        versao: m[2],
+        titulo: d?.titulo ?? m[1],
+        fase: d?.fase ?? 'Substituída',
+        substituido: true,
+        vigente_em: { codigo: m[1], versao: m[3] },
+        citado: false,
+        secoes_usadas: [],
+        trechos: []
+      });
+    }
+  }
+  return { ...base, consultados: lista };
+}
+
+/** C22: Ficha do documento. Sem API, usa o mock oficial (CTR) ou a ficha extrativa. */
+export async function fetchFicha(
+  codigo: string,
+  versao?: string,
+  opcoes: { perfil?: string | null; linguagem?: 'original' | 'simples' } = {}
+): Promise<FichaDocumento> {
+  if (isMockMode()) {
+    const f = mockFicha(codigo, versao);
+    if (!f) throw new Error(`Não encontramos ${codigo}.`);
+    return { ...f, perfil: opcoes.perfil ?? null };
+  }
+  const params = new URLSearchParams();
+  if (versao) params.set('versao', versao);
+  if (opcoes.perfil) params.set('perfil', opcoes.perfil);
+  if (opcoes.linguagem === 'simples') params.set('linguagem', 'simples');
+  const qs = params.toString() ? `?${params}` : '';
+  const res = await fetch(`${API_BASE_URL}/api/documentos/${encodeURIComponent(codigo)}/ficha${qs}`);
+  if (res.status === 404) throw new Error(`Não encontramos ${codigo}.`);
+  if (!res.ok) throw new Error(`Falha ao carregar a ficha (${res.status} ${res.statusText})`);
   return res.json();
 }
 
@@ -405,4 +507,13 @@ export async function enviarLote(arquivos: { nome: string; tamanho: number; arqu
     throw new Error(`Não conseguimos enviar o lote agora (${res.status}). Tente de novo em alguns segundos.`);
   }
   return (await res.json()).arquivos;
+}
+
+/** C25: Fila de atenção. Nunca gera ficha: usa o relance do cache. */
+export async function fetchTriagem(filtros: FiltrosTriagem = {}): Promise<TriagemResposta> {
+  if (isMockMode()) return mockTriagem(filtros);
+  const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
+  const res = await fetch(`${API_BASE_URL}/api/ficha/triagem${qs ? '?' + qs : ''}`);
+  if (!res.ok) throw new Error(`Falha ao carregar a fila de atenção (${res.status} ${res.statusText})`);
+  return res.json();
 }

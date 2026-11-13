@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { FonteCita, PerspectivaDetalhe, PerspectivaResumo } from '../api/types';
 import { fetchPerspectivaDetalhe, fetchPerspectivas } from '../api/client';
 import { Icon, NomeIcone } from '../ui/Icon';
@@ -142,6 +143,7 @@ export const PerspectivasView: React.FC<PerspectivasViewProps> = ({
           </button>
         }
       />
+      <FontesBase fontes={(detalhe ? [...detalhe.destaques.map((d) => d.fonte), ...detalhe.valores.map((v) => v.fonte), ...detalhe.prazos.map((p) => p.fonte), ...detalhe.responsaveis.map((r) => r.fonte), ...detalhe.riscos.map((r) => r.fonte)] : [])} />
 
       <div className="fg-grid-3 fg-stats">
         <div className="fg-card fg-stat">

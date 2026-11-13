@@ -1,0 +1,52 @@
+{
+  "codigo": "CTR_2026-012",
+  "versao": "1.0.0",
+  "secao": { "id": "Cláusula Décima Terceira", "titulo": "Rescisão pela LOCATÁRIA", "ordem": 13, "total": 43, "pagina_estimada": 13 },
+  "estado": "pronta",
+  "modo": { "ia": "bedrock", "modelo": "amazon.nova-pro-v1:0" },
+  "explicacao": {
+    "texto": "Se a ACME quiser encerrar o contrato antes do fim, precisa avisar por escrito com 30 dias de antecedência. Sair até o 90º dia custa um aluguel (R$ 3.650,00). A partir do 91º dia, não há multa.",
+    "origem": "resumo",
+    "fontes": [
+      { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Terceira", "trecho": "A LOCATÁRIA pode rescindir com aviso por escrito de 30 dias corridos." },
+      { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Terceira", "trecho": "a partir do 91º dia, não há multa." }
+    ]
+  },
+  "principais_trechos": [
+    { "texto": "A LOCATÁRIA pode rescindir com aviso por escrito de 30 dias corridos.", "origem": "literal" },
+    { "texto": "Se a rescisão ocorrer até o 90º dia de vigência, aplica-se multa equivalente a um aluguel mensal; a partir do 91º dia, não há multa.", "origem": "literal" }
+  ],
+  "pontos": [
+    { "rotulo": "30 dias", "texto": "de aviso por escrito", "sinal": "prazo", "origem": "literal",
+      "fonte": { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Terceira", "trecho": "A LOCATÁRIA pode rescindir com aviso por escrito de 30 dias corridos." } },
+    { "rotulo": "1 aluguel", "texto": "de multa se sair até o 90º dia (R$ 3.650,00)", "sinal": "risco", "origem": "literal",
+      "fonte": { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Terceira", "trecho": "aplica-se multa equivalente a um aluguel mensal" } },
+    { "rotulo": "Sem multa", "texto": "a partir do 91º dia de vigência", "sinal": "valor", "origem": "literal",
+      "fonte": { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Terceira", "trecho": "a partir do 91º dia, não há multa." } }
+  ],
+  "destaque": {
+    "sinais": { "prazo": 3, "valor": 1, "obrigacao": 0, "risco": 4 },
+    "intensidade": 1.0,
+    "dominante": "risco",
+    "motivo": "Tem prazo de aviso e multa: é onde sair do contrato custa dinheiro."
+  },
+  "relacionadas": [
+    { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Sétima", "titulo": "Valor", "motivo": "define o aluguel mensal usado na multa" },
+    { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Apêndice B", "titulo": "Memória de cálculo dos valores", "motivo": "calcula a multa por rescisão" },
+    { "codigo": "CTR_2026-012", "versao": "1.0.0", "secao": "Cláusula Décima Quarta", "titulo": "Rescisão pela LOCADORA", "motivo": "o outro lado da rescisão" }
+  ],
+  "texto_original": {
+    "texto": "A LOCATÁRIA pode rescindir com aviso por escrito de 30 dias corridos. Se a rescisão ocorrer até o 90º dia de vigência, aplica-se multa equivalente a um aluguel mensal; a partir do 91º dia, não há multa.",
+    "trechos_destacados": [
+      { "inicio": 38, "fim": 76, "sinal": "prazo" },
+      { "inicio": 94, "fim": 109, "sinal": "prazo" },
+      { "inicio": 113, "fim": 160, "sinal": "risco" },
+      { "inicio": 164, "fim": 200, "sinal": "valor" }
+    ]
+  },
+  "navegacao": {
+    "anterior": { "secao_id": "Cláusula Sétima", "titulo": "Valor" },
+    "proxima": { "secao_id": "Cláusula Décima Quinta", "titulo": "Inexecução" }
+  },
+  "_nota": "Exemplo ilustrativo. As posições de trechos_destacados são aproximadas e devem ser calculadas pelo backend sobre o texto real. A explicação por IA só entra quando todas as afirmações passam na verificação de fonte; sem ela, o campo explicacao vem null e o frontend mostra principais_trechos."
+}

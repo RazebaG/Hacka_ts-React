@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { isMockMode, getApiBaseUrl } from '../api/client';
 import { PerfilUsuario } from '../api/types';
 import { navegar, Tela, url } from '../app/rotas';
@@ -32,6 +32,7 @@ const GRUPOS: { titulo: string; itens: ItemNav[] }[] = [
     titulo: 'Consultar',
     itens: [
       { id: 'catalogo', rotulo: 'Documentos', icone: 'documento', destino: url.catalogo() },
+      { id: 'atencao', rotulo: 'Fila de atenção', icone: 'raio', destino: url.atencao() },
       { id: 'radar', rotulo: 'Regras que mudaram', icone: 'regras', destino: url.radar() },
       { id: 'comparar', rotulo: 'Comparar versões', icone: 'comparar', destino: url.comparar() },
       { id: 'perspectivas', rotulo: 'Resumo por área', icone: 'resumo', destino: url.painel() },
@@ -56,15 +57,18 @@ export const TITULOS: Record<Tela, string> = {
   ese: 'Simular uma mudança',
   catalogo: 'Documentos',
   documento: 'Documento',
+  ficha: 'Ficha do documento',
+  atencao: 'Fila de atenção',
   comparar: 'Comparar versões',
   grafo: 'Ligações entre documentos',
   relatorio: 'Montar relatório',
   enviar: 'Enviar documentos',
   revisar: 'Conferir documento lido',
+  lote: 'Lote enviado',
   'nao-encontrada': 'Página não encontrada'
 };
 
-const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar' };
+const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar', lote: 'enviar', ficha: 'catalogo', documento: 'catalogo' };
 
 interface SidebarProps {
   telaAtiva: Tela;
@@ -157,6 +161,7 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
   const nSelecao = useEstado((e) => e.selecao.length);
   const tamanho = useEstado((e) => e.tamanhoTexto);
   const menuAberto = useEstado((e) => e.menuAberto);
+  const [pergunta, setPergunta] = useState('');
 
   return (
     <header className="app-topbar print-hidden">
@@ -174,6 +179,31 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
       <span className="sr-only" aria-live="polite">
         Você está em {TITULOS[telaAtiva]}
       </span>
+
+      {/* T0: pergunta rápida (FLUXO v2). Enter abre a dúvida já respondida. */}
+      <form
+        className="pergunta-rapida"
+        role="search"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!pergunta.trim()) return;
+          navegar(url.perguntar(pergunta.trim()));
+          setPergunta('');
+        }}
+      >
+        <label htmlFor="pergunta-rapida" className="sr-only">
+          Pergunta rápida
+        </label>
+        <Icon nome="busca" tamanho={16} />
+        <input
+          id="pergunta-rapida"
+          type="search"
+          placeholder="Pergunte ao acervo…"
+          value={pergunta}
+          onChange={(e) => setPergunta(e.target.value)}
+          data-testid="pergunta-rapida"
+        />
+      </form>
 
       <div className="topbar-actions">
         <div className="tamanho-texto" role="group" aria-label="Tamanho do texto">

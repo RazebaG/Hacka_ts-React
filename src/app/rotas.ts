@@ -13,11 +13,14 @@ export type Tela =
   | 'ese'
   | 'catalogo'
   | 'documento'
+  | 'ficha'
+  | 'atencao'
   | 'comparar'
   | 'grafo'
   | 'relatorio'
   | 'enviar'
   | 'revisar'
+  | 'lote'
   | 'nao-encontrada';
 
 export interface Rota {
@@ -34,11 +37,14 @@ const ROTAS: [RegExp, Tela, string[]][] = [
   [/^\/radar\/?$/, 'radar', []],
   [/^\/e-se\/?$/, 'ese', []],
   [/^\/catalogo\/?$/, 'catalogo', []],
+  [/^\/documento\/([^/]+)\/ficha\/?$/, 'ficha', ['codigo']],
+  [/^\/atencao\/?$/, 'atencao', []],
   [/^\/documento\/([^/]+)\/?$/, 'documento', ['codigo']],
   [/^\/comparar\/?$/, 'comparar', []],
   [/^\/mapa\/?$/, 'grafo', []],
   [/^\/relatorio\/?$/, 'relatorio', []],
   [/^\/enviar\/?$/, 'enviar', []],
+  [/^\/enviar\/lote\/([\w-]+)\/?$/, 'lote', ['id']],
   [/^\/enviar\/([\w-]+)\/?$/, 'revisar', ['id']]
 ];
 
@@ -89,13 +95,36 @@ export function useRota(): Rota {
 
 /** Construtores de endereço, para não espalhar strings pelo código. */
 export const url = {
-  inicio: () => '/',
-  perguntar: (q?: string) => (q ? `/perguntar?q=${encodeURIComponent(q)}` : '/perguntar'),
+  inicio: (doc?: string, bloco?: string) => {
+    const qs = new URLSearchParams();
+    if (doc) qs.set('doc', doc);
+    if (bloco) qs.set('bloco', bloco);
+    const t = qs.toString();
+    return `/${t ? '?' + t : ''}`;
+  },
+  perguntar: (q?: string, documentos?: string[]) => {
+    const qs = new URLSearchParams();
+    if (q) qs.set('q', q);
+    if (documentos && documentos.length) qs.set('doc', documentos.join(','));
+    const t = qs.toString();
+    return `/perguntar${t ? '?' + t : ''}`;
+  },
+  ficha: (codigo: string, versao?: string, bloco?: string) => {
+    const qs = new URLSearchParams();
+    if (versao) qs.set('versao', versao);
+    if (bloco) qs.set('bloco', bloco);
+    const t = qs.toString();
+    return `/documento/${encodeURIComponent(codigo)}/ficha${t ? '?' + t : ''}`;
+  },
+  atencao: (filtros: { tema?: string; tipo?: string; situacao?: string; sinal?: string; ordenar?: string } = {}) => {
+    const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
+    return `/atencao${qs ? '?' + qs : ''}`;
+  },
   painel: (p?: string, filtros: { tema?: string; prazo?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
     return `/painel${p ? '/' + p : ''}${qs ? '?' + qs : ''}`;
   },
-  radar: (opc: { item?: string; tema?: string } = {}) => {
+  radar: (opc: { item?: string; tema?: string; codigo?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(opc).filter(([, v]) => v) as [string, string][]).toString();
     return `/radar${qs ? '?' + qs : ''}`;
   },
@@ -110,5 +139,6 @@ export const url = {
   relatorio: (opc: { perspectiva?: string; selecao?: boolean } = {}) =>
     opc.selecao ? '/relatorio?selecao=1' : opc.perspectiva ? `/relatorio?perspectiva=${opc.perspectiva}` : '/relatorio',
   enviar: () => '/enviar',
-  revisar: (id: string) => `/enviar/${id}`
+  revisar: (id: string) => `/enviar/${id}`,
+  lote: (id: string) => `/enviar/lote/${id}`
 };

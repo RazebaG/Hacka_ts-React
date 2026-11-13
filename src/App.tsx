@@ -14,6 +14,8 @@ import { EnviarView } from './components/EnviarView';
 import { RevisarView } from './components/RevisarView';
 import { DecisaoModal } from './components/DecisaoModal';
 import { CabecalhoTela } from './ui/componentes';
+import { FichaView } from './components/FichaView';
+import { FilaAtencaoView } from './components/FilaAtencaoView';
 import { navegar, url, useRota } from './app/rotas';
 import { acoes, useEstado } from './app/store';
 import { fetchSaude } from './api/client';
@@ -23,6 +25,7 @@ import './ui/shell.css';
 import './ui/telas-v2.css';
 import './ui/leitura.css';
 import './ui/figma.css';
+import './ui/mesa.css';
 
 const dataBR = (iso?: string) => (iso ? iso.split('-').reverse().join('/') : '12/11/2026');
 
@@ -59,10 +62,17 @@ export function App() {
   let conteudo: JSX.Element;
   switch (rota.tela) {
     case 'inicio':
-      conteudo = <VisaoGeralView />;
+      conteudo = <VisaoGeralView docSelecionado={q.get('doc') ?? undefined} />;
       break;
     case 'perguntar':
-      conteudo = <PerguntarView key={q.get('q') ?? ''} onNavegarDocumento={abrirDocumento} perguntaInicial={q.get('q') ?? undefined} />;
+      conteudo = (
+        <PerguntarView
+          key={`${q.get('q') ?? ''}|${q.get('doc') ?? ''}`}
+          onNavegarDocumento={abrirDocumento}
+          perguntaInicial={q.get('q') ?? undefined}
+          documentosIniciais={q.get('doc') ? q.get('doc')!.split(',').filter(Boolean) : undefined}
+        />
+      );
       break;
     case 'perspectivas':
       conteudo = (
@@ -76,13 +86,29 @@ export function App() {
       );
       break;
     case 'radar':
-      conteudo = <RadarView itemId={q.get('item') ?? undefined} tema={q.get('tema') ?? ''} />;
+      conteudo = <RadarView itemId={q.get('item') ?? undefined} tema={q.get('tema') ?? ''} codigo={q.get('codigo') ?? ''} />;
       break;
     case 'ese':
       conteudo = <ESeView valorInicial={Number(q.get('valor')) || 30} />;
       break;
     case 'catalogo':
       conteudo = <CatalogoView onNavegarDocumento={abrirDocumento} temaInicial={q.get('tema') ?? undefined} />;
+      break;
+    case 'atencao':
+      conteudo = (
+        <FilaAtencaoView
+          filtros={{
+            tema: q.get('tema') ?? undefined,
+            tipo: q.get('tipo') ?? undefined,
+            situacao: q.get('situacao') ?? undefined,
+            sinal: q.get('sinal') ?? undefined,
+            ordenar: q.get('ordenar') ?? undefined
+          }}
+        />
+      );
+      break;
+    case 'ficha':
+      conteudo = <FichaView key={`${rota.params.codigo}-${q.get('versao') ?? ''}`} codigo={rota.params.codigo} versao={q.get('versao') ?? undefined} />;
       break;
     case 'documento':
       conteudo = (
@@ -113,6 +139,9 @@ export function App() {
       break;
     case 'enviar':
       conteudo = <EnviarView />;
+      break;
+    case 'lote':
+      conteudo = <EnviarView loteId={rota.params.id} />;
       break;
     case 'revisar':
       conteudo = <RevisarView arquivoId={rota.params.id} />;
@@ -147,7 +176,7 @@ export function App() {
         <main className="app-main" id="conteudo" tabIndex={-1}>
           {conteudo}
         </main>
-        <Rodape ia={saude?.ia} dataReferencia={dataBR(saude?.data_referencia)} />
+        {rota.tela !== 'inicio' && <Rodape ia={saude?.ia} dataReferencia={dataBR(saude?.data_referencia)} />}
       </div>
 
       <DecisaoModal />
