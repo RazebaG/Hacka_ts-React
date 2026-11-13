@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { RadarItem } from '../api/types';
-import { fetchRadar } from '../api/client';
+import { RadarItem, TriagemResposta } from '../api/types';
+import { fetchRadar, fetchTriagem } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { useEstado } from '../app/store';
 import { CabecalhoTela, FonteLink } from '../ui/componentes';
 import { Icon, NomeIcone } from '../ui/Icon';
 import { SUGESTOES_POR_PERFIL } from './perfis';
+import { SemaforoSituacao } from './FichaView';
 
 /** T1 Início (layout do Figma): atalhos, pendências, resumo por área, prazo e dúvidas. */
 const CARTOES = [
@@ -32,9 +33,11 @@ export const VisaoGeralView: React.FC = () => {
   const [erro, setErro] = useState(false);
   const perfil = useEstado((e) => e.perfil);
   const avaliacoes = useEstado((e) => e.avaliacoes);
+  const [fila, setFila] = useState<TriagemResposta | null>(null);
 
   useEffect(() => {
     fetchRadar().then(setRadar).catch(() => setErro(true));
+    fetchTriagem().then(setFila).catch(() => undefined);
   }, []);
 
   const sugestoes = (SUGESTOES_POR_PERFIL[perfil ?? 'diretoria'] ?? SUGESTOES_POR_PERFIL.diretoria).slice(0, 2);
@@ -84,6 +87,34 @@ export const VisaoGeralView: React.FC = () => {
           <a className="btn btn-primary btn-sm" href={url.radar()} onClick={ir(url.radar())}>
             Ver pendências <span aria-hidden="true">→</span>
           </a>
+        </section>
+      )}
+
+      {fila && fila.itens.length > 0 && (
+        <section className="fg-card inicio-atencao" aria-labelledby="t-precisa" data-testid="inicio-atencao">
+          <div className="fg-cabeca-card">
+            <h2 id="t-precisa">
+              <Icon nome="raio" tamanho={18} /> Precisa de atenção
+            </h2>
+            <a className="fg-link" href={url.atencao()} onClick={ir(url.atencao())}>
+              Ver fila completa <Icon nome="seta" tamanho={14} />
+            </a>
+          </div>
+          <ul className="fg-lista">
+            {fila.itens.slice(0, 3).map((i) => (
+              <li key={i.codigo}>
+                <a className="fg-lista-item" href={url.ficha(i.codigo, i.versao)} onClick={ir(url.ficha(i.codigo, i.versao))}>
+                  <span className="fg-lista-texto">
+                    <span>
+                      <strong>{i.codigo}</strong> · {i.titulo}
+                    </span>
+                    <small>{i.semaforo.motivos[0] ?? (i.proximo_prazo ? `${i.proximo_prazo.evento}: ${i.proximo_prazo.data.split('-').reverse().join('/')}` : '')}</small>
+                  </span>
+                  <SemaforoSituacao nivel={i.semaforo.nivel} />
+                </a>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

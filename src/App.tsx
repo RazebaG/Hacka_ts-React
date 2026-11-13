@@ -14,6 +14,9 @@ import { EnviarView } from './components/EnviarView';
 import { RevisarView } from './components/RevisarView';
 import { DecisaoModal } from './components/DecisaoModal';
 import { CabecalhoTela } from './ui/componentes';
+import { FichaView } from './components/FichaView';
+import { ApresentacaoView } from './components/ApresentacaoView';
+import { FilaAtencaoView } from './components/FilaAtencaoView';
 import { navegar, url, useRota } from './app/rotas';
 import { acoes, useEstado } from './app/store';
 import { fetchSaude } from './api/client';
@@ -62,7 +65,14 @@ export function App() {
       conteudo = <VisaoGeralView />;
       break;
     case 'perguntar':
-      conteudo = <PerguntarView key={q.get('q') ?? ''} onNavegarDocumento={abrirDocumento} perguntaInicial={q.get('q') ?? undefined} />;
+      conteudo = (
+        <PerguntarView
+          key={`${q.get('q') ?? ''}|${q.get('doc') ?? ''}`}
+          onNavegarDocumento={abrirDocumento}
+          perguntaInicial={q.get('q') ?? undefined}
+          documentosIniciais={q.get('doc') ? q.get('doc')!.split(',').filter(Boolean) : undefined}
+        />
+      );
       break;
     case 'perspectivas':
       conteudo = (
@@ -83,6 +93,32 @@ export function App() {
       break;
     case 'catalogo':
       conteudo = <CatalogoView onNavegarDocumento={abrirDocumento} temaInicial={q.get('tema') ?? undefined} />;
+      break;
+    case 'atencao':
+      conteudo = (
+        <FilaAtencaoView
+          filtros={{
+            tema: q.get('tema') ?? undefined,
+            tipo: q.get('tipo') ?? undefined,
+            situacao: q.get('situacao') ?? undefined,
+            sinal: q.get('sinal') ?? undefined,
+            ordenar: q.get('ordenar') ?? undefined
+          }}
+        />
+      );
+      break;
+    case 'apresentar':
+      conteudo = (
+        <ApresentacaoView
+          key={`${rota.params.codigo}-${q.get('versao') ?? ''}`}
+          codigo={rota.params.codigo}
+          versao={q.get('versao') ?? undefined}
+          cartaoInicial={Number(q.get('cartao')) || undefined}
+        />
+      );
+      break;
+    case 'ficha':
+      conteudo = <FichaView key={`${rota.params.codigo}-${q.get('versao') ?? ''}`} codigo={rota.params.codigo} versao={q.get('versao') ?? undefined} />;
       break;
     case 'documento':
       conteudo = (

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { RadarItem } from '../api/types';
 import { fetchRadar } from '../api/client';
 import { navegar, url } from '../app/rotas';
@@ -89,6 +90,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
           </button>
         }
       />
+      <FontesBase fontes={itens.flatMap((i) => [...i.fontes, ...(i.citado_por ?? [])])} />
 
       <div className="fg-grid-3 fg-stats">
         <div className="fg-card fg-radar-stat">

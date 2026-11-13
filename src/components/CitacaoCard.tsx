@@ -2,6 +2,7 @@ import React from 'react';
 import { Citacao } from '../api/types';
 import { camadaDe } from '../mocks/v2';
 import { SemQuebra } from '../ui/componentes';
+import { navegar, url } from '../app/rotas';
 
 interface CitacaoCardProps {
   citacao: Citacao;
@@ -30,6 +31,18 @@ export const CitacaoCard: React.FC<CitacaoCardProps> = ({ citacao, onSelect }) =
           <strong>{citacao.codigo}</strong> · v{citacao.versao} · Seção {citacao.secao}
         </span>
         <span className="citacao-link-action">Abrir no texto &rarr;</span>
+        <a
+          className="citacao-link-action citacao-ficha"
+          href={url.ficha(citacao.codigo, citacao.versao)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navegar(url.ficha(citacao.codigo, citacao.versao));
+          }}
+          onKeyDown={(e) => e.stopPropagation()}
+        >
+          Ver ficha
+        </a>
       </div>
       <span className="fonte-camada">
         <SemQuebra texto={`${c.sigla} ${c.tipo_nome} · ${c.grupo}${c.subordinado_a ? ` · subordinado à ${c.subordinado_a}` : ''}`} />

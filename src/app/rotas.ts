@@ -13,6 +13,9 @@ export type Tela =
   | 'ese'
   | 'catalogo'
   | 'documento'
+  | 'ficha'
+  | 'apresentar'
+  | 'atencao'
   | 'comparar'
   | 'grafo'
   | 'relatorio'
@@ -34,6 +37,9 @@ const ROTAS: [RegExp, Tela, string[]][] = [
   [/^\/radar\/?$/, 'radar', []],
   [/^\/e-se\/?$/, 'ese', []],
   [/^\/catalogo\/?$/, 'catalogo', []],
+  [/^\/documento\/([^/]+)\/ficha\/?$/, 'ficha', ['codigo']],
+  [/^\/documento\/([^/]+)\/apresentar\/?$/, 'apresentar', ['codigo']],
+  [/^\/atencao\/?$/, 'atencao', []],
   [/^\/documento\/([^/]+)\/?$/, 'documento', ['codigo']],
   [/^\/comparar\/?$/, 'comparar', []],
   [/^\/mapa\/?$/, 'grafo', []],
@@ -90,7 +96,25 @@ export function useRota(): Rota {
 /** Construtores de endereço, para não espalhar strings pelo código. */
 export const url = {
   inicio: () => '/',
-  perguntar: (q?: string) => (q ? `/perguntar?q=${encodeURIComponent(q)}` : '/perguntar'),
+  perguntar: (q?: string, documentos?: string[]) => {
+    const qs = new URLSearchParams();
+    if (q) qs.set('q', q);
+    if (documentos && documentos.length) qs.set('doc', documentos.join(','));
+    const t = qs.toString();
+    return `/perguntar${t ? '?' + t : ''}`;
+  },
+  ficha: (codigo: string, versao?: string) => `/documento/${encodeURIComponent(codigo)}/ficha${versao ? `?versao=${versao}` : ''}`,
+  apresentar: (codigo: string, versao?: string, cartao?: number) => {
+    const qs = new URLSearchParams();
+    if (versao) qs.set('versao', versao);
+    if (cartao) qs.set('cartao', String(cartao));
+    const t = qs.toString();
+    return `/documento/${encodeURIComponent(codigo)}/apresentar${t ? '?' + t : ''}`;
+  },
+  atencao: (filtros: { tema?: string; tipo?: string; situacao?: string; sinal?: string; ordenar?: string } = {}) => {
+    const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
+    return `/atencao${qs ? '?' + qs : ''}`;
+  },
   painel: (p?: string, filtros: { tema?: string; prazo?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
     return `/painel${p ? '/' + p : ''}${qs ? '?' + qs : ''}`;

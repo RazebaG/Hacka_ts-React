@@ -32,6 +32,7 @@ const GRUPOS: { titulo: string; itens: ItemNav[] }[] = [
     titulo: 'Consultar',
     itens: [
       { id: 'catalogo', rotulo: 'Documentos', icone: 'documento', destino: url.catalogo() },
+      { id: 'atencao', rotulo: 'Fila de atenção', icone: 'raio', destino: url.atencao() },
       { id: 'radar', rotulo: 'Regras que mudaram', icone: 'regras', destino: url.radar() },
       { id: 'comparar', rotulo: 'Comparar versões', icone: 'comparar', destino: url.comparar() },
       { id: 'perspectivas', rotulo: 'Resumo por área', icone: 'resumo', destino: url.painel() },
@@ -56,6 +57,9 @@ export const TITULOS: Record<Tela, string> = {
   ese: 'Simular uma mudança',
   catalogo: 'Documentos',
   documento: 'Documento',
+  ficha: 'Ficha do documento',
+  apresentar: 'Apresentar documento',
+  atencao: 'Fila de atenção',
   comparar: 'Comparar versões',
   grafo: 'Ligações entre documentos',
   relatorio: 'Montar relatório',
@@ -64,7 +68,7 @@ export const TITULOS: Record<Tela, string> = {
   'nao-encontrada': 'Página não encontrada'
 };
 
-const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar' };
+const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar', ficha: 'catalogo', documento: 'catalogo', apresentar: 'catalogo' };
 
 interface SidebarProps {
   telaAtiva: Tela;

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { SimulacaoResultado } from '../api/types';
 import { postSimular } from '../api/client';
 import { navegar, url } from '../app/rotas';
@@ -51,6 +52,7 @@ export const ESeView: React.FC<{ valorInicial?: number }> = ({ valorInicial = 30
           </>
         }
       />
+      <FontesBase fontes={[{ codigo: 'NG_111', versao: '3.0.0' }, ...(resultado?.impactos.map((i) => i.fonte) ?? [])]} />
 
       <div className="fg-faixa-info" role="note">
         <Icon nome="info" tamanho={16} /> Simulação: nada muda nos documentos até a norma ser revisada.
