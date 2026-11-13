@@ -1,4 +1,4 @@
-# Assistente do Arquivo Central de Normas (Frontend React)
+# ACME - Assistente do Arquivo Central de Normas (Frontend React)
 
 Frontend da **Plataforma de Inteligência Empresarial** desenvolvido para o **HACKA/TS 2026 (Desafio 2)**.
 
