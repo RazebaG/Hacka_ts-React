@@ -104,15 +104,9 @@ POST /api/perguntar
 ```
 **Regras:** `consultados` inclui os documentos recuperados mesmo que não citados (`citado: false`), ordenados por `citado` e `relevancia`; em abstenção (`consta: false`) continua preenchido, para mostrar "procurei em n documentos"; `documentos` inexistentes devolvem `422` com a lista dos desconhecidos. Para a resposta de documento substituído, `vigente_em` aponta a versão em vigor.
 
-## C24 · `GET /api/documentos/{codigo}/apresentacao` (P1)
+## C24 · REMOVIDO (13/11)
 
-Cartões da apresentação, derivados da ficha (sem IA extra). Query: `versao`, `perfil`.
-```
-{ "codigo", "versao", "duracao_alvo_s": 300,
-  "cartoes": [ { "ordem": 1, "tipo": "capa|frase|decidir|numeros|prazos|riscos|quem|fontes",
-                 "titulo": "...", "itens": [ItemFicha | Acao], "tempo_s": 15 } ] }
-```
-
+O endpoint `/api/documentos/{codigo}/apresentacao` foi **descartado** junto com o modo apresentação. Ver C28.
 ## C25 · `GET /api/ficha/triagem` (P1)
 
 Fila de atenção. Query: `tema`, `tipo`, `situacao` (`ok|atencao|critico`), `sinal` (`prazo_30d|multa|divergencia`), `perfil`, `ordenar` (`urgencia|vigencia|tema|tipo`), `pagina` (1), `tamanho` (50, máx. 100).
@@ -180,3 +174,31 @@ Bloco {
 | `norma` | O que muda para você · Prazos que valem · Quem faz o quê · Limites e valores · Penalidades e exceções · Versão em vigor e o que mudou · Documentos ligados |
 | `procedimento` (P1) | Passo a passo em 5 linhas · Quem faz cada etapa · Prazos por etapa · Formulários e tabelas usados · Onde costuma travar · Norma de origem |
 | `nota_tecnica` (P1) | Decisão e o porquê · Valores e alçada · Prazo e vigência · Impacto em outras normas · Documentos citados e ausentes |
+---
+
+## C28 · Resumo explicado de uma seção (P1) · `GET /api/documentos/{codigo}/secoes/{secao_id}/resumo`
+
+Alimenta o pop-up aberto pelo mapa de calor (`POPUP-RESUMO-DA-SECAO-v1.md`). Query: `versao` (padrão a vigente). `secao_id` é o `id` da seção (URL-encoded, por exemplo `Cl%C3%A1usula%20D%C3%A9cima%20Terceira`). **Exemplo completo:** `mock-resumo-secao-CTR_2026-012.json`.
+
+```
+ResumoSecao {
+  codigo, versao,
+  secao: { id, titulo, ordem, total, pagina_estimada },
+  estado: "pronta" | "gerando" | "erro",
+  modo: { ia: "bedrock" | "extrativo", modelo: string | null },
+  explicacao: { texto, origem: "resumo", fontes: [Fonte] } | null,   // null sem IA ou se a verificação falhar
+  principais_trechos: [ { texto, origem: "literal" } ],               // sempre presente (2 a 3 frases literais da seção)
+  pontos: [ { rotulo, texto, sinal: "prazo"|"valor"|"obrigacao"|"risco"|"regra", origem, fonte: Fonte } ],   // até 5, fonte verificada
+  destaque: { sinais: {prazo, valor, obrigacao, risco}, intensidade: 0..1, dominante: string|null, motivo: string },  // = a célula do mapa_calor
+  relacionadas: [ { codigo, versao, secao, titulo, motivo } ],         // até 4
+  texto_original: { texto, trechos_destacados: [ { inicio, fim, sinal } ] },
+  navegacao: { anterior: { secao_id, titulo } | null, proxima: { secao_id, titulo } | null }   // vizinhas com sinal
+}
+```
+
+**Regras:**
+1. **Nada sem fonte (RNF20):** todo `ponto` e toda afirmação da `explicacao` passam na verificação de fonte (`trecho_consta_na_secao`). Se algum item da explicação não passar, `explicacao` vem `null` e o frontend mostra `principais_trechos`.
+2. `pontos`, `destaque`, `principais_trechos`, `texto_original` e `navegacao` vêm **por regra, sem IA** (F-02, F-03); só `explicacao` usa o modelo (Nova Pro, reserva Nova Lite), com o texto da seção entre delimitadores e saída em JSON validado.
+3. Cache por conteúdo (texto da seção + versão + modelo + versão do prompt); a primeira chamada com IA pode levar de 1 a 3 s, e o frontend já mostra o resto.
+4. `404` se o documento ou a seção não existe.
+5. **MVP sem backend:** o frontend monta a versão sem IA localmente a partir da ficha e do texto da seção; este endpoint só é necessário para a explicação por IA.

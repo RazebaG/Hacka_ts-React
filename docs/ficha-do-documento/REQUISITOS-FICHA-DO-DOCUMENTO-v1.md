@@ -38,7 +38,7 @@ Uma tela por documento, em **três profundidades**, sem trocar de página:
 |---|---|---|---|
 | **1 · Relance** | 10 s | Identidade, selos de governança, semáforo de situação, **uma frase** (BLUF), 3 números, próximo prazo | "Do que se trata e preciso me preocupar?" |
 | **2 · Decisão** | 2 min | "O que isso exige de mim": ações com prazo, responsável e consequência; pontos-chave por tema; alertas de vigência e divergência | "O que eu faço, até quando, com quem?" |
-| **3 · Estudo** | 5 min+ | Mapa de calor do documento inteiro; modo apresentação (pitch do documento); leitura completa com trecho destacado; perguntas sugeridas | "Onde está o detalhe e como eu explico isso a outra pessoa?" |
+| **3 · Estudo** | 5 min+ | Mapa de calor do documento inteiro; pop-up de resumo explicado da seção (aberto pelo mapa de calor); leitura completa com trecho destacado; perguntas sugeridas | "Onde está o detalhe e como eu explico isso a outra pessoa?" |
 
 ### 2.1 Diferenciais (o que nos separa de um "resumidor de PDF")
 
@@ -50,7 +50,7 @@ Uma tela por documento, em **três profundidades**, sem trocar de página:
 | D4 | **"O que isso exige de mim":** lista de ações com quem, até quando e o que acontece se não fizer | Transforma resumo em decisão (a tese do desafio) | P0 | M |
 | D5 | **Origem de cada afirmação:** selo "Trecho literal", "Resumo da IA" ou "Calculado", com fonte clicável; o que não se verifica é descartado | Confiança e auditoria; diferencia de chatbots | P0 | S (já temos o verificador) |
 | D6 | **Cobertura declarada:** "li 47 de 47 seções; 3 pontos descartados por falta de fonte" | Honestidade sobre o que a IA fez e não fez | P0 | S |
-| D7 | **Modo apresentação (pitch do documento):** 7 a 8 cartões cronometrados em 5 min, gerados a partir da própria ficha | Pedido explícito: "como se fosse um pitch do documento"; serve para reunião e comitê | P1 (P0 se sobrar tempo) | S (derivado, sem IA extra) |
+| D7 | **Resumo explicado da seção:** ao selecionar uma seção no mapa de calor, um pop-up com o que ela diz em palavras simples, os pontos principais com fonte, por que está em destaque, as seções ligadas e o texto original com os termos marcados | Dá ao mapa de calor o motivo de existir: cor diz onde olhar, o pop-up diz o que a seção significa (substitui o antigo modo apresentação) | P0 (versão sem IA) · P1 (explicação por IA) | M |
 | D8 | **Fila de atenção (triagem de 1.000):** lista ordenada por urgência (prazo mais próximo, divergência, vigência acabando) | Escala: ninguém abre 1.000 fichas, abre as 10 que importam hoje | P1 | M |
 | D9 | **Tempo economizado:** "Documento de ~100 págs · leitura 50 min · ficha 4 min" | Métrica de valor para o pitch e para o usuário | P0 | S |
 | D10 | **Delta de versão:** "o que mudou desde a v2" e "novidades desde a sua última visita" | Em acervo vivo, mudança importa mais que estoque | P1 | M (reaproveita `/api/comparar`) |
@@ -120,7 +120,7 @@ Prioridade: **P0** = MVP · **P1** = se sobrar tempo · **P2** = depois do event
 | RF55 | **Perguntas sugeridas** (até 4) por documento; ao clicar, abre o T2 com o escopo fixado no documento (RF63) | P0 | T14 | C22 |
 | RF56 | **Alertas do documento:** itens do Radar (T4) que citam este documento (versão substituída, referência ausente) e conflitos com outras fontes | P0 | T14 | C22 |
 | RF57 | **Estados de geração:** `gerando` (com progresso por etapa), `parcial` (extrativo pronto, IA pendente), `pronta`, `erro` (com tentar de novo). A pessoa pode usar o relance enquanto o resto carrega | P0 | T14 | C22 |
-| RF58 | **Modo apresentação:** 7 a 8 cartões navegáveis por teclado (capa, em uma frase, o que decidir, números, prazos, riscos, quem faz o quê, de onde vem), com cronômetro opcional de 5 min, tela cheia e fonte clicável em cada cartão | P1 | T16 | C24 |
+| RF58 | **Pop-up de resumo explicado da seção** (revisão 13/11): ao selecionar uma seção no mapa de calor, abre um pop-up com o que ela diz em palavras simples, os pontos principais com fonte, por que está em destaque, as seções ligadas e o texto original com os termos marcados; fundo desfocado e responsivo (gaveta no celular). Sem IA: "Principais trechos" no lugar da explicação. **Substitui o modo apresentação (retirado)** | P0 (abertura pelo mapa e versão sem IA) · P1 (explicação por IA) | T1, T14 | C28 |
 | RF59 | **Visão por perfil:** o perfil escolhido reordena e enfatiza a ficha (seção 4) e ajusta o BLUF | P1 | T14 | C22 (`perfil`) |
 | RF60 | **Linguagem simples:** alternar o texto entre "como está" e "em palavras simples" | P1 | T14 | C22 (`linguagem`) |
 | RF61 | **Delta de versão:** "o que mudou desde a v2" no topo da ficha e "novidades desde a sua última visita" | P1 | T14, T17 | C26 |

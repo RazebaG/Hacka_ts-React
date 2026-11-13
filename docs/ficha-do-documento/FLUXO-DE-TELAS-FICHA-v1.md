@@ -26,7 +26,7 @@
 │ │ ┌ Quanto custa ┐ ┌ Até quando ┐ ┌ Quem faz o quê ┐   blocos por família, 4 a 6,          │ │
 │ │ ┌ Onde pode doer ┐ ┌ Regras ┐ ┌ Falta no acervo ┐    cada um com selo "1º · maior valor"│ │
 │ │ Detalhe: trecho exato + cláusula + origem + [Abrir no texto completo]                    │ │
-│ │ [ Pergunte a este documento… ]  [Apresentar em 5 min]  [Abrir ficha completa]            │ │
+│ │ [ Pergunte a este documento… ]  [Ver resumo da seção]  [Abrir ficha completa]            │ │
 │ └──────────────────────────────────────────────────────────────────────────────────────────┘ │
 ├ continua como hoje ───────────────────────────────────────────────────────────────────────┤
 │ Faixa do radar · Resumo normativo por área · Próximo prazo · Dúvidas frequentes            │
@@ -56,7 +56,7 @@
 | Pontos-chave por tema (lista longa) | Não | Sim |
 | Alertas do radar, cobertura declarada, perguntas sugeridas | Resumo em uma linha | Sim |
 | Versão e "o que mudou" | Selo | Bloco |
-| Apresentar em 5 min, exportar, compartilhar | Botão "Apresentar" | Todos |
+| Exportar e compartilhar | Não | Sim |
 
 Regra de implementação: `MesaDocumento` recebe `variante="compacta" | "completa"`. A T14 é a rota `/documento/:codigo/ficha` renderizando a variante completa.
 
@@ -84,7 +84,7 @@ O componente `BlocoDecisao` é **um só**: recebe `titulo`, `destaque`, `apoio`,
 |---|---|
 | **T1 Início** | **Passa a ser a tela principal da funcionalidade** (lista de atenção + Mesa) |
 | **T14 Ficha** | Versão completa da mesma Mesa; destino de "Abrir ficha completa" e dos links do Slack/Teams |
-| **T16 Apresentação** | Igual (P1); abre por "Apresentar em 5 min" na Mesa |
+| **T16 Pop-up de resumo da seção** | Aberto ao clicar numa célula do mapa de calor (Mesa e Ficha); ver `POPUP-RESUMO-DA-SECAO-v1.md` |
 | **T17 Fila de atenção** | Vira a página completa da lista que a T1 mostra em versão curta (P1) |
 | Painel de Fontes (T2) | Igual (P0) |
 
@@ -93,7 +93,7 @@ O componente `BlocoDecisao` é **um só**: recebe `titulo`, `destaque`, `apoio`,
 1. **Fatia 1 (P0):** `MesaDocumento` compacta na T1 com o mock `mock-ficha-CTR_2026-012.json` (faixa, frase, blocos, detalhe), mantendo o topo e o restante da T1.
 2. **Fatia 2 (P0):** mapa de posição ligado aos blocos; lista "Documentos que pedem sua atenção" com 2 mocks (contrato e norma, para provar a troca de blocos).
 3. **Fatia 3 (P0):** Painel de Fontes e escopo no T2; botão "Abrir ficha completa" (T14, variante completa).
-4. **Fatia 4 (P1):** apresentação, fila de atenção completa, perfil, linguagem simples.
+4. **Fatia 4 (P1):** fila de atenção completa, perfil, linguagem simples. O pop-up de resumo da seção entra logo depois do mapa (passo 8 do guia de implementação).
 
 ---
 
@@ -105,7 +105,7 @@ Início (T1) ─┬─▶ Fila de atenção (T17, P1) ──▶ Ficha (T14)
              └─▶ Pergunte (T2) ── chip de fonte ▶ Ficha (T14)        ▲
                      │                                                │
                      └─ Painel de Fontes (novo) ── "abrir documento" ─┘
-Ficha (T14) ─▶ Modo apresentação (T16, P1) ─▶ Exportar / Slack / Teams
+Mapa de calor (T1/T14) ─▶ Pop-up de resumo da seção (T16) ─▶ Texto completo (T8)
 Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 ```
 
@@ -116,7 +116,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 | Tela | Rota | Observação |
 |---|---|---|
 | T14 Ficha | `/documento/:codigo/ficha` (query opcional `?perfil=`, `?v=` versão) | Antes do padrão `/documento/:codigo` (ordem importa no `ROTAS`) |
-| T16 Apresentação | `/documento/:codigo/apresentar` | Tela cheia; `?cartao=3` abre no cartão |
+| T16 Pop-up de resumo | sem rota própria; `?secao=<id>` na Mesa ou na Ficha | Abre o pop-up daquela seção; fecha com Esc e devolve o foco à célula |
 | T17 Fila de atenção | `/atencao` (query `?tema=&tipo=&situacao=&ordenar=`) | P1 |
 | Painel de Fontes | sem rota: componente dentro de T2 (e blocos "Baseado em") | |
 
@@ -159,7 +159,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 │  ▸ Atestar a nota em 5 dias úteis · GOC                │  › Posso rescindir sem multa?        │
 │ Pontos-chave  [Obrigações][Prazos][Valores][Riscos]…   │  › Quem paga o IPTU?                 │
 │  (cartões com selo de origem, fonte e "Incluir no      │ [Perguntar sobre este documento]     │
-│   relatório")                                          │ [Apresentar em 5 min] [Exportar]     │
+│   relatório")                                          │ [Ver resumo da seção] [Exportar]     │
 │ Cobertura: 43/43 seções · 31 itens verificados ·       │ Ler o texto completo (T8)            │
 │ 0 descartados · modo: IA (Nova Pro)                    │                                      │
 └────────────────────────────────────────────────────────┴──────────────────────────────────────┘
@@ -177,7 +177,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 | **Pontos-chave** | abas por tema; cartões com valor, fonte, selo | Igual aos cartões do T3 (reaproveitar) | |
 | **Alertas** | itens do Radar sobre este documento; conflitos | Clique abre T4 filtrado (`?codigo=`) | |
 | **Cobertura** | "43/43 seções · 31 verificados · 0 descartados · modo IA/extrativo" | Descartados > 0: link "ver por que" (lista, sem texto do documento) | modo extrativo: aviso "IA indisponível; mostrando só o que se extrai por regra" |
-| **Ações laterais** | Perguntar sobre este documento (fixa escopo), Apresentar, Exportar, Ler texto completo | | |
+| **Ações laterais** | Perguntar sobre este documento (fixa escopo), Exportar, Ler texto completo | | |
 
 ### 2.3 Selo de origem (componente novo `SeloOrigem`)
 
@@ -201,11 +201,11 @@ Regra de microcopy: nunca "a IA garante". Usar "com fonte" / "resumo da IA, conf
 
 ### 2.5 Mobile (375 px)
 
-Ordem vertical: cabeçalho compacto → relance → 3 números (rolagem horizontal) → ações → mapa (faixa em 2 linhas) → governança (acordeão) → pontos-chave (abas roláveis) → alertas → cobertura. Botões de ação fixos no rodapé ("Perguntar", "Apresentar").
+Ordem vertical: cabeçalho compacto → relance → 3 números (rolagem horizontal) → ações → mapa (faixa em 2 linhas) → governança (acordeão) → pontos-chave (abas roláveis) → alertas → cobertura. Botões de ação fixos no rodapé ("Perguntar", "Abrir texto completo").
 
 ### 2.6 Acessibilidade
 
-Cor nunca é o único sinal (semáforo tem ícone e texto); mapa de calor com alternativa em lista; foco visível; `aria-live="polite"` no progresso de geração; contraste AA; atalhos: `P` apresentar, `?` perguntar.
+Cor nunca é o único sinal (semáforo tem ícone e texto); mapa de calor com alternativa em lista; foco visível; `aria-live="polite"` no progresso de geração; contraste AA; atalhos: `?` perguntar.
 
 ### 2.7 Microcopy (tom do guia de voz já existente)
 
@@ -216,27 +216,15 @@ Cor nunca é o único sinal (semáforo tem ícone e texto); mapa de calor com al
 
 ---
 
-## 3. T16 · Modo apresentação (pitch do documento) · P1
+## 3. T16 · Pop-up de resumo explicado da seção (aberto pelo mapa de calor)
 
-> **Detalhamento completo (13/11):** ver MODO-APRESENTACAO-v1.md, que substitui esta seção quando houver diferença (cartões escolhidos pelo **sinal** dos blocos, tempo redistribuído, roteiro falado, teclado, PDF, aceite e montagem no cliente).
+> **Detalhamento completo e aceite: `POPUP-RESUMO-DA-SECAO-v1.md`.** Esta seção substitui o antigo "Modo apresentação" (removido: sem cronômetro, notas, cartões por tempo, tela cheia nem rota `/apresentar`).
 
-**Objetivo:** a pessoa apresenta o documento em 5 minutos, em reunião ou no comitê. Os cartões são **derivados da ficha**: não há nova chamada de IA.
-
-| # | Cartão | Conteúdo | Tempo sugerido |
-|---|---|---|---|
-| 1 | Capa | Título, código, vigência, selos de governança, semáforo | 15 s |
-| 2 | Em uma frase | BLUF grande + fonte | 30 s |
-| 3 | O que decidir | até 3 ações com quem e prazo | 60 s |
-| 4 | Números que importam | até 4 números com fonte | 45 s |
-| 5 | Linha do tempo | prazos em ordem, com "hoje" marcado | 45 s |
-| 6 | Riscos e alertas | multas, divergências, referências ausentes | 45 s |
-| 7 | Quem faz o quê | responsáveis e obrigações | 45 s |
-| 8 | De onde vem | fontes, cobertura, modo IA/extrativo | 15 s |
-
-- Tela cheia, navegação por setas/clique/toque, indicador "3 de 8", cronômetro opcional de 5:00 que muda de cor nos últimos 60 s.
-- Cada número e frase tem a fonte clicável (abre painel lateral sem sair da apresentação).
-- Rodapé: [Exportar PDF] [Enviar para o Slack/Teams] [Sair].
-- Dados: `GET /api/documentos/{codigo}/apresentacao` (C24) ou montar no cliente a partir da ficha (decisão do FE; o contrato existe para os canais).
+- **Abre** ao clicar (ou `Enter`) numa célula do mapa de calor, na Mesa ou na Ficha; a URL ganha `?secao=<id>`.
+- **Forma:** pop-up centralizado no desktop e **gaveta de baixo para cima no celular**, com o **fundo desfocado** (`backdrop-filter`) e escurecido; fecha por `×`, `Esc` ou clique no fundo.
+- **Conteúdo:** Em palavras simples (P1, IA) ou Principais trechos (sem IA) · O que ela diz, em pontos · Por que está em destaque no mapa · Ligada a · Texto original com os termos marcados.
+- **Rodapé:** `← Anterior`, `Próxima →`, `Perguntar sobre esta seção` e `Abrir no texto completo`.
+- **Dados:** montado no cliente a partir da ficha e do texto da seção; endpoint C28 do backend (P1) para a explicação por IA.
 
 ---
 
@@ -321,7 +309,7 @@ Linha final "Fontes consultadas: NG_111 v3.0.0 (vigente) · PX_1111-001 v1.0.0" 
 
 ## 7. Componentes novos (inventário para o FE)
 
-`FichaView`, `RelanceCard`, `SelosGovernanca`, `MapaCalor` (+ `MapaCalorLista` acessível), `AcoesExigidas`, `PontosChave`, `SeloOrigem`, `CoberturaBarra`, `ApresentacaoView`, `FilaAtencao` (+ `CartaoTriagem`), `PainelFontes`, `FontesBase`, `EscopoChips`, `SemaforoSituacao`.
+`FichaView`, `RelanceCard`, `SelosGovernanca`, `MapaCalor` (+ `MapaCalorLista` acessível), `AcoesExigidas`, `PontosChave`, `SeloOrigem`, `CoberturaBarra`, `PopupResumoSecao`, `FilaAtencao` (+ `CartaoTriagem`), `PainelFontes`, `FontesBase`, `EscopoChips`, `SemaforoSituacao`.
 Mocks: `src/mocks/ficha.ts` (usar `mock-ficha-CTR_2026-012.json` como base; criar mais 2: `NG_111`, `PX_1111-001`), tipos em `src/api/types.ts` (espelhar o contrato C22–C25).
 
 ## 8. Ordem sugerida de entrega do frontend
@@ -329,7 +317,7 @@ Mocks: `src/mocks/ficha.ts` (usar `mock-ficha-CTR_2026-012.json` como base; cria
 1. **Fatia 1 (P0, base):** rota + `FichaView` com Relance, Governança, Cobertura e estados, lendo o mock; link no Catálogo e nas citações.
 2. **Fatia 2 (P0):** Mapa de calor, "O que isso exige de você", Pontos-chave, Selo de origem.
 3. **Fatia 3 (P0):** Painel de Fontes e escopo no T2.
-4. **Fatia 4 (P1):** Modo apresentação.
+4. **Fatia 4 (P1):** fila de atenção e perfil.
 5. **Fatia 5 (P1):** Fila de atenção, perfil, linguagem simples, exportar.
 
 Trocar o mock pela API real quando o backend entregar `GET /api/documentos/{codigo}/ficha` (issue F-07 do PRD).

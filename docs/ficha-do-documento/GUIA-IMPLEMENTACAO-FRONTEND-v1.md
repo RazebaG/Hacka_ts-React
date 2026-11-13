@@ -7,7 +7,7 @@
 
 ## 1. Diagnóstico: o que a PR #24 tem de certo e de errado
 
-**Certo (manter):** a estrutura da tela inicial está como planejado: título, 4 atalhos, "Documentos que pedem sua atenção" com chips, Mesa compacta (faixa "Precisa de você", frase-resumo, blocos com selo de relevância, detalhe), resto da T1 abaixo. A Ficha (`/documento/:codigo/ficha`) e a Apresentação (`/documento/:codigo/apresentar`) funcionam e usam o visual do app.
+**Certo (manter):** a estrutura da tela inicial está como planejado: título, 4 atalhos, "Documentos que pedem sua atenção" com chips, Mesa compacta (faixa "Precisa de você", frase-resumo, blocos com selo de relevância, detalhe), resto da T1 abaixo. A Ficha (`/documento/:codigo/ficha`) funciona e usa o visual do app. A tela de Apresentação (`/documento/:codigo/apresentar`) existe, mas **não é o que foi decidido** (linha 7 abaixo).
 
 **Errado (corrigir antes de qualquer coisa nova):**
 
@@ -19,7 +19,8 @@
 | 4 | **Mapa de calor sem calor:** a faixa aparece como caixinhas cinza; só acende uma cor ao escolher um bloco. Na Ficha aparece "mostrando 11" de 43 seções | O que os mentores elogiaram (mapa de calor) não aparece na tela | 3 |
 | 5 | **Dados do mapa vêm do meu exemplo**, que tem só 5 células. **Falha minha:** o exemplo tinha 5 células para um documento de 43 seções | A tela mostra um mapa incompleto por culpa do dado, não do código | 3.4 |
 | 6 | **Ficha completa = card dentro de card** com cabeçalho repetido (título do documento duas vezes) | Visual pesado e confuso | 5, passo 6 |
-| 7 | `MesaDocumento.tsx` com **476 linhas** e duas variantes no mesmo componente (`compacta` e `completa`) | Cada ajuste mexe na outra variante | 4 |
+| 7 | A **tela de Apresentação** atual (tela cheia, cronômetro, notas, cartões por tempo) **não é o que foi decidido e deve ser removida**: o que existe no escopo é o pop-up de resumo da seção (aberto pelo mapa de calor) | Remover `ApresentacaoView`, `src/ficha/cartoes.ts`, `notasApresentador.ts`, a rota `/apresentar` e o botão "Apresentar"; implementar o passo 8 |
+| 8 | `MesaDocumento.tsx` com **476 linhas** e duas variantes no mesmo componente (`compacta` e `completa`) | Cada ajuste mexe na outra variante | 4 |
 
 ## 2. Design system: as regras (valem para qualquer agente)
 
@@ -56,7 +57,7 @@ Se faltar um token que o desenho exige, **peça no PR**; não invente.
 ### 2.4 Onde ficam os estilos novos
 
 - Estilos novos em **`src/ui/mesa.css`** (importado uma vez), com classes `fg-mesa-*`, `fg-bloco-*` e `fg-mapa-*`. **Não** acrescentar mais nada em `figma.css`.
-- Mover o que já foi acrescentado em `figma.css` por esta PR para `mesa.css` (os blocos `mesa-*`, `inicio-*`, `ficha-*`, `apresentacao-*`).
+- Mover o que já foi acrescentado em `figma.css` por esta PR para `mesa.css` (os blocos `mesa-*`, `inicio-*`, `ficha-*`).
 - Estados de interação (hover, foco, selecionado) com os tokens de foco já usados nos botões (`--color-focus-ring`); nunca remover o foco visível.
 
 ## 3. O mapa de calor (o que os mentores gostaram) · especificação v2
@@ -115,7 +116,8 @@ VisaoGeralView                      (existe; só compõe)
  │    ├─ GradeBlocos                lista de BlocoDecisao (mesmo componente para qualquer família)
  │    │    └─ BlocoDecisao          titulo · destaque · apoio · selo de relevância · sinal
  │    ├─ DetalheBloco               trecho exato · cláusula · SeloOrigem · "Abrir no texto completo"
- │    └─ PerguntaEscopada + BotaoApresentar
+ │    └─ PerguntaEscopada
+ ├─ PopupResumoSecao                NOVO  abre ao clicar numa célula do MapaCalor (POPUP-RESUMO-DA-SECAO-v1.md)
  └─ (resto da T1 existente, abaixo)
 ```
 
@@ -132,9 +134,10 @@ Cada passo termina com: `npm run build` sem erro, `npm test` verde, o `grep` de 
 | 2 | **`MapaCalor` v2** (seção 3) com os dados reais do `CTR_2026-012` | Faixa **colorida ao abrir a tela**; filtro por sinal funciona; passar o mouse mostra a dica; escolher "Quanto custa" contorna as seções dele; legenda e subtítulo presentes |
 | 3 | Mesmo mapa com o `NG_111` (112 seções) e a variante de lista | Sem estouro de largura; rolagem ou agrupamento; a lista alternativa lista 10 seções com o nome do sinal |
 | 4 | Família `norma`: chip do `NG_111` troca os blocos ("O que muda para você", "Prazos que valem", "Quem faz o quê", "Limites e valores", "Documentos ligados") | O mesmo `BlocoDecisao` renderiza os dois documentos, sem código específico por documento |
-| 5 | Pergunta escopada e botão "Apresentar em 5 min" | Campo com o documento fixado; o botão abre a apresentação e o "Sair" volta ao mesmo bloco |
+| 5 | Pergunta escopada (campo com o documento fixado) | O campo mostra o documento fixado; "Perguntar sobre este documento" abre o T2 já com o escopo |
 | 6 | **Ficha completa** sem card dentro de card | Título do documento aparece **uma vez**; governança completa, cobertura e alertas; mapa com **todas** as seções (sem "mostrando n") |
 | 7 | Painel de Fontes no T2 | Conforme `FLUXO-DE-TELAS-FICHA-v1.md`, seção 5 |
+| 8 | **Pop-up de resumo explicado da seção**, aberto pelo mapa de calor (substitui a tela de Apresentação): fundo desfocado, gaveta no celular, conteúdo da seção, navegação anterior e próxima | `POPUP-RESUMO-DA-SECAO-v1.md`, seção 8: capturas em **375×812, 768×1024 e 1280×720**; clique numa célula do mapa abre o pop-up; `Esc`, `×` e clique no fundo fecham e devolvem o foco à célula; sem `--mk-*` nem cor hexadecimal |
 
 **Quando uma captura não bate com o aceite, o passo não está pronto**, mesmo que os testes passem.
 
@@ -147,7 +150,7 @@ Criar `src/test/design-system.test.ts` que falha se, nos arquivos da Mesa, do Ma
 
 ## 7. Instrução curta para colar no agente que implementa
 
-> Leia `docs/ficha-do-documento/GUIA-IMPLEMENTACAO-FRONTEND-v1.md` inteiro antes de escrever código. Regras: use só os tokens de `index.css` e `figma.css` (nada de `--mk-*` nem hexadecimal); reuse `fg-card`, `fg-pilula`, `fg-faixa-alerta` e `btn`; estilos novos só em `src/ui/mesa.css`; componentes de até ~150 linhas; o mapa de calor usa os dados de `src/mocks/mapa-calor-*.json`. Faça **um passo por vez** (seção 5), rode `npm run build`, `npm test` e o `grep` de cor, e anexe as capturas 1280×720 e 375×812. Se a captura não bate com o critério do passo, corrija antes de seguir.
+> Leia `docs/ficha-do-documento/GUIA-IMPLEMENTACAO-FRONTEND-v1.md` inteiro antes de escrever código. Regras: use só os tokens de `index.css` e `figma.css` (nada de `--mk-*` nem hexadecimal); reuse `fg-card`, `fg-pilula`, `fg-faixa-alerta` e `btn`; estilos novos só em `src/ui/mesa.css`; componentes de até ~150 linhas; o mapa de calor usa os dados de `src/mocks/mapa-calor-*.json` e abre o pop-up de resumo da seção (`POPUP-RESUMO-DA-SECAO-v1.md`); **não construa modo apresentação**. Faça **um passo por vez** (seção 5), rode `npm run build`, `npm test` e o `grep` de cor, e anexe as capturas 1280×720 e 375×812. Se a captura não bate com o critério do passo, corrija antes de seguir.
 
 ## 8. O que o backend entrega e quando
 
