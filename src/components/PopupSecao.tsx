@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { DocumentoDetalhe, FichaDocumento } from '../api/types';
-import { fetchDocumentoDetalhe } from '../api/client';
+import { fetchDocumentoDetalhe, mensagemDeErro } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { ROTULO_SINAL, Sinal, montarResumoSecao } from '../ficha/resumoSecao';
 import { Icon } from '../ui/Icon';
@@ -23,7 +23,7 @@ const PALAVRAS_LONGO = 400;
 
 export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir }) => {
   const [doc, setDoc] = useState<DocumentoDetalhe | null>(null);
-  const [erro, setErro] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const caixa = useRef<HTMLDivElement>(null);
   const corpo = useRef<HTMLDivElement>(null);
   const origem = useRef<HTMLElement | null>(typeof document !== 'undefined' ? (document.activeElement as HTMLElement | null) : null);
@@ -31,10 +31,10 @@ export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir 
   useEffect(() => {
     let ativo = true;
     setDoc(null);
-    setErro(false);
+    setErro(null);
     fetchDocumentoDetalhe(ficha.codigo, ficha.versao)
       .then((d) => ativo && setDoc(d))
-      .catch(() => ativo && setErro(true));
+      .catch((e) => ativo && setErro(mensagemDeErro(e, 'Não consegui abrir esta seção agora. Você ainda pode ler o texto completo.')));
     return () => {
       ativo = false;
     };
@@ -143,7 +143,7 @@ export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir 
           )}
           {erro && (
             <p className="popup-aviso" role="alert">
-              Não consegui abrir esta seção agora. Você ainda pode ler o texto completo.
+              {erro}
             </p>
           )}
           {doc && !resumo && <p className="popup-aviso">Não achei o texto desta seção. Você ainda pode abrir o documento completo.</p>}

@@ -30,6 +30,14 @@ Com o backend rodando em `http://localhost:8000`:
 VITE_API_URL=http://localhost:8000 npm run dev
 ```
 
+#### Variáveis de ambiente
+Copie `.env.example` para `.env.local` (ignorado pelo git) e preencha:
+
+- `VITE_API_URL`: endereço do backend. Vazia, o app roda no modo de exemplo, sem rede.
+- `VITE_API_KEY`: enviada como cabeçalho `X-API-Key` em toda chamada a `/api/...` (deve ser igual à `API_KEY` do backend). Vazia, nenhum cabeçalho é enviado. Se a API recusar a chave (401/403), a tela mostra "A chave de acesso não foi aceita. Confira a configuração."
+
+> **Limite importante:** variáveis `VITE_*` entram no código que o navegador baixa, então **a chave fica visível para quem abrir o site**. Ela serve de trava básica contra uso casual e para proteger a cota do Bedrock no MVP; **não é segredo de verdade**. A solução definitiva (pós-MVP) é um proxy no servidor ou autenticação por usuário. A chave real é entregue por canal privado e nunca vai para o repositório, issue, PR ou captura de tela.
+
 ### 3. Execução dos Testes e Build
 ```bash
 # Rodar suíte de testes unitários e de integração

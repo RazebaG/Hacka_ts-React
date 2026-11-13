@@ -40,11 +40,41 @@ const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
 export const isMockMode = (): boolean => !API_BASE_URL;
 export const getApiBaseUrl = (): string => API_BASE_URL;
 
+export const MENSAGEM_CHAVE_RECUSADA = 'A chave de acesso não foi aceita. Confira a configuração.';
+
+/** 401/403 da API: a chave (VITE_API_KEY) faltou ou não confere com a API_KEY do backend. */
+export class ErroChaveApi extends Error {
+  constructor(public readonly status: number) {
+    super(MENSAGEM_CHAVE_RECUSADA);
+    this.name = 'ErroChaveApi';
+  }
+}
+
+/** Texto para a tela: a mensagem da chave recusada tem prioridade sobre o texto padrão. */
+export const mensagemDeErro = (e: unknown, padrao: string): string =>
+  e instanceof ErroChaveApi ? e.message : padrao;
+
+/** Lida a cada chamada (e não no carregamento) para os testes poderem trocar a variável. */
+const chaveApi = (): string => (import.meta.env.VITE_API_KEY ?? '').trim();
+
+/**
+ * Único ponto de saída para a API: prefixa VITE_API_URL e, se VITE_API_KEY existir, envia
+ * `X-API-Key`. Sem a variável, não envia cabeçalho nenhum. 401/403 viram ErroChaveApi.
+ */
+export async function apiFetch(caminho: string, init: RequestInit = {}): Promise<Response> {
+  const headers = new Headers(init.headers);
+  const chave = chaveApi();
+  if (chave) headers.set('X-API-Key', chave);
+  const res = await fetch(`${API_BASE_URL}${caminho}`, { ...init, headers });
+  if (res.status === 401 || res.status === 403) throw new ErroChaveApi(res.status);
+  return res;
+}
+
 export async function fetchSaude(): Promise<SaudeResponse> {
   if (isMockMode()) {
     return Promise.resolve(MOCK_SAUDE);
   }
-  const res = await fetch(`${API_BASE_URL}/api/saude`);
+  const res = await apiFetch(`/api/saude`);
   if (!res.ok) {
     throw new Error(`Falha ao consultar saúde da API (${res.status} ${res.statusText})`);
   }
@@ -55,7 +85,7 @@ export async function fetchDocumentos(): Promise<DocumentoResumo[]> {
   if (isMockMode()) {
     return Promise.resolve(getResumoDocumentos());
   }
-  const res = await fetch(`${API_BASE_URL}/api/documentos`);
+  const res = await apiFetch(`/api/documentos`);
   if (!res.ok) {
     throw new Error(`Falha ao obter lista de documentos (${res.status} ${res.statusText})`);
   }
@@ -74,9 +104,9 @@ export async function fetchDocumentoDetalhe(
     return Promise.resolve(doc);
   }
   const url = versao
-    ? `${API_BASE_URL}/api/documentos/${encodeURIComponent(codigo)}?versao=${encodeURIComponent(versao)}`
-    : `${API_BASE_URL}/api/documentos/${encodeURIComponent(codigo)}`;
-  const res = await fetch(url);
+    ? `/api/documentos/${encodeURIComponent(codigo)}?versao=${encodeURIComponent(versao)}`
+    : `/api/documentos/${encodeURIComponent(codigo)}`;
+  const res = await apiFetch(url);
   if (!res.ok) {
     throw new Error(`Falha ao carregar documento ${codigo} (${res.status} ${res.statusText})`);
   }
@@ -92,7 +122,7 @@ export async function postPerguntar(
   if (isMockMode()) {
     return Promise.resolve(comFontesEmEvidencia(aplicarEscopo(mockPerguntar(pergunta, perfil), escopo), escopo));
   }
-  const res = await fetch(`${API_BASE_URL}/api/perguntar`, {
+  const res = await apiFetch(`/api/perguntar`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -196,7 +226,7 @@ export async function fetchFicha(
   if (opcoes.perfil) params.set('perfil', opcoes.perfil);
   if (opcoes.linguagem === 'simples') params.set('linguagem', 'simples');
   const qs = params.toString() ? `?${params}` : '';
-  const res = await fetch(`${API_BASE_URL}/api/documentos/${encodeURIComponent(codigo)}/ficha${qs}`);
+  const res = await apiFetch(`/api/documentos/${encodeURIComponent(codigo)}/ficha${qs}`);
   if (res.status === 404) throw new Error(`Não encontramos ${codigo}.`);
   if (!res.ok) throw new Error(`Falha ao carregar a ficha (${res.status} ${res.statusText})`);
   return res.json();
@@ -216,7 +246,7 @@ export async function fetchCodigo(codigo: string): Promise<CodigoInfo> {
   if (isMockMode()) {
     return Promise.resolve(getCodigoInfoMock(codigo));
   }
-  const res = await fetch(`${API_BASE_URL}/api/codigo/${encodeURIComponent(codigo)}`);
+  const res = await apiFetch(`/api/codigo/${encodeURIComponent(codigo)}`);
   if (!res.ok) {
     throw new Error(`Falha ao decodificar código ${codigo} (${res.status} ${res.statusText})`);
   }
@@ -227,7 +257,7 @@ export async function fetchPerspectivas(): Promise<PerspectivaResumo[]> {
   if (isMockMode()) {
     return Promise.resolve(MOCK_PERSPECTIVAS);
   }
-  const res = await fetch(`${API_BASE_URL}/api/perspectivas`);
+  const res = await apiFetch(`/api/perspectivas`);
   if (!res.ok) {
     throw new Error(`Falha ao carregar perspectivas (${res.status} ${res.statusText})`);
   }
@@ -242,7 +272,7 @@ export async function fetchPerspectivaDetalhe(id: string): Promise<PerspectivaDe
     }
     return Promise.resolve(detalhe);
   }
-  const res = await fetch(`${API_BASE_URL}/api/perspectivas/${encodeURIComponent(id)}`);
+  const res = await apiFetch(`/api/perspectivas/${encodeURIComponent(id)}`);
   if (!res.ok) {
     throw new Error(`Falha ao carregar detalhes da perspectiva ${id} (${res.status} ${res.statusText})`);
   }
@@ -253,7 +283,7 @@ export async function fetchGrafo(): Promise<GrafoAcervo> {
   if (isMockMode()) {
     return Promise.resolve(MOCK_GRAFO);
   }
-  const res = await fetch(`${API_BASE_URL}/api/grafo`);
+  const res = await apiFetch(`/api/grafo`);
   if (!res.ok) {
     throw new Error(`Falha ao carregar grafo do acervo (${res.status} ${res.statusText})`);
   }
@@ -287,8 +317,8 @@ export async function fetchComparar(
     }
     return Promise.resolve(comp);
   }
-  const res = await fetch(
-    `${API_BASE_URL}/api/comparar?codigo=${encodeURIComponent(codigo)}&de=${encodeURIComponent(de)}&para=${encodeURIComponent(para)}`
+  const res = await apiFetch(
+    `/api/comparar?codigo=${encodeURIComponent(codigo)}&de=${encodeURIComponent(de)}&para=${encodeURIComponent(para)}`
   );
   if (!res.ok) {
     throw new Error(`Falha ao comparar versões (${res.status} ${res.statusText})`);
@@ -333,7 +363,7 @@ export async function fetchRelatorio(params: {
     ? `perspectiva=${encodeURIComponent(params.perspectiva)}`
     : `codigo=${encodeURIComponent(params.codigo || '')}`;
 
-  const res = await fetch(`${API_BASE_URL}/api/relatorio?${query}`);
+  const res = await apiFetch(`/api/relatorio?${query}`);
   if (!res.ok) {
     throw new Error(`Falha ao carregar relatório (${res.status} ${res.statusText})`);
   }
@@ -346,7 +376,7 @@ export async function fetchRelatorio(params: {
 // ==========================================
 
 async function obterJson<T>(caminho: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE_URL}${caminho}`, {
+  const res = await apiFetch(caminho, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) }
   });
@@ -502,7 +532,7 @@ export async function enviarLote(arquivos: { nome: string; tamanho: number; arqu
   if (isMockMode() || arquivos.some((a) => !a.arquivo)) return local();
   const corpo = new FormData();
   arquivos.forEach((a) => corpo.append('arquivos', a.arquivo as File, a.nome));
-  const res = await fetch(`${API_BASE_URL}/api/lotes`, { method: 'POST', body: corpo });
+  const res = await apiFetch(`/api/lotes`, { method: 'POST', body: corpo });
   if (!res.ok) {
     throw new Error(`Não conseguimos enviar o lote agora (${res.status}). Tente de novo em alguns segundos.`);
   }
@@ -513,7 +543,7 @@ export async function enviarLote(arquivos: { nome: string; tamanho: number; arqu
 export async function fetchTriagem(filtros: FiltrosTriagem = {}): Promise<TriagemResposta> {
   if (isMockMode()) return mockTriagem(filtros);
   const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
-  const res = await fetch(`${API_BASE_URL}/api/ficha/triagem${qs ? '?' + qs : ''}`);
+  const res = await apiFetch(`/api/ficha/triagem${qs ? '?' + qs : ''}`);
   if (!res.ok) throw new Error(`Falha ao carregar a fila de atenção (${res.status} ${res.statusText})`);
   return res.json();
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FichaDocumento, TriagemResposta } from '../api/types';
-import { fetchFicha, fetchTriagem } from '../api/client';
+import { ErroChaveApi, fetchFicha, fetchTriagem, mensagemDeErro } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { useEstado } from '../app/store';
 import { CabecalhoTela } from '../ui/componentes';
@@ -30,12 +30,20 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
   const [fila, setFila] = useState<TriagemResposta | null>(null);
 
   const [fichaMesa, setFichaMesa] = useState<FichaDocumento | null>(null);
-  const [erroMesa, setErroMesa] = useState(false);
+  const [erroMesa, setErroMesa] = useState<string | null>(null);
+  const [erroFila, setErroFila] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(0);
 
   // RF71: lista curta (até 5) ordenada por urgência e pelo perfil escolhido
   useEffect(() => {
-    fetchTriagem({ limite: 5, perfil }).then(setFila).catch(() => setFila({ total: 0, pagina: 1, tamanho: 5, pedem_acao: 0, itens: [] }));
+    setErroFila(null);
+    fetchTriagem({ limite: 5, perfil })
+      .then(setFila)
+      .catch((e) => {
+        // Chave recusada não pode parecer "nenhum documento pede atenção"
+        if (e instanceof ErroChaveApi) setErroFila(e.message);
+        setFila({ total: 0, pagina: 1, tamanho: 5, pedem_acao: 0, itens: [] });
+      });
   }, [perfil]);
 
   // A Mesa abre sozinha no primeiro chip; ?doc= escolhe outro (link compartilhável)
@@ -43,10 +51,10 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
   useEffect(() => {
     if (!escolhido) return;
     let vivo = true;
-    setErroMesa(false);
+    setErroMesa(null);
     fetchFicha(escolhido, undefined, { perfil })
       .then((f) => vivo && setFichaMesa(f))
-      .catch(() => vivo && setErroMesa(true));
+      .catch((e) => vivo && setErroMesa(mensagemDeErro(e, 'Não conseguimos abrir este documento agora.')));
     return () => {
       vivo = false;
     };
@@ -85,6 +93,10 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
               <span key={i} className="mesa-chip triagem-esqueleto" />
             ))}
           </div>
+        ) : erroFila ? (
+          <div className="alerta alerta-erro" role="alert">
+            {erroFila}
+          </div>
         ) : fila.itens.length === 0 ? (
           <p className="fg-card">Nada pede sua atenção agora.</p>
         ) : (
@@ -109,7 +121,7 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
               <MesaDocumento ficha={fichaMesa} variante="compacta" />
             ) : erroMesa ? (
               <div className="alerta alerta-erro" role="alert">
-                Não conseguimos abrir este documento agora.{' '}
+                {erroMesa}{' '}
                 <button type="button" className="btn btn-outline btn-sm" onClick={() => setTentativa((t) => t + 1)}>
                   Tentar de novo
                 </button>
