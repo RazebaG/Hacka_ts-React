@@ -15,6 +15,7 @@ export const RevisarView: React.FC<{ arquivoId: string }> = ({ arquivoId }) => {
   const [versao, setVersao] = useState('');
   const [tema, setTema] = useState(arquivo?.tema || 'ferias');
   const [publicado, setPublicado] = useState(false);
+  const voltarLote = lote.id() ? url.lote(lote.id()!) : url.enviar();
   const [erro, setErro] = useState('');
 
   const incertas = linhas.map((l, i) => (l.incerta ? i : -1)).filter((i) => i >= 0);
@@ -61,7 +62,7 @@ export const RevisarView: React.FC<{ arquivoId: string }> = ({ arquivoId }) => {
             <a className="btn btn-primary btn-sm" href={url.documento('FL_1111-001')} onClick={(e) => { e.preventDefault(); navegar(url.documento('FL_1111-001')); }}>
               Abrir documento
             </a>
-            <a className="btn btn-outline btn-sm" href={url.enviar()} onClick={(e) => { e.preventDefault(); navegar(url.enviar()); }}>
+            <a className="btn btn-outline btn-sm" href={voltarLote} onClick={(e) => { e.preventDefault(); navegar(voltarLote); }}>
               Próximo arquivo do lote
             </a>
           </div>

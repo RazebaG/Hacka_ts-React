@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { FonteCita, RelatorioExecutivo } from '../api/types';
 import { fetchRelatorio } from '../api/client';
 import { Icon } from '../ui/Icon';
@@ -110,6 +111,7 @@ const RelatorioPorFonte: React.FC<Omit<RelatorioViewProps, 'modoSelecao'>> = ({
             </>
           }
         />
+        <FontesBase fontes={(relatorio ? relatorio.secoes.flatMap((s) => s.itens.map((i) => i.fonte)) : [])} />
       </div>
 
       <div className="fg-relatorio-grade">

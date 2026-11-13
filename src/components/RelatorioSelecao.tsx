@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { fetchDocumentoDetalhe } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { acoes, useEstado } from '../app/store';
@@ -37,6 +38,7 @@ export const RelatorioSelecao: React.FC = () => {
           </a>
         }
       />
+      <FontesBase fontes={itens.map((x) => x.fonte)} />
 
       {itens.length === 0 ? (
         <div className="painel-secao" data-testid="selecao-vazia">

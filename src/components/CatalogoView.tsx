@@ -6,6 +6,8 @@ import { camadaDe } from '../mocks/v2';
 import { useEstado } from '../app/store';
 import { CabecalhoTela, SemQuebra } from '../ui/componentes';
 import { Icon } from '../ui/Icon';
+import { semaforoDe } from '../mocks/ficha';
+import { SemaforoSituacao } from './FichaView';
 import { navegar, url } from '../app/rotas';
 
 interface CatalogoViewProps {
@@ -254,6 +256,11 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
               </thead>
               {Object.entries(documentosPorAssunto).map(([assunto, docs]) => (
                 <tbody key={assunto} data-testid={`grupo-assunto-${assunto}`}>
+                  <tr className="grupo-linha">
+                    <th colSpan={7} scope="rowgroup">
+                      {NOMES_ASSUNTOS[assunto] ?? assunto} <span className="fg-sub">· {docs.length} {docs.length === 1 ? 'documento' : 'documentos'}</span>
+                    </th>
+                  </tr>
                   {docs.map((doc) => (
                     <tr
                       key={chave(doc)}
@@ -269,10 +276,18 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
                         />
                       </td>
                       <td className="col-codigo">
-                        <span className="fg-codigo">
+                        <a
+                          className="fg-codigo fg-codigo-link"
+                          href={url.ficha(doc.codigo, doc.versao)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            navegar(url.ficha(doc.codigo, doc.versao));
+                          }}
+                          title="Abrir a ficha do documento"
+                        >
                           <Icon nome="documento" tamanho={14} />
                           <SemQuebra texto={doc.codigo} />
-                        </span>
+                        </a>
                       </td>
                       <td className="col-titulo">
                         <strong className="fg-doc-titulo">{doc.titulo}</strong>
@@ -287,11 +302,29 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
                       </td>
                       <td>
                         <BadgeStatus substituido={doc.substituido} fase={doc.fase} />
+                        {semaforoDe(doc.codigo, doc.versao)?.nivel === 'atencao' && (
+                          <span className="catalogo-semaforo">
+                            <SemaforoSituacao nivel="atencao" />
+                          </span>
+                        )}
                         <span className="fg-doc-sub col-vigencia">{doc.vigencia}</span>
                       </td>
                       <td className="col-versao">v{doc.versao}</td>
                       <td>
                         <div className="fg-acoes">
+                          <a
+                            className="fg-acao"
+                            href={url.ficha(doc.codigo, doc.versao)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              navegar(url.ficha(doc.codigo, doc.versao));
+                            }}
+                            aria-label={`Ficha de ${doc.titulo}, versão ${doc.versao}`}
+                            title="Ficha do documento"
+                            data-testid={`btn-ficha-${doc.codigo}-${doc.versao}`}
+                          >
+                            <Icon nome="resumo" tamanho={18} />
+                          </a>
                           <button
                             type="button"
                             className="fg-acao"

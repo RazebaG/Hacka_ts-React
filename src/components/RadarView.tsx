@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { FontesBase } from './PainelFontes';
 import { RadarItem } from '../api/types';
 import { fetchRadar } from '../api/client';
 import { navegar, url } from '../app/rotas';
@@ -10,6 +11,8 @@ import { Icon } from '../ui/Icon';
 interface RadarViewProps {
   itemId?: string;
   tema?: string;
+  /** Só os avisos que envolvem este documento (vindo da Ficha). */
+  codigo?: string;
 }
 
 const ir = (destino: string) => (e: React.MouseEvent) => {
@@ -25,7 +28,7 @@ const abrirDecisao = (i: RadarItem) =>
   });
 
 /** T4 Radar de contradições + T5 Comparação lado a lado (quando há `itemId`). */
-export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
+export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '', codigo = '' }) => {
   const [itens, setItens] = useState<RadarItem[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const decisoes = useEstado((e) => e.decisoes);
@@ -56,7 +59,8 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
     return <LadoALado item={item} />;
   }
 
-  const visiveis = itens.filter((i) => !tema || i.tema.includes(tema)).filter((i) => !busca || `${i.titulo} ${i.fontes.map((f) => f.codigo).join(' ')} ${i.codigo_ausente ?? ''}`.toLowerCase().includes(busca.toLowerCase()));
+  const envolve = (i: RadarItem) => [...i.fontes.map((f) => f.codigo), ...(i.citado_por ?? []).map((f) => f.codigo), i.codigo_ausente ?? ''].includes(codigo);
+  const visiveis = itens.filter((i) => !codigo || envolve(i)).filter((i) => !tema || i.tema.includes(tema)).filter((i) => !busca || `${i.titulo} ${i.fontes.map((f) => f.codigo).join(' ')} ${i.codigo_ausente ?? ''}`.toLowerCase().includes(busca.toLowerCase()));
   const nSub = itens.filter((i) => i.tipo === 'versao_substituida').length;
   const nAus = itens.filter((i) => i.tipo === 'referencia_ausente').length;
   const temas = [...new Set(itens.flatMap((i) => i.tema))];
@@ -89,6 +93,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
           </button>
         }
       />
+      <FontesBase fontes={itens.flatMap((i) => [...i.fontes, ...(i.citado_por ?? [])])} />
 
       <div className="fg-grid-3 fg-stats">
         <div className="fg-card fg-radar-stat">
@@ -149,7 +154,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
         <label htmlFor="radar-tema" className="sr-only">
           Assunto
         </label>
-        <select id="radar-tema" className="fg-select" value={tema} onChange={(e) => navegar(url.radar({ tema: e.target.value }), true)} data-testid="filtro-tema-radar">
+        <select id="radar-tema" className="fg-select" value={tema} onChange={(e) => navegar(url.radar({ tema: e.target.value, codigo }), true)} data-testid="filtro-tema-radar">
           <option value="">Todas as áreas</option>
           {Object.entries(TEMAS).map(([id, nome]) => (
             <option key={id} value={id}>
@@ -160,8 +165,13 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
         <span className="fg-pilula">
           <Icon nome="busca" tamanho={13} /> Exibindo {visiveis.length} {visiveis.length === 1 ? 'alteração' : 'alterações'}
         </span>
+        {codigo && (
+          <button type="button" className="chip-filtro" onClick={() => navegar(url.radar({ tema }), true)} aria-label={`Remover filtro do documento ${codigo}`} data-testid="radar-filtro-codigo">
+            Documento: {codigo} <span aria-hidden="true">×</span>
+          </button>
+        )}
         {tema && (
-          <button type="button" className="chip-filtro" onClick={() => navegar(url.radar(), true)} aria-label={`Remover filtro de tema ${TEMAS[tema]}`}>
+          <button type="button" className="chip-filtro" onClick={() => navegar(url.radar({ codigo }), true)} aria-label={`Remover filtro de tema ${TEMAS[tema]}`}>
             Assunto: {TEMAS[tema]} <span aria-hidden="true">×</span>
           </button>
         )}
@@ -169,7 +179,7 @@ export const RadarView: React.FC<RadarViewProps> = ({ itemId, tema = '' }) => {
 
       {visiveis.length === 0 ? (
         <div className="fg-card" data-testid="radar-vazio">
-          <p>Nenhum aviso para este assunto. Escolha “Todas as áreas” para ver tudo.</p>
+          <p>{codigo ? `Nenhum aviso envolve ${codigo}.` : 'Nenhum aviso para este assunto. Escolha “Todas as áreas” para ver tudo.'}</p>
           <button
             type="button"
             className="btn btn-outline btn-sm"

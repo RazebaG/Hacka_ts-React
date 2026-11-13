@@ -4,15 +4,19 @@ import { postPerguntar } from '../api/client';
 import { CitacaoCard } from './CitacaoCard';
 import { EXEMPLOS_PERGUNTAS } from '../mocks/perguntas';
 import { acoes, useEstado } from '../app/store';
-import { AvaliarResposta, IncluirRelatorio, nomeDoDocumento, secaoLegivel } from '../ui/componentes';
+import { AvaliarResposta, IncluirRelatorio, ProximaAcao, nomeDoDocumento, secaoLegivel } from '../ui/componentes';
 import { Icon } from '../ui/Icon';
 import { navegar, url } from '../app/rotas';
 import { PERFIS } from './perfis';
+import { PainelFontes, RespondidoCom } from './PainelFontes';
+import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 
 interface PerguntarViewProps {
   onNavegarDocumento: (codigo: string, versao?: string, secaoId?: string) => void;
   /** Pergunta vinda da rota /perguntar?q= (topo, Visão geral, Slack, Teams). */
   perguntaInicial?: string;
+  /** Escopo vindo da Ficha ou do documento (/perguntar?doc=CTR_2026-012), RF63. */
+  documentosIniciais?: string[];
 }
 
 interface Turno {
@@ -43,7 +47,7 @@ const agora = () => {
 };
 
 /** T2 Tirar uma dúvida (layout do Figma): conversa à esquerda, perguntas frequentes à direita. */
-export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento, perguntaInicial }) => {
+export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento, perguntaInicial, documentosIniciais }) => {
   const [pergunta, setPergunta] = useState<string>(perguntaInicial ?? '');
   const perfil = useEstado((e) => e.perfil);
   const setPerfil = (p: PerfilUsuario) => acoes.definirPerfil(p);
@@ -51,13 +55,15 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
   const [turnos, setTurnos] = useState<Turno[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const fim = useRef<HTMLDivElement>(null);
+  const [escopo, setEscopo] = useState<string[]>(documentosIniciais ?? []);
+  const vigentes = MOCK_DOCUMENTOS.filter((d) => !d.substituido);
 
   const executarPergunta = async (texto: string, perfilSelecionado: PerfilUsuario) => {
     if (!texto.trim()) return;
     setCarregando(true);
     setErro(null);
     try {
-      const res = await postPerguntar(texto, perfilSelecionado);
+      const res = await postPerguntar(texto, perfilSelecionado, escopo);
       setTurnos((t) => [...t, { id: t.length + 1, pergunta: texto.trim(), hora: agora(), resposta: res }]);
       setPergunta('');
     } catch (e: unknown) {
@@ -144,6 +150,7 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
                       <Icon nome="livro" tamanho={16} />
                     </span>
                     <article className={`fg-resposta ${r.consta ? '' : 'fg-resposta-nao-consta'}`} data-testid={ultimo && !r.consta ? 'alerta-nao-consta' : undefined}>
+                      <RespondidoCom resposta={r} testId={ultimo ? 'respondido-com' : undefined} />
                       <div className="fg-resposta-topo">
                         {r.consta ? (
                           <>
@@ -190,6 +197,27 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
                             {r.avisos.map((aviso, idx) => (
                               <li key={idx} data-testid={ultimo ? `aviso-${idx}` : undefined}>
                                 {aviso}
+                                {(() => {
+                                  const m = /([A-Z]{2,3}_\d+(?:-\d+)?) v(\d+\.\d+\.\d+) foi substituída pela v(\d+\.\d+\.\d+)/.exec(aviso);
+                                  if (!m) return null;
+                                  const destino = url.comparar(m[1], m[2], m[3]);
+                                  return (
+                                    <>
+                                      {' '}
+                                      <a
+                                        className="fg-link"
+                                        href={destino}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          navegar(destino);
+                                        }}
+                                        data-testid={ultimo ? `aviso-comparar-${idx}` : undefined}
+                                      >
+                                        Ver o que mudou <Icon nome="seta" tamanho={13} />
+                                      </a>
+                                    </>
+                                  );
+                                })()}
                               </li>
                             ))}
                           </ul>
@@ -218,6 +246,15 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
                         </div>
                       </div>
                       <AvaliarResposta key={t.id} respostaId={`web-${t.id}`} perfil={perfil} />
+                      <ProximaAcao
+                        texto={
+                          r.consta
+                            ? r.avisos?.length
+                              ? 'Confira o que mudou e use sempre a versão em vigor.'
+                              : 'Abra a fonte para ler o trecho completo no documento.'
+                            : 'Reformule a pergunta ou procure em Documentos.'
+                        }
+                      />
                     </article>
                   </div>
                 </div>
@@ -239,6 +276,48 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
           </div>
 
           <form onSubmit={handleSubmit} className="fg-chat-form" role="search">
+            <div className="escopo-linha" data-testid="escopo">
+              <span className="fg-rotulo">Escopo</span>
+              {escopo.length === 0 ? (
+                <span className="fg-pilula neutra">Todo o acervo</span>
+              ) : (
+                escopo.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className="fg-pilula escopo-chip"
+                    onClick={() => setEscopo((e) => e.filter((x) => x !== c))}
+                    aria-label={`Tirar ${c} do escopo`}
+                    data-testid={`escopo-${c}`}
+                  >
+                    {c} <Icon nome="fechar" tamanho={12} />
+                  </button>
+                ))
+              )}
+              <label className="sr-only" htmlFor="fixar-doc">
+                Fixar documento
+              </label>
+              <select
+                id="fixar-doc"
+                className="escopo-fixar"
+                value=""
+                onChange={(e) => e.target.value && setEscopo((x) => (x.includes(e.target.value) ? x : [...x, e.target.value]))}
+              >
+                <option value="">+ fixar documento</option>
+                {vigentes
+                  .filter((d) => !escopo.includes(d.codigo))
+                  .map((d) => (
+                    <option key={d.codigo} value={d.codigo}>
+                      {d.codigo} · {d.titulo}
+                    </option>
+                  ))}
+              </select>
+              {escopo.length > 0 && (
+                <button type="button" className="fg-link" onClick={() => setEscopo([])}>
+                  Perguntar em todo o acervo
+                </button>
+              )}
+            </div>
             <label htmlFor="input-pergunta" className="sr-only">
               Sua dúvida
             </label>
@@ -293,6 +372,7 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
         </section>
 
         <aside className="fg-coluna">
+          {turnos.length > 0 && <PainelFontes resposta={turnos[turnos.length - 1].resposta} onFixar={setEscopo} />}
           <section className="fg-card">
             <div className="fg-cabeca-card">
               <h2>

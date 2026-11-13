@@ -141,6 +141,12 @@ export const DocumentoView: React.FC<DocumentoViewProps> = ({
           </p>
         </div>
         <div className="fg-mudanca-acoes fg-doc-acoes">
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => navegar(url.ficha(documento.codigo, documento.versao))} data-testid="btn-ver-ficha">
+            <Icon nome="resumo" tamanho={15} /> Voltar à ficha
+          </button>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => navegar(url.perguntar(undefined, [documento.codigo]))} data-testid="btn-perguntar-doc">
+            <Icon nome="perguntar" tamanho={15} /> Perguntar só neste documento
+          </button>
           <button type="button" className="btn btn-outline btn-sm" onClick={copiarLink}>
             <Icon nome="link" tamanho={15} /> Copiar Link
           </button>
@@ -149,7 +155,7 @@ export const DocumentoView: React.FC<DocumentoViewProps> = ({
               <Icon nome="simular" tamanho={15} /> Simular Mudança
             </button>
           )}
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => window.print()}>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => window.print()}>
             <Icon nome="baixar" tamanho={15} /> Exportar PDF
           </button>
         </div>
