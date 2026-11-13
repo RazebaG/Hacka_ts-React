@@ -15,7 +15,6 @@ import { RevisarView } from './components/RevisarView';
 import { DecisaoModal } from './components/DecisaoModal';
 import { CabecalhoTela } from './ui/componentes';
 import { FichaView } from './components/FichaView';
-import { ApresentacaoView } from './components/ApresentacaoView';
 import { FilaAtencaoView } from './components/FilaAtencaoView';
 import { navegar, url, useRota } from './app/rotas';
 import { acoes, useEstado } from './app/store';
@@ -26,6 +25,7 @@ import './ui/shell.css';
 import './ui/telas-v2.css';
 import './ui/leitura.css';
 import './ui/figma.css';
+import './ui/mesa.css';
 
 const dataBR = (iso?: string) => (iso ? iso.split('-').reverse().join('/') : '12/11/2026');
 
@@ -104,16 +104,6 @@ export function App() {
             sinal: q.get('sinal') ?? undefined,
             ordenar: q.get('ordenar') ?? undefined
           }}
-        />
-      );
-      break;
-    case 'apresentar':
-      conteudo = (
-        <ApresentacaoView
-          key={`${rota.params.codigo}-${q.get('versao') ?? ''}`}
-          codigo={rota.params.codigo}
-          versao={q.get('versao') ?? undefined}
-          cartaoInicial={Number(q.get('cartao')) || undefined}
         />
       );
       break;

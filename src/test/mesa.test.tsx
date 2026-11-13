@@ -5,8 +5,7 @@ import { VisaoGeralView } from '../components/VisaoGeralView';
 import { mockFicha, mockTriagem, familiaDe } from '../mocks/ficha';
 import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { acoes } from '../app/store';
-import { lerRota, navegar, url } from '../app/rotas';
-import { ApresentacaoView } from '../components/ApresentacaoView';
+import { lerRota, url } from '../app/rotas';
 
 afterEach(() => acoes.definirPerfil(null));
 
@@ -110,34 +109,6 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('inicio-atencao')).toHaveTextContent('Perfil: todos');
   });
 
-  it('Apresentar: sem IA usa a frase do documento; desativado só sem nenhuma frase; leva a origem e o bloco escolhido', () => {
-    const ng = mockFicha('NG_111')!;
-    const r1 = render(<MesaDocumento ficha={ng} variante="compacta" />);
-    expect(screen.getByTestId('mesa-apresentar')).toHaveAttribute('href', '/documento/NG_111/apresentar?versao=3.0.0&de=inicio');
-    r1.unmount();
-    const vazia = { ...ng, blocos: [], numeros: [], pontos: { obrigacoes: [], prazos: [], valores: [], riscos: [], responsaveis: [], condicoes: [] } };
-    const { unmount } = render(<MesaDocumento ficha={vazia} variante="compacta" />);
-    expect(screen.getByTestId('mesa-apresentar')).toBeDisabled();
-    expect(screen.getByText('Este documento ainda não tem resumo pronto.')).toBeInTheDocument();
-    unmount();
-    render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
-    fireEvent.click(screen.getByTestId('bloco-b-custo'));
-    expect(screen.getByTestId('mesa-apresentar')).toHaveAttribute('href', '/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo');
-  });
-
-  it('Apresentação: Sair volta à Mesa no mesmo bloco; norma sem IA também apresenta', async () => {
-    navegar('/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo', true);
-    const { unmount } = render(<ApresentacaoView codigo="CTR_2026-012" versao="1.0.0" />);
-    fireEvent.click(await screen.findByTestId('apresentacao-sair'));
-    expect(window.location.pathname + window.location.search).toBe('/?doc=CTR_2026-012&bloco=b-custo');
-    unmount();
-    render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
-    expect(screen.getByTestId('bloco-b-custo')).toHaveAttribute('aria-pressed', 'true');
-    navegar('/', true);
-    render(<ApresentacaoView codigo="NG_111" />);
-    expect(await screen.findByTestId('apresentacao-cartao')).toHaveTextContent('Férias');
-  });
-
   it('Protótipo 13/11: cabeçalho com siglas, 43 células no mapa, detalhe sempre à vista e pergunta pela família', () => {
     render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
     const mesa = screen.getByTestId('mesa');
@@ -146,12 +117,14 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('mesa-abrir-ficha')).toHaveTextContent('ficha 3 min');
     const faixa = screen.getByRole('list', { name: /Seções do documento/ });
     expect(faixa.querySelectorAll('.mesa-celula')).toHaveLength(43);
-    // Posições sem dado ficam fora do leitor de tela; só as seções conhecidas são itens
-    expect(within(faixa).getAllByRole('listitem').length).toBeLessThan(43);
+    // Com o texto real das 43 seções, toda célula é um item do mapa
+    expect(within(faixa).getAllByRole('listitem')).toHaveLength(43);
+    // O mapa abre cinza: nenhuma célula acesa até escolher um bloco
+    expect(faixa.querySelectorAll('.mesa-celula.acesa')).toHaveLength(0);
     expect(screen.getByTestId('mesa-detalhe-vazio')).toHaveTextContent('Escolha um bloco para ver o trecho exato');
     expect(screen.getByTestId('mesa-mapa-dica')).toHaveTextContent('Escolha um bloco');
     fireEvent.click(screen.getByTestId('bloco-b-quem'));
-    expect(screen.getByTestId('mesa-mapa-dica')).toHaveTextContent('2 seções destacadas');
+    expect(faixa.querySelectorAll('.mesa-celula.acesa').length).toBeGreaterThan(0);
     expect(screen.getByTestId('mesa-pergunta')).toHaveAttribute('placeholder', 'Pergunte a este contrato: posso rescindir sem multa?');
   });
 

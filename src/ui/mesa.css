@@ -1,0 +1,204 @@
+/* =====================================================================
+ * Pop-up de resumo explicado da seção (POPUP-RESUMO-DA-SECAO-v1)
+ * Só tokens do projeto (index.css e figma.css): nada de cor literal nem tokens copiados de protótipo.
+ * ===================================================================== */
+.popup-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000; /* acima da barra superior (150) e dos modais antigos (100) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  background: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .popup-fundo {
+    background: color-mix(in srgb, var(--color-text) 38%, transparent);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+  }
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 660px;
+  max-height: min(540px, 90vh);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: calc(var(--fg-card-radius) + 4px);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  outline: none;
+  animation: popup-entrada 160ms ease-out;
+}
+@keyframes popup-entrada {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .popup { animation: none; }
+}
+
+.popup-cab {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+.popup-cab-texto { min-width: 0; }
+.popup-eyebrow {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+.popup-titulo {
+  margin: 2px 0 0;
+  font-family: var(--font-titulo);
+  font-size: 19px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.popup-titulo span { font-weight: 500; color: var(--fg-cinza); }
+.popup-fechar {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fg-azul-suave);
+  color: var(--color-text);
+  cursor: pointer;
+}
+.popup-fechar:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.popup-corpo {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--space-5) var(--space-2);
+}
+.popup-carregando,
+.popup-aviso { padding: var(--space-5) 0; color: var(--fg-cinza); }
+.popup-sec {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.popup-sec-ultima { border-bottom: 0; }
+.popup-rotulo {
+  margin: 0 0 var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+.popup-trechos {
+  margin: 0;
+  padding-left: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  font-size: 15px;
+  line-height: 1.55;
+}
+.popup-fonte,
+.popup-nota { margin: var(--space-2) 0 0; font-size: 12px; color: var(--fg-cinza); }
+.popup-selo {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--fg-azul-suave);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+.popup-texto { margin: 0; font-size: 14px; }
+
+.popup-pontos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-2);
+}
+.popup-pontos li { display: flex; gap: var(--space-3); align-items: flex-start; }
+.popup-ponto-selo {
+  flex: none;
+  display: inline-block;
+  min-width: 86px;
+  text-align: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--fg-azul-suave);
+  color: var(--color-primary);
+}
+.popup-ponto-texto { font-size: 13.5px; line-height: 1.45; padding-top: 2px; }
+.popup-sinais { margin: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.popup-sinais .popup-ponto-selo { min-width: 0; }
+
+.popup-chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.popup-chip {
+  padding: 5px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-size: 12px;
+  cursor: pointer;
+}
+.popup-chip:hover { background: var(--fg-azul-suave); }
+
+.popup-original {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--fg-card-radius);
+  background: var(--color-bg);
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.popup-marca { padding: 0 2px; border-radius: 3px; color: inherit; }
+
+/* Sinais: prazo = aviso, valor = sucesso, risco = perigo, obrigação = azul */
+.popup .sinal-prazo { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.popup .sinal-valor { background: var(--color-success-bg); color: var(--color-success-text); }
+.popup .sinal-risco { background: var(--color-danger-bg); color: var(--color-danger-text); }
+.popup .sinal-regra { background: var(--fg-azul-suave); color: var(--color-primary); }
+
+.popup-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.popup-nav,
+.popup-acoes { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+
+/* Celular: gaveta que sobe de baixo, botões empilhados */
+@media (max-width: 560px) {
+  .popup-fundo { padding: 0; align-items: flex-end; }
+  .popup { max-width: none; max-height: 92vh; height: 92vh; border-radius: calc(var(--fg-card-radius) + 4px) calc(var(--fg-card-radius) + 4px) 0 0; }
+  .popup-rodape { flex-direction: column; align-items: stretch; }
+  .popup-nav,
+  .popup-acoes { flex-direction: column; }
+  .popup-rodape .btn { width: 100%; min-height: 36px; justify-content: center; }
+  .popup-pontos li { flex-direction: column; gap: var(--space-1); }
+  .popup-ponto-selo { min-width: 0; align-self: flex-start; }
+}
+@media print {
+  .popup-fundo { display: none; }
+}
