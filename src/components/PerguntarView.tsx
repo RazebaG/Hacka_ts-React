@@ -4,7 +4,7 @@ import { postPerguntar } from '../api/client';
 import { CitacaoCard } from './CitacaoCard';
 import { EXEMPLOS_PERGUNTAS } from '../mocks/perguntas';
 import { acoes, useEstado } from '../app/store';
-import { AvaliarResposta, IncluirRelatorio, nomeDoDocumento, secaoLegivel } from '../ui/componentes';
+import { AvaliarResposta, IncluirRelatorio, ProximaAcao, nomeDoDocumento, secaoLegivel } from '../ui/componentes';
 import { Icon } from '../ui/Icon';
 import { navegar, url } from '../app/rotas';
 import { PERFIS } from './perfis';
@@ -197,6 +197,27 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
                             {r.avisos.map((aviso, idx) => (
                               <li key={idx} data-testid={ultimo ? `aviso-${idx}` : undefined}>
                                 {aviso}
+                                {(() => {
+                                  const m = /([A-Z]{2,3}_\d+(?:-\d+)?) v(\d+\.\d+\.\d+) foi substituída pela v(\d+\.\d+\.\d+)/.exec(aviso);
+                                  if (!m) return null;
+                                  const destino = url.comparar(m[1], m[2], m[3]);
+                                  return (
+                                    <>
+                                      {' '}
+                                      <a
+                                        className="fg-link"
+                                        href={destino}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          navegar(destino);
+                                        }}
+                                        data-testid={ultimo ? `aviso-comparar-${idx}` : undefined}
+                                      >
+                                        Ver o que mudou <Icon nome="seta" tamanho={13} />
+                                      </a>
+                                    </>
+                                  );
+                                })()}
                               </li>
                             ))}
                           </ul>
@@ -225,6 +246,15 @@ export const PerguntarView: React.FC<PerguntarViewProps> = ({ onNavegarDocumento
                         </div>
                       </div>
                       <AvaliarResposta key={t.id} respostaId={`web-${t.id}`} perfil={perfil} />
+                      <ProximaAcao
+                        texto={
+                          r.consta
+                            ? r.avisos?.length
+                              ? 'Confira o que mudou e use sempre a versão em vigor.'
+                              : 'Abra a fonte para ler o trecho completo no documento.'
+                            : 'Reformule a pergunta ou procure em Documentos.'
+                        }
+                      />
                     </article>
                   </div>
                 </div>

@@ -3,7 +3,8 @@ import { RadarItem, TriagemResposta } from '../api/types';
 import { fetchRadar, fetchTriagem } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { useEstado } from '../app/store';
-import { CabecalhoTela, FonteLink } from '../ui/componentes';
+import { CabecalhoTela, FonteLink, ProximaAcao } from '../ui/componentes';
+import { TEMAS } from '../mocks/v2';
 import { Icon, NomeIcone } from '../ui/Icon';
 import { SUGESTOES_POR_PERFIL } from './perfis';
 import { SemaforoSituacao } from './FichaView';
@@ -148,6 +149,37 @@ export const VisaoGeralView: React.FC = () => {
         ))}
       </div>
 
+      {radar && (
+        <section className="fg-assuntos" aria-labelledby="t-assuntos" data-testid="inicio-assuntos">
+          <h2 id="t-assuntos" className="fg-rotulo">
+            Por assunto
+          </h2>
+          <div className="fg-grid-3">
+            {Object.entries(TEMAS).map(([id, nome]) => {
+              const n = radar.filter((i) => i.tema.includes(id)).length;
+              return (
+                <article key={id} className="fg-card fg-assunto" data-testid={`assunto-${id}`}>
+                  <p className="fg-assunto-nome">
+                    <strong>{nome}</strong> · {n} {n === 1 ? 'ponto' : 'pontos'} no radar
+                  </p>
+                  <div className="fg-assunto-links">
+                    <a className="fg-link" href={url.radar({ tema: id })} onClick={ir(url.radar({ tema: id }))}>
+                      Ver avisos <Icon nome="seta" tamanho={13} />
+                    </a>
+                    <a className="fg-link" href={url.painel(undefined, { tema: id })} onClick={ir(url.painel(undefined, { tema: id }))}>
+                      Resumo <Icon nome="seta" tamanho={13} />
+                    </a>
+                    <a className="fg-link" href={url.catalogo(id)} onClick={ir(url.catalogo(id))}>
+                      Documentos <Icon nome="seta" tamanho={13} />
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <div className="fg-grid-2 fg-inicio-baixo">
         <section className="fg-card">
           <div className="fg-cabeca-card">
@@ -197,6 +229,12 @@ export const VisaoGeralView: React.FC = () => {
           </div>
         </section>
       </div>
+
+      <ProximaAcao texto={radar && radar.length ? `Comece pelas ${radar.length} pendências do radar: veja o que mudou e decida o que encaminhar.` : 'Tire uma dúvida ou procure um documento.'}>
+        <a className="btn btn-primary btn-sm" href={url.radar()} onClick={ir(url.radar())}>
+          Ver pendências
+        </a>
+      </ProximaAcao>
     </div>
   );
 };

@@ -256,6 +256,11 @@ export const CatalogoView: React.FC<CatalogoViewProps> = ({ onNavegarDocumento, 
               </thead>
               {Object.entries(documentosPorAssunto).map(([assunto, docs]) => (
                 <tbody key={assunto} data-testid={`grupo-assunto-${assunto}`}>
+                  <tr className="grupo-linha">
+                    <th colSpan={7} scope="rowgroup">
+                      {NOMES_ASSUNTOS[assunto] ?? assunto} <span className="fg-sub">· {docs.length} {docs.length === 1 ? 'documento' : 'documentos'}</span>
+                    </th>
+                  </tr>
                   {docs.map((doc) => (
                     <tr
                       key={chave(doc)}

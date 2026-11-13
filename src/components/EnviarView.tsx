@@ -2,17 +2,22 @@ import React, { useState, useSyncExternalStore } from 'react';
 import { ArquivoLote } from '../api/types';
 import { enviarLote } from '../api/client';
 import { navegar, url } from '../app/rotas';
-import { LEITURA_FL, LOTE_EXEMPLO, TEMAS } from '../mocks/v2';
+import { LEITURA_FL, LOTE_EXEMPLO, TEMAS, classificarArquivo } from '../mocks/v2';
+import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { Aviso, CabecalhoTela, SemQuebra } from '../ui/componentes';
 import { Icon } from '../ui/Icon';
 
 /* Lote atual guardado fora do componente, para a revisão (T13) voltar à mesma tabela. */
 let loteAtual: ArquivoLote[] = [];
+let loteIdAtual: string | null = null;
+const tamanhos = new Map<string, number>();
 const ouvintes = new Set<() => void>();
 export const lote = {
   ler: () => loteAtual,
-  definir(l: ArquivoLote[]) {
+  id: () => loteIdAtual,
+  definir(l: ArquivoLote[], id?: string | null) {
     loteAtual = l;
+    if (id !== undefined) loteIdAtual = id;
     ouvintes.forEach((f) => f());
   },
   atualizar(id: string, parcial: Partial<ArquivoLote>) {
@@ -46,7 +51,7 @@ const PILULA: Record<ArquivoLote['estado'], string> = {
 };
 
 /** T12 Enviar em lote e digitalizar (RF23, RF24, RF35, RF36). */
-export const EnviarView: React.FC = () => {
+export const EnviarView: React.FC<{ loteId?: string }> = ({ loteId }) => {
   const arquivos = useLote();
   const [enviando, setEnviando] = useState(false);
   const [sobre, setSobre] = useState(false);
@@ -59,7 +64,10 @@ export const EnviarView: React.FC = () => {
       return setMsg({ ok: false, texto: 'O lote passa de 50 MB. Divida em dois envios.' });
     setEnviando(true);
     try {
-      lote.definir(await enviarLote(lista));
+      lista.forEach((a) => tamanhos.set(a.nome, a.tamanho));
+      const id = `lote-${Date.now().toString(36)}`;
+      lote.definir(await enviarLote(lista), id);
+      navegar(url.lote(id), true);
     } catch (e) {
       setMsg({ ok: false, texto: e instanceof Error ? e.message : 'Não conseguimos enviar o lote.' });
     } finally {
@@ -81,6 +89,19 @@ export const EnviarView: React.FC = () => {
     ].filter(Boolean);
     setMsg({ ok: !semTema.length, texto: partes.join(' ') || 'Nada para publicar agora.' });
   };
+
+  /** Publicado: abre o documento se o código já está no acervo; senão, Documentos no tema. */
+  const destinoPublicado = (a: ArquivoLote) => {
+    const codigo = (a.nome.match(/(NG|PX|FM|TB|FL|RG|NT|CTR|CT)_\d+(-\d+)?/i) || [])[0]?.toUpperCase();
+    return codigo && MOCK_DOCUMENTOS.some((d) => d.codigo === codigo) ? url.documento(codigo) : url.catalogo(a.tema || undefined);
+  };
+  /** Erro: classifica de novo o mesmo arquivo (útil depois de trocar o nome, a versão ou a foto). */
+  const tentarDeNovo = (a: ArquivoLote) => {
+    const novo = classificarArquivo(a.nome, tamanhos.get(a.nome) ?? 0, a.id);
+    lote.atualizar(a.id, novo);
+    setMsg(novo.estado === 'erro' ? { ok: false, texto: `${a.nome}: o erro continua. ${novo.erro}` } : null);
+  };
+  const loteFechado = Boolean(loteId) && loteId !== lote.id();
 
   const prontos = arquivos.filter((a) => a.estado === 'classificado' || a.estado === 'publicado').length;
   const pendentes = arquivos.filter((a) => a.estado === 'revisar' || a.estado === 'sem-tema').length;
@@ -110,6 +131,15 @@ export const EnviarView: React.FC = () => {
           </a>
         }
       />
+
+      {loteFechado && (
+        <div className="alerta alerta-aviso" role="status" data-testid="lote-fechado">
+          <strong>Este lote não está mais aberto neste navegador.</strong> Os documentos já publicados continuam em Documentos.{' '}
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => navegar(url.enviar(), true)}>
+            Começar um novo envio
+          </button>
+        </div>
+      )}
 
       <ol className="fg-card fg-passos" aria-label="Etapas do envio">
         {PASSOS.map((p, i) => {
@@ -281,10 +311,27 @@ export const EnviarView: React.FC = () => {
                                 Revisar texto
                               </a>
                             )}
+                            {a.estado === 'publicado' && (
+                              <a
+                                className="btn btn-outline btn-sm"
+                                href={destinoPublicado(a)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  navegar(destinoPublicado(a));
+                                }}
+                              >
+                                Ver documento
+                              </a>
+                            )}
                             {a.estado === 'erro' && (
-                              <button type="button" className="btn btn-outline btn-sm" onClick={() => lote.definir(arquivos.filter((x) => x.id !== a.id))}>
-                                Retirar
-                              </button>
+                              <span className="fg-mudanca-acoes">
+                                <button type="button" className="btn btn-outline btn-sm" onClick={() => tentarDeNovo(a)}>
+                                  Tentar de novo
+                                </button>
+                                <button type="button" className="btn btn-outline btn-sm" onClick={() => lote.definir(arquivos.filter((x) => x.id !== a.id))}>
+                                  Retirar
+                                </button>
+                              </span>
                             )}
                           </td>
                         </tr>
@@ -359,7 +406,7 @@ export const EnviarView: React.FC = () => {
             <Icon nome="info" tamanho={16} /> Publica os digitais classificados. Fotos seguem para a revisão, uma a uma.
           </span>
           <div className="fg-mudanca-acoes">
-            <button type="button" className="btn btn-outline btn-sm" onClick={() => (lote.definir([]), setMsg(null))}>
+            <button type="button" className="btn btn-outline btn-sm" onClick={() => (lote.definir([], null), setMsg(null), navegar(url.enviar(), true))}>
               Cancelar
             </button>
             <button type="button" className="btn btn-primary btn-sm" onClick={publicar} data-testid="btn-publicar-lote">

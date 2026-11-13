@@ -150,6 +150,9 @@ export function App() {
     case 'enviar':
       conteudo = <EnviarView />;
       break;
+    case 'lote':
+      conteudo = <EnviarView loteId={rota.params.id} />;
+      break;
     case 'revisar':
       conteudo = <RevisarView arquivoId={rota.params.id} />;
       break;

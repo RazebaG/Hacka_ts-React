@@ -21,6 +21,7 @@ export type Tela =
   | 'relatorio'
   | 'enviar'
   | 'revisar'
+  | 'lote'
   | 'nao-encontrada';
 
 export interface Rota {
@@ -45,6 +46,7 @@ const ROTAS: [RegExp, Tela, string[]][] = [
   [/^\/mapa\/?$/, 'grafo', []],
   [/^\/relatorio\/?$/, 'relatorio', []],
   [/^\/enviar\/?$/, 'enviar', []],
+  [/^\/enviar\/lote\/([\w-]+)\/?$/, 'lote', ['id']],
   [/^\/enviar\/([\w-]+)\/?$/, 'revisar', ['id']]
 ];
 
@@ -134,5 +136,6 @@ export const url = {
   relatorio: (opc: { perspectiva?: string; selecao?: boolean } = {}) =>
     opc.selecao ? '/relatorio?selecao=1' : opc.perspectiva ? `/relatorio?perspectiva=${opc.perspectiva}` : '/relatorio',
   enviar: () => '/enviar',
-  revisar: (id: string) => `/enviar/${id}`
+  revisar: (id: string) => `/enviar/${id}`,
+  lote: (id: string) => `/enviar/lote/${id}`
 };

@@ -1133,7 +1133,15 @@ h3,
   font-style: normal;
 }
 .fg-citacoes .fonte-camada {
-  display: none;
+  display: inline-block;
+  margin-top: 4px;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #334155;
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 600;
 }
 .fg-resposta-rodape {
   display: flex;
@@ -2882,6 +2890,77 @@ h3,
   vertical-align: middle;
 }
 
+/* T0: pergunta rápida discreta, à esquerda das ações */
+.pergunta-rapida {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 1 300px;
+  min-width: 0;
+  margin-right: auto;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: #f8fafd;
+  color: var(--fg-cinza);
+  cursor: text;
+}
+.pergunta-rapida input {
+  flex: 1;
+  min-width: 0;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  padding: 0;
+  min-height: 36px;
+}
+.pergunta-rapida:focus-within {
+  border-color: var(--fg-azul);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-focus-ring, var(--fg-azul-suave));
+  color: var(--fg-azul);
+}
+@media (max-width: 860px) {
+  .pergunta-rapida {
+    order: 3;
+    flex: 1 1 100%;
+    margin-right: 0;
+  }
+}
+
+/* Início: cartões por assunto (FLUXO v2, T1 Δ) */
+.fg-assuntos {
+  margin-top: var(--space-5);
+}
+.fg-assuntos > .fg-rotulo {
+  margin-bottom: var(--space-2);
+}
+.fg-assunto {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+}
+.fg-assunto-nome {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: #334155;
+}
+.fg-assunto-nome strong {
+  font-family: var(--font-titulo);
+  font-size: var(--text-md);
+  color: var(--color-text);
+}
+.fg-assunto-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+}
+
 /* =====================================================================
  * T14 · Ficha do Documento (FLUXO-DE-TELAS-FICHA-v1)
  * ===================================================================== */
@@ -3788,4 +3867,32 @@ h3,
 [data-testid='ficha-aprovado-por'] {
   white-space: normal;
   line-height: 1.35;
+}
+
+/* Documentos: cabeçalho de cada grupo por assunto (FLUXO v2, T7 Δ) */
+.fg-tabela tr.grupo-linha th {
+  padding: var(--space-2) var(--space-3);
+  background: #f1f5fb;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  font-family: var(--font-titulo);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text);
+}
+/* Celular: "Menu" e a pergunta rápida dividem a primeira linha; as ações vão para a segunda */
+@media (max-width: 860px) {
+  .app-topbar .btn-menu {
+    margin-right: 0;
+    order: 0;
+  }
+  .pergunta-rapida {
+    order: 1;
+    flex: 1 1 140px;
+  }
+  .app-topbar .topbar-actions {
+    order: 2;
+  }
 }
