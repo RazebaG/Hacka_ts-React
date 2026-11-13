@@ -1,0 +1,1463 @@
+{
+ "codigo": "NG_111",
+ "versao": "3.0.0",
+ "secoes": 112,
+ "mapa_calor": [
+  {
+   "secao_id": "1",
+   "titulo": "Objetivo",
+   "ordem": 1,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "2",
+   "titulo": "Informações",
+   "ordem": 2,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "2.1",
+   "titulo": "Histórico de versões",
+   "ordem": 3,
+   "peso": 0.0132,
+   "sinais": {
+    "prazo": 4,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.13
+  },
+  {
+   "secao_id": "2.2",
+   "titulo": "Esta norma substitui a NG_111 versão 2.0.0",
+   "ordem": 4,
+   "peso": 0.0042,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "2.3",
+   "titulo": "Os procedimentos operacionais constam do PX_1111-001; o formulário, do",
+   "ordem": 5,
+   "peso": 0.0081,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3",
+   "titulo": "Conceitos",
+   "ordem": 6,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.1",
+   "titulo": "Período aquisitivo: 12 meses de vínculo contados da admissão (ou do fim do",
+   "ordem": 7,
+   "peso": 0.0102,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.2",
+   "titulo": "Período concessivo: 12 meses seguintes ao aquisitivo, em que a ACME deve",
+   "ordem": 8,
+   "peso": 0.0081,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.3",
+   "titulo": "Início de gozo: primeiro dia de afastamento efetivo das atividades",
+   "ordem": 9,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.4",
+   "titulo": "Aviso de férias: comunicado formal, assinado pelo empregado, que fixa as datas",
+   "ordem": 10,
+   "peso": 0.0078,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.5",
+   "titulo": "Abono pecuniário: conversão de até um terço das férias (10 dias) em",
+   "ordem": 11,
+   "peso": 0.0075,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.6",
+   "titulo": "Portal Raiz: sistema de gestão de pessoas da ACME, em que se registram",
+   "ordem": 12,
+   "peso": 0.009,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3.7",
+   "titulo": "Dia útil: dia que não seja sábado, domingo ou feriado na sede da ACME",
+   "ordem": 13,
+   "peso": 0.0084,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4",
+   "titulo": "Diretrizes",
+   "ordem": 14,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.1",
+   "titulo": "Direito e período",
+   "ordem": 15,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.1.1",
+   "titulo": "Cada 12 meses de período aquisitivo geram 30 dias corridos de férias,",
+   "ordem": 16,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.05
+  },
+  {
+   "secao_id": "4.1.2",
+   "titulo": "As férias devem ser gozadas dentro do período concessivo",
+   "ordem": 17,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.2",
+   "titulo": "Programação anual",
+   "ordem": 18,
+   "peso": 0.0012,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.2.1",
+   "titulo": "Entre 1º e 31 de outubro de cada ano, o empregado registra no Portal Raiz a",
+   "ordem": 19,
+   "peso": 0.0114,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.2.2",
+   "titulo": "O gestor imediato consolida a programação da equipe até 30 de novembro",
+   "ordem": 20,
+   "peso": 0.0072,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.2.3",
+   "titulo": "A GGC publica o calendário institucional de férias até 15 de dezembro",
+   "ordem": 21,
+   "peso": 0.0072,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.2.4",
+   "titulo": "A programação não substitui a solicitação formal do item 4.3",
+   "ordem": 22,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.3",
+   "titulo": "Solicitação",
+   "ordem": 23,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.3.1",
+   "titulo": "A solicitação é formal e feita no Portal Raiz (FM_1111-001) com antecedência",
+   "ordem": 24,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.3.2",
+   "titulo": "O início de gozo deve ocorrer em dia útil e não pode cair nos 2 dias úteis",
+   "ordem": 25,
+   "peso": 0.0123,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.3.3",
+   "titulo": "Solicitação com menos de 45 dias só é aceita por decisão do diretor da",
+   "ordem": 26,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.4",
+   "titulo": "Fracionamento",
+   "ordem": 27,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.4.1",
+   "titulo": "As férias podem ser divididas em até 3 períodos",
+   "ordem": 28,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.4.2",
+   "titulo": "Um dos períodos deve ter no mínimo 14 dias corridos; os demais, no mínimo",
+   "ordem": 29,
+   "peso": 0.0096,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 4
+   },
+   "intensidade": 0.13
+  },
+  {
+   "secao_id": "4.4.3",
+   "titulo": "Cada período fracionado exige uma solicitação própria, com os prazos do",
+   "ordem": 30,
+   "peso": 0.0093,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5",
+   "titulo": "Prazos em camadas (contados em dias corridos antes do início de gozo, salvo",
+   "ordem": 31,
+   "peso": 0.0084,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5.1",
+   "titulo": "Solicitação: até 45 dias antes",
+   "ordem": 32,
+   "peso": 0.003,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5.2",
+   "titulo": "Decisão do gestor imediato: até 7 dias corridos depois do registro da",
+   "ordem": 33,
+   "peso": 0.0075,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5.3",
+   "titulo": "Emissão do aviso pela GGC: até 35 dias antes",
+   "ordem": 34,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5.4",
+   "titulo": "Assinatura do aviso pelo empregado: até 5 dias úteis depois do",
+   "ordem": 35,
+   "peso": 0.0102,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.05
+  },
+  {
+   "secao_id": "4.5.5",
+   "titulo": "Pagamento: até 3 dias corridos antes; se esse dia for sábado, domingo ou",
+   "ordem": 36,
+   "peso": 0.0108,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.5.6",
+   "titulo": "O quadro completo está no TB_1111-001",
+   "ordem": 37,
+   "peso": 0.0036,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.6",
+   "titulo": "Decisão do gestor",
+   "ordem": 38,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.6.1",
+   "titulo": "O gestor aprova, recusa com justificativa ou propõe nova data",
+   "ordem": 39,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "4.6.2",
+   "titulo": "A ausência de decisão em 7 dias não equivale a aprovação: a solicitação é",
+   "ordem": 40,
+   "peso": 0.012,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 2,
+    "risco": 0
+   },
+   "intensidade": 0.1
+  },
+  {
+   "secao_id": "4.6.3",
+   "titulo": "No máximo 30% da equipe pode estar de férias ao mesmo tempo,",
+   "ordem": 41,
+   "peso": 0.0111,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.6.4",
+   "titulo": "Ao se ausentar, o gestor registra no Portal Raiz o substituto com poder de",
+   "ordem": 42,
+   "peso": 0.0132,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.7",
+   "titulo": "Abono pecuniário",
+   "ordem": 43,
+   "peso": 0.0012,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.7.1",
+   "titulo": "O empregado pode converter até 10 dias em abono",
+   "ordem": 44,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.7.2",
+   "titulo": "O pedido é feito na mesma solicitação de férias e nunca depois de 15 dias",
+   "ordem": 45,
+   "peso": 0.0108,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.7.3",
+   "titulo": "O abono é pago junto com as férias",
+   "ordem": 46,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.8",
+   "titulo": "Adiantamento da 1ª parcela do 13º salário",
+   "ordem": 47,
+   "peso": 0.0042,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.8.1",
+   "titulo": "O empregado pode pedir o adiantamento entre 1º e 31 de janeiro, no Portal",
+   "ordem": 48,
+   "peso": 0.0087,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.8.2",
+   "titulo": "A parcela é paga junto com as férias do primeiro período do ano",
+   "ordem": 49,
+   "peso": 0.0078,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.9",
+   "titulo": "Alteração e cancelamento",
+   "ordem": 50,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.9.1",
+   "titulo": "Por iniciativa do empregado, com anuência do gestor, a alteração ou o",
+   "ordem": 51,
+   "peso": 0.0123,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.9.2",
+   "titulo": "Nos 20 dias que antecedem o início, a alteração ocorre apenas por",
+   "ordem": 52,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.9.3",
+   "titulo": "Na alteração por necessidade de serviço, a ACME ressarce as despesas",
+   "ordem": 53,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 1,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "4.9.4",
+   "titulo": "Alteração com pagamento já efetuado exige a devolução ou a",
+   "ordem": 54,
+   "peso": 0.0078,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.10",
+   "titulo": "Férias vencidas e alertas",
+   "ordem": 55,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.10.1",
+   "titulo": "A GGC alerta o gestor 120 dias antes do fim do período concessivo",
+   "ordem": 56,
+   "peso": 0.0078,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.10.2",
+   "titulo": "O gestor programa o gozo até 90 dias antes do fim do período concessivo",
+   "ordem": 57,
+   "peso": 0.0084,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.10.3",
+   "titulo": "Sem programação nesse prazo, a GGC escala o caso à DIRAF",
+   "ordem": 58,
+   "peso": 0.0066,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.11",
+   "titulo": "Empregado em teletrabalho integral segue as mesmas regras; o aviso é assinado",
+   "ordem": 59,
+   "peso": 0.0075,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4.12",
+   "titulo": "Estagiários e aprendizes não são regidos por esta norma",
+   "ordem": 60,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5",
+   "titulo": "Entrada",
+   "ordem": 61,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5.1",
+   "titulo": "Intenção de gozo registrada na programação anual",
+   "ordem": 62,
+   "peso": 0.0042,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5.2",
+   "titulo": "Solicitação de férias (FM_1111-001)",
+   "ordem": 63,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5.3",
+   "titulo": "Pedido de abono, de adiantamento da 1ª parcela do 13º salário, de alteração ou",
+   "ordem": 64,
+   "peso": 0.009,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "6",
+   "titulo": "Saída",
+   "ordem": 65,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "6.1",
+   "titulo": "Aviso de férias assinado",
+   "ordem": 66,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "6.2",
+   "titulo": "Pagamento de férias, do terço constitucional, do abono e do adiantamento do",
+   "ordem": 67,
+   "peso": 0.0081,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "6.3",
+   "titulo": "Calendário institucional de férias",
+   "ordem": 68,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "6.4",
+   "titulo": "Registro da decisão no Portal Raiz",
+   "ordem": 69,
+   "peso": 0.0036,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7",
+   "titulo": "Intervenientes",
+   "ordem": 70,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7.1",
+   "titulo": "Empregado",
+   "ordem": 71,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7.2",
+   "titulo": "Gestor imediato",
+   "ordem": 72,
+   "peso": 0.0012,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7.3",
+   "titulo": "Diretor da área",
+   "ordem": 73,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7.4",
+   "titulo": "Gerência de Gente e Cultura (GGC)",
+   "ordem": 74,
+   "peso": 0.0036,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "7.5",
+   "titulo": "Gerência de Finanças (GFI)",
+   "ordem": 75,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8",
+   "titulo": "Procedimentos",
+   "ordem": 76,
+   "peso": 0.0006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.1",
+   "titulo": "Cabe ao empregado:",
+   "ordem": 77,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "8.1.1",
+   "titulo": "registrar a intenção de gozo na programação anual;",
+   "ordem": 78,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.1.2",
+   "titulo": "solicitar as férias com 45 dias de antecedência;",
+   "ordem": 79,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.1.3",
+   "titulo": "assinar o aviso no prazo;",
+   "ordem": 80,
+   "peso": 0.003,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.1.4",
+   "titulo": "comunicar ao gestor qualquer fato que impeça o gozo",
+   "ordem": 81,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.2",
+   "titulo": "Cabe ao gestor imediato:",
+   "ordem": 82,
+   "peso": 0.0024,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "8.2.1",
+   "titulo": "consolidar a programação da equipe até 30 de novembro;",
+   "ordem": 83,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.2.2",
+   "titulo": "decidir a solicitação em até 7 dias corridos;",
+   "ordem": 84,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.2.3",
+   "titulo": "respeitar o limite de 30% de ausência simultânea;",
+   "ordem": 85,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.2.4",
+   "titulo": "registrar o substituto antes das próprias férias",
+   "ordem": 86,
+   "peso": 0.0042,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.3",
+   "titulo": "Cabe ao diretor da área:",
+   "ordem": 87,
+   "peso": 0.003,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 2,
+    "risco": 0
+   },
+   "intensidade": 0.05
+  },
+  {
+   "secao_id": "8.3.1",
+   "titulo": "decidir as solicitações escaladas em até 3 dias úteis;",
+   "ordem": 88,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.3.2",
+   "titulo": "decidir solicitações com menos de 45 dias e alterações por necessidade de",
+   "ordem": 89,
+   "peso": 0.0075,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.4",
+   "titulo": "Cabe à GGC:",
+   "ordem": 90,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "8.4.1",
+   "titulo": "publicar o calendário institucional até 15 de dezembro;",
+   "ordem": 91,
+   "peso": 0.0048,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.4.2",
+   "titulo": "emitir o aviso até 35 dias antes do início;",
+   "ordem": 92,
+   "peso": 0.0054,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.4.3",
+   "titulo": "alertar sobre férias a vencer;",
+   "ordem": 93,
+   "peso": 0.003,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.4.4",
+   "titulo": "enviar à GFI a ordem de pagamento",
+   "ordem": 94,
+   "peso": 0.0042,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.5",
+   "titulo": "Cabe à GFI:",
+   "ordem": 95,
+   "peso": 0.0018,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "8.5.1",
+   "titulo": "pagar as férias até 3 dias corridos antes do início, com antecipação para o",
+   "ordem": 96,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "8.5.2",
+   "titulo": "compensar valores em caso de alteração",
+   "ordem": 97,
+   "peso": 0.0036,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "9",
+   "titulo": "Disposições finais",
+   "ordem": 98,
+   "peso": 0.0012,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "9.1",
+   "titulo": "Casos omissos são decididos pela GGC",
+   "ordem": 99,
+   "peso": 0.0036,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "9.2",
+   "titulo": "Esta norma tem vigência de 18 meses contados da aprovação",
+   "ordem": 100,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Anexo A",
+   "titulo": "Visão geral",
+   "ordem": 101,
+   "peso": 0.0242,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "1",
+   "titulo": "Programação. Entre 1º e 31 de outubro, o empregado registra no Portal Raiz a",
+   "ordem": 102,
+   "peso": 0.0141,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "2",
+   "titulo": "Solicitação. Com pelo menos 45 dias corridos de antecedência do início de gozo,",
+   "ordem": 103,
+   "peso": 0.0108,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3",
+   "titulo": "Decisão. O gestor imediato decide em até 7 dias corridos. Se não decidir, a",
+   "ordem": 104,
+   "peso": 0.0126,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 2,
+    "risco": 0
+   },
+   "intensidade": 0.05
+  },
+  {
+   "secao_id": "4",
+   "titulo": "Aviso. A GGC emite o aviso até 35 dias antes do início, e o empregado o assina no",
+   "ordem": 105,
+   "peso": 0.0111,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5",
+   "titulo": "Pagamento. A GFI paga as férias até 3 dias corridos antes do início de gozo",
+   "ordem": 106,
+   "peso": 0.0165,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Anexo B",
+   "titulo": "Quadro resumo de responsabilidades",
+   "ordem": 107,
+   "peso": 0.0467,
+   "sinais": {
+    "prazo": 8,
+    "valor": 0,
+    "obrigacao": 10,
+    "risco": 0
+   },
+   "intensidade": 0.46
+  },
+  {
+   "secao_id": "Anexo C",
+   "titulo": "Exemplos de aplicação",
+   "ordem": 108,
+   "peso": 0.1158,
+   "sinais": {
+    "prazo": 21,
+    "valor": 5,
+    "obrigacao": 6,
+    "risco": 4
+   },
+   "intensidade": 1.0
+  },
+  {
+   "secao_id": "Anexo D",
+   "titulo": "Glossário ampliado",
+   "ordem": 109,
+   "peso": 0.0458,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 6,
+    "risco": 0
+   },
+   "intensidade": 0.1
+  },
+  {
+   "secao_id": "Anexo E",
+   "titulo": "Relação com outros documentos",
+   "ordem": 110,
+   "peso": 0.0224,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Anexo F",
+   "titulo": "Perguntas frequentes de esclarecimento",
+   "ordem": 111,
+   "peso": 0.0673,
+   "sinais": {
+    "prazo": 8,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 6
+   },
+   "intensidade": 0.3
+  },
+  {
+   "secao_id": "Anexo G",
+   "titulo": "Lista de verificação por perfil",
+   "ordem": 112,
+   "peso": 0.0539,
+   "sinais": {
+    "prazo": 10,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.23
+  }
+ ]
+}

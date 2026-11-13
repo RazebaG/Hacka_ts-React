@@ -1,0 +1,566 @@
+{
+ "codigo": "CTR_2026-012",
+ "versao": "1.0.0",
+ "secoes": 43,
+ "mapa_calor": [
+  {
+   "secao_id": "Cláusula Primeira",
+   "titulo": "Objeto",
+   "ordem": 1,
+   "peso": 0.0147,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Segunda",
+   "titulo": "Prazo",
+   "ordem": 2,
+   "peso": 0.0121,
+   "sinais": {
+    "prazo": 7,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.15
+  },
+  {
+   "secao_id": "Cláusula Terceira",
+   "titulo": "Prorrogação",
+   "ordem": 3,
+   "peso": 0.0125,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Quarta",
+   "titulo": "Obrigações da LOCADORA",
+   "ordem": 4,
+   "peso": 0.025,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Cláusula Quinta",
+   "titulo": "Obrigações da LOCATÁRIA",
+   "ordem": 5,
+   "peso": 0.019,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Cláusula Sexta",
+   "titulo": "Vistoria e termo de entrega",
+   "ordem": 6,
+   "peso": 0.0125,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Sétima",
+   "titulo": "Valor",
+   "ordem": 7,
+   "peso": 0.0125,
+   "sinais": {
+    "prazo": 0,
+    "valor": 3,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.08
+  },
+  {
+   "secao_id": "Cláusula Oitava",
+   "titulo": "Faturamento",
+   "ordem": 8,
+   "peso": 0.0108,
+   "sinais": {
+    "prazo": 1,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Cláusula Nona",
+   "titulo": "Atesto",
+   "ordem": 9,
+   "peso": 0.0091,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Cláusula Décima",
+   "titulo": "Pagamento",
+   "ordem": 10,
+   "peso": 0.0142,
+   "sinais": {
+    "prazo": 1,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Cláusula Décima Primeira",
+   "titulo": "Atraso",
+   "ordem": 11,
+   "peso": 0.016,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 2
+   },
+   "intensidade": 0.07
+  },
+  {
+   "secao_id": "Cláusula Décima Segunda",
+   "titulo": "Reajuste",
+   "ordem": 12,
+   "peso": 0.0104,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Décima Terceira",
+   "titulo": "Rescisão pela LOCATÁRIA",
+   "ordem": 13,
+   "peso": 0.0173,
+   "sinais": {
+    "prazo": 3,
+    "valor": 2,
+    "obrigacao": 0,
+    "risco": 4
+   },
+   "intensidade": 0.29
+  },
+  {
+   "secao_id": "Cláusula Décima Quarta",
+   "titulo": "Rescisão pela LOCADORA",
+   "ordem": 14,
+   "peso": 0.0112,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 3
+   },
+   "intensidade": 0.1
+  },
+  {
+   "secao_id": "Cláusula Décima Quinta",
+   "titulo": "Inexecução",
+   "ordem": 15,
+   "peso": 0.0099,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 4
+   },
+   "intensidade": 0.14
+  },
+  {
+   "secao_id": "Cláusula Décima Sexta",
+   "titulo": "Sublocação",
+   "ordem": 16,
+   "peso": 0.006,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Décima Sétima",
+   "titulo": "Integridade",
+   "ordem": 17,
+   "peso": 0.0078,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Décima Oitava",
+   "titulo": "Proteção de dados",
+   "ordem": 18,
+   "peso": 0.0186,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Décima Nona",
+   "titulo": "Casos omissos",
+   "ordem": 19,
+   "peso": 0.0082,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Cláusula Vigésima",
+   "titulo": "Foro",
+   "ordem": 20,
+   "peso": 0.0065,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "1",
+   "titulo": "Objeto: locação de 8 estações e sala de reunião (até 40 horas mensais)",
+   "ordem": 21,
+   "peso": 0.0112,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "2",
+   "titulo": "Especificações técnicas: internet de 500 Mbps; estações com mesa, cadeira e",
+   "ordem": 22,
+   "peso": 0.0155,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "3",
+   "titulo": "Classificação do serviço: serviço continuado de baixa complexidade",
+   "ordem": 23,
+   "peso": 0.0069,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "4",
+   "titulo": "Subcontratação: vedada",
+   "ordem": 24,
+   "peso": 0.0017,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "5",
+   "titulo": "Condições de entrega: espaço pronto em 30/11/2026; vistoria até 25/11/2026",
+   "ordem": 25,
+   "peso": 0.0086,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.07
+  },
+  {
+   "secao_id": "6",
+   "titulo": "Informações de faturamento: nota fiscal até o dia 25; enviar ao gestor do",
+   "ordem": 26,
+   "peso": 0.0121,
+   "sinais": {
+    "prazo": 1,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "7",
+   "titulo": "Condições de pagamento: até o dia 8 do mês de uso, após o atesto do fiscal (5",
+   "ordem": 27,
+   "peso": 0.0155,
+   "sinais": {
+    "prazo": 2,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.06
+  },
+  {
+   "secao_id": "8",
+   "titulo": "Multa: 1% por atraso de pagamento; 5% do valor global por inexecução; um aluguel",
+   "ordem": 28,
+   "peso": 0.0147,
+   "sinais": {
+    "prazo": 1,
+    "valor": 4,
+    "obrigacao": 0,
+    "risco": 3
+   },
+   "intensidade": 0.24
+  },
+  {
+   "secao_id": "9",
+   "titulo": "Deveres dos intervenientes: LOCADORA mantém serviços e comunica",
+   "ordem": 29,
+   "peso": 0.0151,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 2,
+    "risco": 0
+   },
+   "intensidade": 0.05
+  },
+  {
+   "secao_id": "10",
+   "titulo": "Segurança: acesso por crachá nominal; lista de usuários atualizada mensalmente;",
+   "ordem": 30,
+   "peso": 0.0129,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "11",
+   "titulo": "Matriz de risco: interrupção de internet (LOCADORA, desconto de 1/30 do aluguel",
+   "ordem": 31,
+   "peso": 0.0173,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "12",
+   "titulo": "Vistoria: obrigatória antes da entrega; registrada em termo assinado pelo fiscal e",
+   "ordem": 32,
+   "peso": 0.0112,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Apêndice A",
+   "titulo": "Quadro-resumo do contrato",
+   "ordem": 33,
+   "peso": 0.116,
+   "sinais": {
+    "prazo": 20,
+    "valor": 12,
+    "obrigacao": 0,
+    "risco": 8
+   },
+   "intensidade": 1.0
+  },
+  {
+   "secao_id": "Apêndice B",
+   "titulo": "Memória de cálculo dos valores",
+   "ordem": 34,
+   "peso": 0.0397,
+   "sinais": {
+    "prazo": 3,
+    "valor": 13,
+    "obrigacao": 0,
+    "risco": 5
+   },
+   "intensidade": 0.65
+  },
+  {
+   "secao_id": "Apêndice C",
+   "titulo": "Calendário contratual",
+   "ordem": 35,
+   "peso": 0.0259,
+   "sinais": {
+    "prazo": 7,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.2
+  },
+  {
+   "secao_id": "Apêndice D",
+   "titulo": "Rotina mensal de execução",
+   "ordem": 36,
+   "peso": 0.0544,
+   "sinais": {
+    "prazo": 6,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.13
+  },
+  {
+   "secao_id": "Apêndice E",
+   "titulo": "Exemplos de aplicação",
+   "ordem": 37,
+   "peso": 0.1191,
+   "sinais": {
+    "prazo": 18,
+    "valor": 14,
+    "obrigacao": 0,
+    "risco": 7
+   },
+   "intensidade": 0.99
+  },
+  {
+   "secao_id": "Apêndice F",
+   "titulo": "Matriz de responsabilidades",
+   "ordem": 38,
+   "peso": 0.0552,
+   "sinais": {
+    "prazo": 5,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.11
+  },
+  {
+   "secao_id": "Apêndice G",
+   "titulo": "Itens do termo de vistoria e entrega",
+   "ordem": 39,
+   "peso": 0.0414,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 0
+   },
+   "intensidade": 0.0
+  },
+  {
+   "secao_id": "Apêndice H",
+   "titulo": "Itens do atesto mensal",
+   "ordem": 40,
+   "peso": 0.0272,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 1,
+    "risco": 0
+   },
+   "intensidade": 0.04
+  },
+  {
+   "secao_id": "Apêndice I",
+   "titulo": "Glossário",
+   "ordem": 41,
+   "peso": 0.0384,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 2
+   },
+   "intensidade": 0.06
+  },
+  {
+   "secao_id": "Apêndice J",
+   "titulo": "Perguntas frequentes de esclarecimento",
+   "ordem": 42,
+   "peso": 0.0712,
+   "sinais": {
+    "prazo": 13,
+    "valor": 1,
+    "obrigacao": 2,
+    "risco": 3
+   },
+   "intensidade": 0.5
+  },
+  {
+   "secao_id": "Apêndice K",
+   "titulo": "Documentos relacionados",
+   "ordem": 43,
+   "peso": 0.0147,
+   "sinais": {
+    "prazo": 0,
+    "valor": 0,
+    "obrigacao": 0,
+    "risco": 2
+   },
+   "intensidade": 0.07
+  }
+ ]
+}
