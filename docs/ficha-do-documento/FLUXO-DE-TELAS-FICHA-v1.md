@@ -218,6 +218,8 @@ Cor nunca é o único sinal (semáforo tem ícone e texto); mapa de calor com al
 
 ## 3. T16 · Modo apresentação (pitch do documento) · P1
 
+> **Detalhamento completo (13/11):** ver MODO-APRESENTACAO-v1.md, que substitui esta seção quando houver diferença (cartões escolhidos pelo **sinal** dos blocos, tempo redistribuído, roteiro falado, teclado, PDF, aceite e montagem no cliente).
+
 **Objetivo:** a pessoa apresenta o documento em 5 minutos, em reunião ou no comitê. Os cartões são **derivados da ficha**: não há nova chamada de IA.
 
 | # | Cartão | Conteúdo | Tempo sugerido |
