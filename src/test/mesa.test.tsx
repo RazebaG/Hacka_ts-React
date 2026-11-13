@@ -110,8 +110,13 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('inicio-atencao')).toHaveTextContent('Perfil: todos');
   });
 
-  it('Apresentar: desativado sem resumo, com o motivo; com resumo leva a origem e o bloco escolhido', () => {
-    const { unmount } = render(<MesaDocumento ficha={mockFicha('NG_111')!} variante="compacta" />);
+  it('Apresentar: sem IA usa a frase do documento; desativado só sem nenhuma frase; leva a origem e o bloco escolhido', () => {
+    const ng = mockFicha('NG_111')!;
+    const r1 = render(<MesaDocumento ficha={ng} variante="compacta" />);
+    expect(screen.getByTestId('mesa-apresentar')).toHaveAttribute('href', '/documento/NG_111/apresentar?versao=3.0.0&de=inicio');
+    r1.unmount();
+    const vazia = { ...ng, blocos: [], numeros: [], pontos: { obrigacoes: [], prazos: [], valores: [], riscos: [], responsaveis: [], condicoes: [] } };
+    const { unmount } = render(<MesaDocumento ficha={vazia} variante="compacta" />);
     expect(screen.getByTestId('mesa-apresentar')).toBeDisabled();
     expect(screen.getByText('Este documento ainda não tem resumo pronto.')).toBeInTheDocument();
     unmount();
@@ -120,7 +125,7 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('mesa-apresentar')).toHaveAttribute('href', '/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo');
   });
 
-  it('Apresentação: Sair volta à Mesa no mesmo bloco; sem resumo a tela não abre', async () => {
+  it('Apresentação: Sair volta à Mesa no mesmo bloco; norma sem IA também apresenta', async () => {
     navegar('/documento/CTR_2026-012/apresentar?versao=1.0.0&de=inicio&bloco=b-custo', true);
     const { unmount } = render(<ApresentacaoView codigo="CTR_2026-012" versao="1.0.0" />);
     fireEvent.click(await screen.findByTestId('apresentacao-sair'));
@@ -130,6 +135,6 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.getByTestId('bloco-b-custo')).toHaveAttribute('aria-pressed', 'true');
     navegar('/', true);
     render(<ApresentacaoView codigo="NG_111" />);
-    expect(await screen.findByTestId('apresentacao-sem-resumo')).toHaveTextContent('ainda não tem resumo pronto');
+    expect(await screen.findByTestId('apresentacao-cartao')).toHaveTextContent('Férias');
   });
 });

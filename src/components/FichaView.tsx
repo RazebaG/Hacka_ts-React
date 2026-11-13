@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AcaoFicha, CampoGov, FichaDocumento, ItemFicha } from '../api/types';
 import { SeloOrigem } from './FichaPecas';
-import { MesaDocumento, SEM_RESUMO } from './MesaDocumento';
+import { BotaoApresentar, MesaDocumento } from './MesaDocumento';
+import { podeApresentar } from '../ficha/cartoes';
 import { fetchFicha, isMockMode } from '../api/client';
 import { acoes as acoesEstado, useEstado } from '../app/store';
 import { PERFIS } from './perfis';
@@ -175,6 +176,24 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
   }, [ficha, carregar]);
 
   const versoes = MOCK_DOCUMENTOS.filter((d) => d.codigo === codigo);
+
+  // Atalhos da Ficha (FICHA §2.6): P apresenta, ? pergunta só neste documento
+  useEffect(() => {
+    if (!ficha) return;
+    const tecla = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (e.ctrlKey || e.metaKey || e.altKey || (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable))) return;
+      if ((e.key === 'p' || e.key === 'P') && podeApresentar(ficha)) {
+        e.preventDefault();
+        navegar(url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' }));
+      } else if (e.key === '?') {
+        e.preventDefault();
+        navegar(url.perguntar(undefined, [ficha.codigo]));
+      }
+    };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [ficha]);
 
   if (erro && !ficha)
     return (
@@ -441,10 +460,10 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
                   <li key={a.titulo}>
                     <a
                       className="fg-lista-item ficha-alerta"
-                      href={a.radar_id ? url.radar({ item: a.radar_id }) : url.radar()}
+                      href={a.radar_id ? url.radar({ item: a.radar_id }) : url.radar({ codigo: ficha.codigo })}
                       onClick={(e) => {
                         e.preventDefault();
-                        navegar(a.radar_id ? url.radar({ item: a.radar_id }) : url.radar());
+                        navegar(a.radar_id ? url.radar({ item: a.radar_id }) : url.radar({ codigo: ficha.codigo }));
                       }}
                     >
                       <span className="fg-lista-texto">
@@ -499,6 +518,7 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
               }}
             >
               <Icon nome="perguntar" tamanho={16} /> Perguntar sobre este documento
+              <kbd className="ficha-atalho" aria-hidden="true">?</kbd>
             </a>
             <a
               className="btn btn-outline btn-sm fg-largo"
@@ -510,29 +530,28 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
             >
               <Icon nome="documento" tamanho={16} /> Ler o texto completo
             </a>
-            {ficha.bluf ? (
-              <a
-                className="btn btn-outline btn-sm fg-largo"
-                href={url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' })}
-                data-testid="ficha-apresentar"
-                onClick={(e) => {
-                  e.preventDefault();
-                  navegar(url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' }));
-                }}
-              >
-                <Icon nome="apresentacao" tamanho={16} /> Apresentar em 5 min
-              </a>
-            ) : (
-              <button type="button" className="btn btn-outline btn-sm fg-largo" disabled title={SEM_RESUMO} aria-label={`Apresentar em 5 min: ${SEM_RESUMO}`} data-testid="ficha-apresentar">
-                <Icon nome="apresentacao" tamanho={16} /> Apresentar em 5 min
-              </button>
-            )}
+            <BotaoApresentar ficha={ficha} de="ficha" className="btn btn-outline btn-sm fg-largo" testId="ficha-apresentar" tamanho={16} />
             <button type="button" className="btn btn-outline btn-sm fg-largo" onClick={() => window.print()}>
               <Icon nome="baixar" tamanho={16} /> Exportar (PDF)
             </button>
           </section>
         </aside>
       </div>
+
+      {/* Celular (FICHA §2.5): ações fixas no rodapé */}
+      <nav className="ficha-barra-celular print-hidden" aria-label="Ações da ficha" data-testid="ficha-barra-celular">
+        <a
+          className="btn btn-primary btn-sm"
+          href={perguntarAqui}
+          onClick={(e) => {
+            e.preventDefault();
+            navegar(perguntarAqui);
+          }}
+        >
+          <Icon nome="perguntar" tamanho={15} /> Perguntar
+        </a>
+        <BotaoApresentar ficha={ficha} de="ficha" testId="ficha-apresentar-celular" />
+      </nav>
     </div>
   );
 };

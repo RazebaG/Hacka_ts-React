@@ -86,7 +86,7 @@ export function App() {
       );
       break;
     case 'radar':
-      conteudo = <RadarView itemId={q.get('item') ?? undefined} tema={q.get('tema') ?? ''} />;
+      conteudo = <RadarView itemId={q.get('item') ?? undefined} tema={q.get('tema') ?? ''} codigo={q.get('codigo') ?? ''} />;
       break;
     case 'ese':
       conteudo = <ESeView valorInicial={Number(q.get('valor')) || 30} />;

@@ -5,6 +5,7 @@ import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { FonteLink } from '../ui/componentes';
 import { Icon } from '../ui/Icon';
 import { SeloOrigem, SemaforoSituacao } from './FichaPecas';
+import { TOTAL_CARTOES, montarCartoes, podeApresentar } from '../ficha/cartoes';
 
 /**
  * Mesa de decisão (FLUXO-DE-TELAS-FICHA §0, RF71–RF76): o documento "desmiuçado" para decidir.
@@ -67,6 +68,40 @@ const Bloco: React.FC<{
 /** Mínimo para existir apresentação: capa, frase e "De onde vem" (MODO-APRESENTACAO §3). */
 export const SEM_RESUMO = 'Este documento ainda não tem resumo pronto.';
 
+/**
+ * "Apresentar em 5 min" (Mesa e Ficha). Sem IA, a apresentação usa a frase copiada do documento;
+ * só fica desativado quando não há nem isso. Gerando: "Preparando (n de 8)" (MODO-APRESENTACAO §5.4).
+ */
+export const BotaoApresentar: React.FC<{ ficha: FichaDocumento; de: 'inicio' | 'ficha'; bloco?: string | null; className?: string; testId: string; tamanho?: number }> = ({
+  ficha,
+  de,
+  bloco,
+  className = 'btn btn-outline btn-sm',
+  testId,
+  tamanho = 15
+}) => {
+  const pronto = podeApresentar(ficha);
+  const gerando = ficha.estado === 'gerando' || ficha.estado === 'parcial';
+  const rotulo = gerando ? `Preparando (${pronto ? montarCartoes(ficha).length : 0} de ${TOTAL_CARTOES})` : 'Apresentar em 5 min';
+  const destino = url.apresentar(ficha.codigo, ficha.versao, undefined, { de, bloco });
+  if (!pronto)
+    return (
+      <span className="mesa-apresentar-off">
+        <button type="button" className={className} disabled aria-describedby={`${testId}-motivo`} data-testid={testId}>
+          <Icon nome="apresentacao" tamanho={tamanho} /> {rotulo}
+        </button>
+        <span id={`${testId}-motivo`} className="fg-sub">
+          {SEM_RESUMO}
+        </span>
+      </span>
+    );
+  return (
+    <a className={className} href={destino} onClick={ir(destino)} data-testid={testId} aria-keyshortcuts={de === 'ficha' ? 'P' : undefined}>
+      <Icon nome="apresentacao" tamanho={tamanho} /> {rotulo}
+    </a>
+  );
+};
+
 export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compacta' | 'completa' }> = ({ ficha, variante }) => {
   const blocos = ficha.blocos ?? [];
   // ?bloco= (volta da apresentação) reabre o bloco que estava escolhido
@@ -83,7 +118,6 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
   const celulas = [...ficha.mapa_calor].sort((a, b) => a.ordem - b.ordem);
   const acao = [...ficha.acoes].sort((a, b) => ['alta', 'media', 'baixa'].indexOf(a.urgencia) - ['alta', 'media', 'baixa'].indexOf(b.urgencia))[0];
   const gerando = ficha.estado === 'gerando' || ficha.estado === 'parcial';
-  const linkApresentar = url.apresentar(ficha.codigo, ficha.versao, undefined, { de: variante === 'compacta' ? 'inicio' : 'ficha', bloco: ativoId });
 
   // Trocou de documento: fecha o detalhe
   useEffect(() => {
@@ -369,20 +403,7 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
           </label>
           <input id={`mesa-pergunta-${variante}`} type="search" placeholder="Pergunte a este documento…" value={pergunta} onChange={(e) => setPergunta(e.target.value)} data-testid="mesa-pergunta" />
         </form>
-        {ficha.bluf ? (
-          <a className="btn btn-outline btn-sm" href={linkApresentar} onClick={ir(linkApresentar)} data-testid="mesa-apresentar">
-            <Icon nome="apresentacao" tamanho={15} /> Apresentar em 5 min
-          </a>
-        ) : (
-          <span className="mesa-apresentar-off">
-            <button type="button" className="btn btn-outline btn-sm" disabled aria-describedby={`mesa-apresentar-motivo-${variante}`} data-testid="mesa-apresentar">
-              <Icon nome="apresentacao" tamanho={15} /> Apresentar em 5 min
-            </button>
-            <span id={`mesa-apresentar-motivo-${variante}`} className="fg-sub">
-              {SEM_RESUMO}
-            </span>
-          </span>
-        )}
+        <BotaoApresentar ficha={ficha} de={variante === 'compacta' ? 'inicio' : 'ficha'} bloco={ativoId} testId="mesa-apresentar" />
         {variante === 'compacta' && (
           <a className="btn btn-primary btn-sm" href={url.ficha(ficha.codigo, ficha.versao)} onClick={ir(url.ficha(ficha.codigo, ficha.versao))} data-testid="mesa-abrir-ficha">
             Abrir ficha completa <Icon nome="seta" tamanho={15} />

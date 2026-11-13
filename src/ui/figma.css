@@ -4250,3 +4250,55 @@ h3,
 /* "Apresentar" sem resumo: botão desativado com o motivo ao lado (MODO-APRESENTACAO §3) */
 .mesa-apresentar-off { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .mesa-apresentar-off .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Ficha · atalho de teclado visível e barra fixa no celular (FICHA §2.5 e §2.6) */
+.ficha-atalho { margin-left: auto; padding: 0 6px; border: 1px solid currentColor; border-radius: 4px; font-size: 11px; opacity: 0.7; font-family: inherit; }
+.ficha-barra-celular { display: none; }
+@media (max-width: 860px) {
+  .ficha-view { padding-bottom: 84px; }
+  .ficha-barra-celular {
+    display: flex; gap: var(--space-2); align-items: center; justify-content: center; flex-wrap: wrap;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--color-surface); border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08);
+  }
+  .ficha-barra-celular > .btn, .ficha-barra-celular > .mesa-apresentar-off > .btn { flex: 1 1 140px; justify-content: center; }
+  .ficha-barra-celular .mesa-apresentar-off { flex: 1 1 140px; }
+}
+
+/* Apresentação · ritmo, notas, relógio, impressão e movimento reduzido (MODO-APRESENTACAO §5) */
+.apresentacao-ritmo { display: flex; align-items: center; gap: var(--space-3); width: min(100%, 980px); margin: 0 auto; }
+.apresentacao-segmentos { display: flex; gap: 3px; flex: 1; height: 8px; }
+.apresentacao-segmentos span { flex-basis: 0; border-radius: 4px; background: var(--color-border); }
+.apresentacao-segmentos span.feito { background: #94a3b8; }
+.apresentacao-segmentos span.atual { background: var(--fg-azul); }
+.apresentacao-segmentos span.atual.adiantado { background: #15803d; }
+.apresentacao-segmentos span.atual.atrasado { background: var(--color-warning-text); }
+.apresentacao-relogio.zero { background: #b42318; border-color: #b42318; color: #fff; }
+.apresentacao-imprimir-notas { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); color: var(--fg-cinza); }
+.apresentacao-notas {
+  width: min(100%, 980px); margin: 0 auto; padding: var(--space-3) var(--space-4);
+  border: 1px dashed var(--color-border-strong); border-radius: 12px; background: var(--color-surface);
+}
+.apresentacao-notas p { margin: 4px 0 0; line-height: 1.55; }
+.apresentacao-fonte-impressa, .apresentacao-notas-impressas { display: none; }
+@media (max-width: 640px) {
+  .apresentacao-imprimir-notas, .apresentacao-dica { display: none; }
+  .apresentacao-notas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; border-radius: 12px 12px 0 0; max-height: 40vh; overflow: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apresentacao *, .apresentacao *::before, .apresentacao *::after { transition: none !important; animation: none !important; }
+}
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  .apresentacao-cartao { break-after: page; page-break-after: always; min-height: auto; }
+  .apresentacao-fonte-impressa { display: block; font-size: 11px; color: #475569; }
+  .apresentacao .fonte-link { display: none; }
+  .apresentacao.imprimir-notas .apresentacao-notas-impressas { display: block; margin-top: 12px; font-size: 12px; color: #334155; border-top: 1px solid #cbd5e1; padding-top: 8px; }
+}
+
+/* "Ver como" não fica embaixo do seletor no celular */
+.fg-perfil-chat { max-width: 100%; }
+.fg-perfil-chat span { flex-shrink: 0; }
+.fg-perfil-chat select { min-width: 0; flex: 1 1 auto; }

@@ -142,7 +142,7 @@ export const DocumentoView: React.FC<DocumentoViewProps> = ({
         </div>
         <div className="fg-mudanca-acoes fg-doc-acoes">
           <button type="button" className="btn btn-primary btn-sm" onClick={() => navegar(url.ficha(documento.codigo, documento.versao))} data-testid="btn-ver-ficha">
-            <Icon nome="resumo" tamanho={15} /> Ver ficha
+            <Icon nome="resumo" tamanho={15} /> Voltar à ficha
           </button>
           <button type="button" className="btn btn-outline btn-sm" onClick={() => navegar(url.perguntar(undefined, [documento.codigo]))} data-testid="btn-perguntar-doc">
             <Icon nome="perguntar" tamanho={15} /> Perguntar só neste documento

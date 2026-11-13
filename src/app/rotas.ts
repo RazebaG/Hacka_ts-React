@@ -136,7 +136,7 @@ export const url = {
     const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();
     return `/painel${p ? '/' + p : ''}${qs ? '?' + qs : ''}`;
   },
-  radar: (opc: { item?: string; tema?: string } = {}) => {
+  radar: (opc: { item?: string; tema?: string; codigo?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(opc).filter(([, v]) => v) as [string, string][]).toString();
     return `/radar${qs ? '?' + qs : ''}`;
   },
