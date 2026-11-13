@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { postDecisao } from '../api/client';
+import { mensagemDeErro, postDecisao } from '../api/client';
 import { acoes, Decisao, useEstado } from '../app/store';
 import { Aviso, FonteChip } from '../ui/componentes';
 
@@ -66,8 +66,8 @@ export const DecisaoModal: React.FC = () => {
           ? `Enviado para a ${resp} em ${data}, ${hora}. Você pode acompanhar em “Regras que mudaram”.`
           : `${acao === 'aceitar' ? 'Item aceito' : 'Item descartado'} em ${data}, ${hora}.`
       );
-    } catch {
-      setErro('Não conseguimos registrar agora. Sua nota continua aqui; tente de novo em alguns segundos.');
+    } catch (e) {
+      setErro(mensagemDeErro(e, 'Não conseguimos registrar agora. Sua nota continua aqui; tente de novo em alguns segundos.'));
     }
   };
 
