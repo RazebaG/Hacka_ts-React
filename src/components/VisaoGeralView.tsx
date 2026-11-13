@@ -97,16 +97,11 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
 
       {/* Revisão 13/11 (RF71/RF72): documentos que pedem atenção + Mesa de decisão */}
       <section className="inicio-mesa" aria-labelledby="t-atencao" data-testid="inicio-atencao">
-        <div className="fg-secao-titulo inicio-mesa-titulo">
-          <div>
-            <h2 id="t-atencao">Documentos que pedem sua atenção</h2>
-            <p className="fg-sub">
-              Perfil: {perfil ? PERFIS.find((p) => p.id === perfil)?.nome ?? perfil : 'todos'} · escolha um documento para ver o que decidir
-            </p>
-          </div>
-          <a className="fg-link" href={url.atencao()} onClick={ir(url.atencao())}>
-            Ver fila completa <Icon nome="seta" tamanho={14} />
-          </a>
+        <div className="inicio-mesa-titulo">
+          <h2 id="t-atencao">Documentos que pedem sua atenção</h2>
+          <span className="fg-sub">
+            Perfil: {perfil ? PERFIS.find((p) => p.id === perfil)?.nome ?? perfil : 'todos'} · escolha um para abrir aqui embaixo
+          </span>
         </div>
         {!fila ? (
           <div className="mesa-chips" aria-busy="true">
@@ -130,8 +125,7 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
                   data-testid={`chip-${i.codigo}`}
                 >
                   <span className={`mesa-chip-ponto nivel-${i.semaforo.nivel}`} aria-hidden="true" />
-                  <strong>{i.codigo}</strong>
-                  <span>· {i.motivo_curto ?? i.semaforo.motivos[0] ?? 'em dia'}</span>
+                  {i.codigo} · {i.motivo_curto ?? i.semaforo.motivos[0] ?? 'em dia'}
                 </button>
               ))}
             </div>

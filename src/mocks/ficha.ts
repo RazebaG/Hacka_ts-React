@@ -198,12 +198,37 @@ function fichaExtrativa(d: DocumentoDetalhe): FichaDocumento {
 }
 
 /** Ficha no modo mock: oficial para o CTR_2026-012, extrativa para os demais. */
+const ORDINAIS: Record<string, number> = {
+  primeira: 1, segunda: 2, terceira: 3, quarta: 4, quinta: 5, sexta: 6, 'sétima': 7, oitava: 8, nona: 9,
+  'décima': 10, 'vigésima': 20, 'trigésima': 30
+};
+/** "Cláusula Décima Terceira" → 13. Só cláusulas: a posição delas no contrato segue o número. */
+function ordemDaClausula(id: string): number | null {
+  const m = /^Cláusula\s+(.+)$/i.exec(id);
+  if (!m) return null;
+  const partes = m[1].toLowerCase().split(/\s+/).map((p) => ORDINAIS[p]);
+  return partes.every((n) => n !== undefined) ? partes.reduce((a, b) => a + b, 0) : null;
+}
+/**
+ * O mock oficial traz só 5 das 43 células do mapa. Para o mapa ligar os blocos às seções,
+ * completa as cláusulas citadas pelos blocos na posição do número delas (sem sinais inventados).
+ */
+function completarMapaOficial(f: FichaDocumento): FichaDocumento {
+  const conhecidas = new Set(f.mapa_calor.map((c) => c.secao_id));
+  const extras = [...new Set((f.blocos ?? []).flatMap((b) => b.secoes_mapa))]
+    .filter((id) => !conhecidas.has(id))
+    .map((id) => ({ id, ordem: ordemDaClausula(id) }))
+    .filter((x): x is { id: string; ordem: number } => x.ordem !== null && !f.mapa_calor.some((c) => c.ordem === x.ordem))
+    .map(({ id, ordem }) => ({ secao_id: id, titulo: id, ordem, peso: 0.02, sinais: { prazo: 0, valor: 0, obrigacao: 0, risco: 0 }, intensidade: 0 }));
+  return extras.length ? { ...f, mapa_calor: [...f.mapa_calor, ...extras].sort((a, b) => a.ordem - b.ordem) } : f;
+}
+
 export function mockFicha(codigo: string, versao?: string): FichaDocumento | null {
   const doc =
     MOCK_DOCUMENTOS.find((d) => d.codigo === codigo && (versao ? d.versao === versao : !d.substituido)) ??
     MOCK_DOCUMENTOS.find((d) => d.codigo === codigo);
   if (!doc) return null;
-  const ficha = codigo === 'CTR_2026-012' && doc.versao === (fichaCtr as FichaDocumento).versao ? (fichaCtr as unknown as FichaDocumento) : fichaExtrativa(doc);
+  const ficha = codigo === 'CTR_2026-012' && doc.versao === (fichaCtr as FichaDocumento).versao ? completarMapaOficial(fichaCtr as unknown as FichaDocumento) : fichaExtrativa(doc);
   const comDelta = { ...ficha, delta: deltaReal(doc) };
   // Mock oficial já traz familia e blocos; os demais saem por regra (RF73/RF74)
   return comDelta.blocos ? comDelta : { ...comDelta, familia: familiaDe(doc.codigo), blocos: blocosPorRegra(comDelta, doc) };
@@ -434,7 +459,15 @@ export function mockTriagem(filtros: FiltrosTriagem = {}): TriagemResposta {
     if (ordem === 'tipo') return a.tipo.localeCompare(b.tipo) || a.codigo.localeCompare(b.codigo);
     const pa = a.proximo_prazo?.data ?? '9999', pb = b.proximo_prazo?.data ?? '9999';
     if (ordem === 'vigencia') return pa.localeCompare(pb);
-    return PESO_NIVEL[a.semaforo.nivel] - PESO_NIVEL[b.semaforo.nivel] || b.alertas - a.alertas || pa.localeCompare(pb);
+    // Urgência (RF74): situação, prazo em até 30 dias, regra que mudou de versão/divergência, nº de alertas, data
+    const perto = (i: TriagemItem) => (i.proximo_prazo && dias(i.proximo_prazo.data) <= 30 ? 0 : 1);
+    return (
+      PESO_NIVEL[a.semaforo.nivel] - PESO_NIVEL[b.semaforo.nivel] ||
+      perto(a) - perto(b) ||
+      Number(!a.sinais?.divergencia) - Number(!b.sinais?.divergencia) ||
+      b.alertas - a.alertas ||
+      pa.localeCompare(pb)
+    );
   });
 
   // Perfil (RF71): Jurídico, Financeiro e Diretoria veem contratos primeiro; Empregado, RH e Gestor, normas
@@ -445,6 +478,7 @@ export function mockTriagem(filtros: FiltrosTriagem = {}): TriagemResposta {
       (a, b) =>
         PESO_NIVEL[a.semaforo.nivel] - PESO_NIVEL[b.semaforo.nivel] ||
         perto(a) - perto(b) ||
+        Number(!a.sinais?.divergencia) - Number(!b.sinais?.divergencia) ||
         Number(b.familia === preferida) - Number(a.familia === preferida) ||
         (a.proximo_prazo?.data ?? '9999').localeCompare(b.proximo_prazo?.data ?? '9999')
     );

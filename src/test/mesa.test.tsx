@@ -87,7 +87,7 @@ describe('Mesa de decisão (RF71–RF76)', () => {
   it('RF72: faixa "Precisa de você", pergunta limitada ao documento e "Abrir ficha completa"', async () => {
     const f = mockFicha('CTR_2026-012')!;
     render(<MesaDocumento ficha={f} variante="compacta" />);
-    expect(screen.getByTestId('mesa-precisa')).toHaveTextContent('Fazer a vistoria e assinar o termo de entrega até 25/11/2026');
+    expect(screen.getByTestId('mesa-precisa')).toHaveTextContent('Precisa de você: fazer a vistoria e assinar o termo de entrega até 25/11/2026');
     expect(screen.getByTestId('mesa-abrir-ficha')).toHaveAttribute('href', '/documento/CTR_2026-012/ficha?versao=1.0.0');
     fireEvent.change(screen.getByTestId('mesa-pergunta'), { target: { value: 'Posso rescindir sem multa?' } });
     fireEvent.submit(screen.getByTestId('mesa-pergunta').closest('form')!);
@@ -136,5 +136,33 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     navegar('/', true);
     render(<ApresentacaoView codigo="NG_111" />);
     expect(await screen.findByTestId('apresentacao-cartao')).toHaveTextContent('Férias');
+  });
+
+  it('Protótipo 13/11: cabeçalho com siglas, 43 células no mapa, detalhe sempre à vista e pergunta pela família', () => {
+    render(<MesaDocumento ficha={mockFicha('CTR_2026-012')!} variante="compacta" />);
+    const mesa = screen.getByTestId('mesa');
+    expect(mesa).toHaveTextContent('Contrato · vigente até 29/04/2027 · interna');
+    expect(mesa).toHaveTextContent('Elaborado: GCO · Aprovado: DIRAF · Assinada em: não consta');
+    expect(screen.getByTestId('mesa-abrir-ficha')).toHaveTextContent('ficha 3 min');
+    const faixa = screen.getByRole('list', { name: /Seções do documento/ });
+    expect(faixa.querySelectorAll('.mesa-celula')).toHaveLength(43);
+    // Posições sem dado ficam fora do leitor de tela; só as seções conhecidas são itens
+    expect(within(faixa).getAllByRole('listitem').length).toBeLessThan(43);
+    expect(screen.getByTestId('mesa-detalhe-vazio')).toHaveTextContent('Escolha um bloco para ver o trecho exato');
+    expect(screen.getByTestId('mesa-mapa-dica')).toHaveTextContent('Escolha um bloco');
+    fireEvent.click(screen.getByTestId('bloco-b-quem'));
+    expect(screen.getByTestId('mesa-mapa-dica')).toHaveTextContent('2 seções destacadas');
+    expect(screen.getByTestId('mesa-pergunta')).toHaveAttribute('placeholder', 'Pergunte a este contrato: posso rescindir sem multa?');
+  });
+
+  it('Protótipo 13/11: norma sem ação mostra "A regra mudou" e a frase copiada do documento, com fonte', () => {
+    render(<MesaDocumento ficha={mockFicha('NG_111')!} variante="compacta" />);
+    expect(screen.getByTestId('mesa-precisa')).toHaveTextContent('A regra mudou: antecedência de férias');
+    expect(screen.getByTestId('mesa-frase-documento')).toHaveTextContent('Trecho literal');
+    expect(screen.getByTestId('mesa-pergunta').getAttribute('placeholder')).toMatch(/^Pergunte a esta norma: /);
+  });
+
+  it('RF71/RF74: sem perfil, a regra que mudou de versão vem logo depois do prazo em até 30 dias', () => {
+    expect(mockTriagem({ limite: 5 }).itens.slice(0, 2).map((i) => i.codigo)).toEqual(['CTR_2026-012', 'NG_111']);
   });
 });
