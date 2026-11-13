@@ -58,7 +58,6 @@ export const TITULOS: Record<Tela, string> = {
   catalogo: 'Documentos',
   documento: 'Documento',
   ficha: 'Ficha do documento',
-  apresentar: 'Apresentar documento',
   atencao: 'Fila de atenção',
   comparar: 'Comparar versões',
   grafo: 'Ligações entre documentos',
@@ -69,7 +68,7 @@ export const TITULOS: Record<Tela, string> = {
   'nao-encontrada': 'Página não encontrada'
 };
 
-const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar', lote: 'enviar', ficha: 'catalogo', documento: 'catalogo', apresentar: 'catalogo' };
+const MAPA_ATIVO: Partial<Record<Tela, Tela>> = { revisar: 'enviar', lote: 'enviar', ficha: 'catalogo', documento: 'catalogo' };
 
 interface SidebarProps {
   telaAtiva: Tela;

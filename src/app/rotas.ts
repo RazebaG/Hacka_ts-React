@@ -14,7 +14,6 @@ export type Tela =
   | 'catalogo'
   | 'documento'
   | 'ficha'
-  | 'apresentar'
   | 'atencao'
   | 'comparar'
   | 'grafo'
@@ -39,7 +38,6 @@ const ROTAS: [RegExp, Tela, string[]][] = [
   [/^\/e-se\/?$/, 'ese', []],
   [/^\/catalogo\/?$/, 'catalogo', []],
   [/^\/documento\/([^/]+)\/ficha\/?$/, 'ficha', ['codigo']],
-  [/^\/documento\/([^/]+)\/apresentar\/?$/, 'apresentar', ['codigo']],
   [/^\/atencao\/?$/, 'atencao', []],
   [/^\/documento\/([^/]+)\/?$/, 'documento', ['codigo']],
   [/^\/comparar\/?$/, 'comparar', []],
@@ -117,16 +115,6 @@ export const url = {
     if (bloco) qs.set('bloco', bloco);
     const t = qs.toString();
     return `/documento/${encodeURIComponent(codigo)}/ficha${t ? '?' + t : ''}`;
-  },
-  /** `de` e `bloco`: "Sair" volta à Mesa (Início) ou à Ficha no bloco que estava escolhido (MODO-APRESENTACAO §2). */
-  apresentar: (codigo: string, versao?: string, cartao?: number, origem: { de?: 'inicio' | 'ficha'; bloco?: string | null } = {}) => {
-    const qs = new URLSearchParams();
-    if (versao) qs.set('versao', versao);
-    if (cartao) qs.set('cartao', String(cartao));
-    if (origem.de) qs.set('de', origem.de);
-    if (origem.bloco) qs.set('bloco', origem.bloco);
-    const t = qs.toString();
-    return `/documento/${encodeURIComponent(codigo)}/apresentar${t ? '?' + t : ''}`;
   },
   atencao: (filtros: { tema?: string; tipo?: string; situacao?: string; sinal?: string; ordenar?: string } = {}) => {
     const qs = new URLSearchParams(Object.entries(filtros).filter(([, v]) => v) as [string, string][]).toString();

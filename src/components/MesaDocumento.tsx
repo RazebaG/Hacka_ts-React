@@ -4,7 +4,8 @@ import { navegar, url } from '../app/rotas';
 import { MOCK_DOCUMENTOS } from '../mocks/documentos';
 import { Icon } from '../ui/Icon';
 import { SemaforoSituacao } from './FichaPecas';
-import { TOTAL_CARTOES, fraseExtrativa, montarCartoes, podeApresentar } from '../ficha/cartoes';
+import { PopupSecao } from './PopupSecao';
+import { fraseExtrativa } from '../ficha/frase';
 
 /**
  * Mesa de decisão (FLUXO-DE-TELAS-FICHA §0, RF71–RF76): o documento "desmiuçado" para decidir.
@@ -56,7 +57,7 @@ const Bloco: React.FC<{
   >
     <span className="mesa-bloco-topo">
       <span className="mesa-bloco-titulo">{b.titulo}</span>
-      <span className={`mesa-bloco-relevancia tom-${TOM[b.sinal]}`}>
+      <span className={`mesa-bloco-relevancia tom-${TOM[b.sinal]}`} title={`${b.relevancia.posicao}º · ${b.relevancia.motivo}`}>
         {b.relevancia.posicao}º · {b.relevancia.motivo}
       </span>
     </span>
@@ -82,52 +83,20 @@ const FonteDaFrase: React.FC<{ origem: keyof typeof ORIGEM_TEXTO; fontes: { codi
   </span>
 );
 
-/** Mínimo para existir apresentação: capa, frase e "De onde vem" (MODO-APRESENTACAO §3). */
-export const SEM_RESUMO = 'Este documento ainda não tem resumo pronto.';
-
-/**
- * "Apresentar em 5 min" (Mesa e Ficha). Sem IA, a apresentação usa a frase copiada do documento;
- * só fica desativado quando não há nem isso. Gerando: "Preparando (n de 8)" (MODO-APRESENTACAO §5.4).
- */
-export const BotaoApresentar: React.FC<{ ficha: FichaDocumento; de: 'inicio' | 'ficha'; bloco?: string | null; className?: string; testId: string; tamanho?: number }> = ({
-  ficha,
-  de,
-  bloco,
-  className = 'btn btn-outline btn-sm',
-  testId,
-  tamanho = 15
-}) => {
-  const pronto = podeApresentar(ficha);
-  const gerando = ficha.estado === 'gerando' || ficha.estado === 'parcial';
-  const rotulo = gerando ? `Preparando (${pronto ? montarCartoes(ficha).length : 0} de ${TOTAL_CARTOES})` : 'Apresentar em 5 min';
-  const destino = url.apresentar(ficha.codigo, ficha.versao, undefined, { de, bloco });
-  if (!pronto)
-    return (
-      <span className="mesa-apresentar-off">
-        <button type="button" className={className} disabled aria-describedby={`${testId}-motivo`} data-testid={testId}>
-          <Icon nome="apresentacao" tamanho={tamanho} /> {rotulo}
-        </button>
-        <span id={`${testId}-motivo`} className="fg-sub">
-          {SEM_RESUMO}
-        </span>
-      </span>
-    );
-  return (
-    <a className={className} href={destino} onClick={ir(destino)} data-testid={testId} aria-keyshortcuts={de === 'ficha' ? 'P' : undefined}>
-      <Icon nome="apresentacao" tamanho={tamanho} /> {rotulo}
-    </a>
-  );
-};
-
 export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compacta' | 'completa' }> = ({ ficha, variante }) => {
   const blocos = ficha.blocos ?? [];
-  // ?bloco= (volta da apresentação) reabre o bloco que estava escolhido
+  // ?bloco= reabre o bloco que estava escolhido
   const [ativoId, setAtivoId] = useState<string | null>(() => {
     const b = new URLSearchParams(window.location.search).get('bloco');
     return b && blocos.some((x) => x.id === b) ? b : null;
   });
   const chaveDoc = useRef(`${ficha.codigo}@${ficha.versao}`);
   const [secaoFoco, setSecaoFoco] = useState<string | null>(null);
+  // Pop-up de resumo da seção: abre ao clicar numa célula do mapa (?secao= abre direto, link compartilhável)
+  const [secaoAberta, setSecaoAberta] = useState<string | null>(() => {
+    const s = new URLSearchParams(window.location.search).get('secao');
+    return s && ficha.mapa_calor.some((c) => c.secao_id === s) ? s : null;
+  });
   const [pergunta, setPergunta] = useState('');
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const ativo = blocos.find((b) => b.id === ativoId) ?? null;
@@ -143,15 +112,25 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
     chaveDoc.current = chave;
     setAtivoId(null);
     setSecaoFoco(null);
+    setSecaoAberta(null);
   }, [ficha.codigo, ficha.versao]);
+
+  // Mantém ?secao= na URL enquanto o pop-up está aberto (sem criar entrada no histórico)
+  useEffect(() => {
+    const u = new URL(window.location.href);
+    if (secaoAberta) u.searchParams.set('secao', secaoAberta);
+    else if (u.searchParams.has('secao')) u.searchParams.delete('secao');
+    else return;
+    window.history.replaceState(null, '', u.pathname + u.search + u.hash);
+  }, [secaoAberta]);
 
   // Esc fecha o detalhe (RF76, teclado)
   useEffect(() => {
-    if (!ativoId) return;
+    if (!ativoId || secaoAberta) return;
     const esc = (e: KeyboardEvent) => e.key === 'Escape' && setAtivoId(null);
     window.addEventListener('keydown', esc);
     return () => window.removeEventListener('keydown', esc);
-  }, [ativoId]);
+  }, [ativoId, secaoAberta]);
 
   const tecla = (i: number) => (e: React.KeyboardEvent) => {
     const alvo = ['ArrowRight', 'ArrowDown'].includes(e.key) ? i + 1 : ['ArrowLeft', 'ArrowUp'].includes(e.key) ? i - 1 : -1;
@@ -316,7 +295,7 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
               ? `${secaoFoco}: ${blocos.filter((b) => b.secoes_mapa.includes(secaoFoco)).map((b) => b.titulo).join(' · ') || 'nenhum bloco usa esta seção'}`
               : ativo
               ? `${destacadas} ${destacadas === 1 ? 'seção destacada' : 'seções destacadas'}`
-              : 'Escolha um bloco'}
+              : 'Escolha um bloco ou clique numa seção'}
           </span>
         </div>
         <div className="mapa-faixa mesa-faixa" role="list" aria-label="Seções do documento, da primeira à última">
@@ -331,12 +310,12 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
                 className={`mesa-celula ${acesa ? `acesa tom-${TOM[ativo!.sinal]}` : ''}`}
                 style={variante === 'completa' ? { flexGrow: Math.max(c.peso, 0.01) * 100 } : undefined}
                 title={`${c.secao_id} · ${c.titulo}`}
-                aria-label={`${c.secao_id}, ${c.titulo}${acesa ? ' (usada no bloco escolhido)' : ''}. Abrir a seção.`}
+                aria-label={`${c.secao_id}, ${c.titulo}${acesa ? ' (usada no bloco escolhido)' : ''}. Abrir o resumo da seção.`}
                 onMouseEnter={() => setSecaoFoco(c.secao_id)}
                 onMouseLeave={() => setSecaoFoco(null)}
                 onFocus={() => setSecaoFoco(c.secao_id)}
                 onBlur={() => setSecaoFoco(null)}
-                onClick={() => navegar(url.documento(ficha.codigo, ficha.versao, c.secao_id))}
+                onClick={() => setSecaoAberta(c.secao_id)}
               />
             );
           })}
@@ -347,9 +326,9 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
             <ol>
               {celulas.map((c) => (
                 <li key={c.secao_id}>
-                  <a className="fg-link" href={url.documento(ficha.codigo, ficha.versao, c.secao_id)} onClick={ir(url.documento(ficha.codigo, ficha.versao, c.secao_id))}>
+                  <button type="button" className="fg-link" onClick={() => setSecaoAberta(c.secao_id)}>
                     {c.secao_id} · {c.titulo}
-                  </a>
+                  </button>
                   {blocos.some((b) => b.secoes_mapa.includes(c.secao_id)) && (
                     <span className="fg-sub"> ({blocos.filter((b) => b.secoes_mapa.includes(c.secao_id)).map((b) => b.titulo).join(', ')})</span>
                   )}
@@ -469,8 +448,15 @@ export const MesaDocumento: React.FC<{ ficha: FichaDocumento; variante: 'compact
           </label>
           <input id={`mesa-pergunta-${variante}`} type="search" placeholder={placeholder} value={pergunta} onChange={(e) => setPergunta(e.target.value)} data-testid="mesa-pergunta" />
         </form>
-        <BotaoApresentar ficha={ficha} de={variante === 'compacta' ? 'inicio' : 'ficha'} bloco={ativoId} testId="mesa-apresentar" />
       </div>
+      {secaoAberta && (
+        <PopupSecao
+          ficha={ficha}
+          secaoId={secaoAberta}
+          onFechar={() => setSecaoAberta(null)}
+          onAbrir={(id) => setSecaoAberta(id)}
+        />
+      )}
     </section>
   );
 };

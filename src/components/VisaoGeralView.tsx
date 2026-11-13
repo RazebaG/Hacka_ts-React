@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { FichaDocumento, RadarItem, TriagemResposta } from '../api/types';
-import { fetchFicha, fetchRadar, fetchTriagem } from '../api/client';
+import { FichaDocumento, TriagemResposta } from '../api/types';
+import { fetchFicha, fetchTriagem } from '../api/client';
 import { navegar, url } from '../app/rotas';
 import { useEstado } from '../app/store';
-import { CabecalhoTela, FonteLink, ProximaAcao } from '../ui/componentes';
-import { TEMAS } from '../mocks/v2';
+import { CabecalhoTela } from '../ui/componentes';
 import { Icon, NomeIcone } from '../ui/Icon';
-import { SUGESTOES_POR_PERFIL } from './perfis';
 import { MesaDocumento } from './MesaDocumento';
 import { PERFIS } from './perfis';
 
-/** T1 Início (layout do Figma): atalhos, pendências, resumo por área, prazo e dúvidas. */
-const CARTOES = [
-  { id: 'juridico', nome: 'Jurídico', rotulo: 'Coworking vigente até', valor: '29/04/2027', fonte: { codigo: 'CTR_2026-012', versao: '1.0.0', secao: 'Cláusula Primeira' } },
-  { id: 'financeiro', nome: 'Financeiro', rotulo: 'Valor global coworking', valor: 'R$18.250,00', fonte: { codigo: 'CTR_2026-012', versao: '1.0.0', secao: 'Cláusula Sétima' } },
-  { id: 'pessoas', nome: 'Pessoas', rotulo: 'Prazo para solicitar férias', valor: '45 dias', fonte: { codigo: 'NG_111', versao: '3.0.0', secao: '4.3' } },
-  { id: 'gestao', nome: 'Gestão', rotulo: 'Orçamento Ideias em Campo', valor: 'R$96.000,00', fonte: { codigo: 'NT_2026-021', versao: '1.0.0', secao: '2' } }
-];
-
+/**
+ * T1 Início (decisão da equipe, 13/11): só o topo, os 4 atalhos, a lista de documentos que pedem atenção
+ * e a Mesa de decisão. O radar, o resumo por área, os assuntos, o próximo prazo e as dúvidas frequentes
+ * saíram do conteúdo da tela inicial (o menu lateral não muda; essas telas continuam pelo menu).
+ */
 const ATALHOS: { titulo: string; descricao: string; icone: NomeIcone; destino: string }[] = [
   { titulo: 'Tirar Dúvida', descricao: 'Consulta inteligente', icone: 'perguntar', destino: url.perguntar() },
   { titulo: 'Regras que Mudaram', descricao: 'Comparação de vigências', icone: 'regras', destino: url.radar() },
@@ -31,27 +26,12 @@ const ir = (destino: string) => (e: React.MouseEvent) => {
 };
 
 export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelecionado }) => {
-  const [radar, setRadar] = useState<RadarItem[] | null>(null);
-  const [erro, setErro] = useState(false);
   const perfil = useEstado((e) => e.perfil);
-  const avaliacoes = useEstado((e) => e.avaliacoes);
   const [fila, setFila] = useState<TriagemResposta | null>(null);
 
   const [fichaMesa, setFichaMesa] = useState<FichaDocumento | null>(null);
   const [erroMesa, setErroMesa] = useState(false);
   const [tentativa, setTentativa] = useState(0);
-
-  const [prazos, setPrazos] = useState<TriagemResposta | null>(null);
-  const [erroPrazo, setErroPrazo] = useState(false);
-
-  useEffect(() => {
-    fetchRadar().then(setRadar).catch(() => setErro(true));
-    // RF08/RF31: o próximo prazo é calculado pela data de referência, entre todos os documentos em vigor
-    fetchTriagem({ limite: 20 }).then(setPrazos).catch(() => setErroPrazo(true));
-  }, []);
-  const proximo = (prazos?.itens ?? [])
-    .filter((i) => i.proximo_prazo)
-    .sort((a, b) => a.proximo_prazo!.data.localeCompare(b.proximo_prazo!.data))[0];
 
   // RF71: lista curta (até 5) ordenada por urgência e pelo perfil escolhido
   useEffect(() => {
@@ -71,10 +51,6 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
       vivo = false;
     };
   }, [escolhido, perfil, tentativa]);
-
-  const sugestoes = (SUGESTOES_POR_PERFIL[perfil ?? 'diretoria'] ?? SUGESTOES_POR_PERFIL.diretoria).slice(0, 2);
-  const nRegras = radar?.filter((i) => i.tipo !== 'referencia_ausente').length ?? 0;
-  const nAusentes = radar?.filter((i) => i.tipo === 'referencia_ausente').length ?? 0;
 
   return (
     <div className="view-container visao-geral" data-testid="visao-geral">
@@ -144,168 +120,6 @@ export const VisaoGeralView: React.FC<{ docSelecionado?: string }> = ({ docSelec
           </>
         )}
       </section>
-
-      {erro ? (
-        <div className="alerta alerta-erro" role="alert">
-          Não conseguimos carregar as pendências agora. Tente de novo em alguns segundos.
-        </div>
-      ) : !radar ? (
-        <div className="loading-state" aria-busy="true">
-          <div className="spinner"></div>
-          <p>Buscando nos documentos…</p>
-        </div>
-      ) : radar.length === 0 ? (
-        <div className="fg-card">Nenhuma pendência nos documentos em vigor.</div>
-      ) : (
-        <section className="fg-faixa-alerta" aria-labelledby="t-radar">
-          <span className="fg-icone" aria-hidden="true">
-            <Icon nome="alerta" tamanho={20} />
-          </span>
-          <span className="fg-etiqueta-atencao">Atenção</span>
-          <strong id="t-radar">{radar.length} pontos requerem análise</strong>
-          <span className="fg-sub">
-            {nRegras} {nRegras === 1 ? 'regra alterada' : 'regras alteradas'} e {nAusentes} {nAusentes === 1 ? 'documento pendente' : 'documentos pendentes'} de arquivo
-          </span>
-          <a className="btn btn-primary btn-sm" href={url.radar()} onClick={ir(url.radar())}>
-            Ver pendências <span aria-hidden="true">→</span>
-          </a>
-        </section>
-      )}
-
-
-      <div className="fg-secao-titulo">
-        <div>
-          <h2>Resumo normativo por área</h2>
-          <p className="fg-sub">Indicadores principais em vigor e referências documentais.</p>
-        </div>
-        <a className="fg-link" href={url.painel()} onClick={ir(url.painel())}>
-          Ver todas as áreas <Icon nome="seta" tamanho={14} />
-        </a>
-      </div>
-
-      <div className="fg-grid-4">
-        {CARTOES.map((c) => (
-          <article key={c.id} className="fg-card fg-area">
-            <div className="fg-area-topo">
-              <p className="fg-rotulo">{c.nome}</p>
-              <span className="fg-ponto" aria-hidden="true" />
-            </div>
-            <p className="fg-area-rotulo">{c.rotulo}</p>
-            <p className="fg-valor">
-              <a href={url.painel(c.id)} onClick={ir(url.painel(c.id))} className="fg-valor-link" aria-label={`${c.valor}: ver resumo de ${c.nome}`}>
-                {c.valor}
-              </a>
-            </p>
-            <div className="fg-area-fonte">
-              <FonteLink fonte={c.fonte} />
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {radar && (
-        <section className="fg-assuntos" aria-labelledby="t-assuntos" data-testid="inicio-assuntos">
-          <h2 id="t-assuntos" className="fg-rotulo">
-            Por assunto
-          </h2>
-          <div className="fg-grid-3">
-            {Object.entries(TEMAS).map(([id, nome]) => {
-              const n = radar.filter((i) => i.tema.includes(id)).length;
-              return (
-                <article key={id} className="fg-card fg-assunto" data-testid={`assunto-${id}`}>
-                  <p className="fg-assunto-nome">
-                    <strong>{nome}</strong> · {n} {n === 1 ? 'ponto' : 'pontos'} no radar
-                  </p>
-                  <div className="fg-assunto-links">
-                    <a className="fg-link" href={url.radar({ tema: id })} onClick={ir(url.radar({ tema: id }))}>
-                      Ver avisos <Icon nome="seta" tamanho={13} />
-                    </a>
-                    <a className="fg-link" href={url.painel(undefined, { tema: id })} onClick={ir(url.painel(undefined, { tema: id }))}>
-                      Resumo <Icon nome="seta" tamanho={13} />
-                    </a>
-                    <a className="fg-link" href={url.catalogo(id)} onClick={ir(url.catalogo(id))}>
-                      Documentos <Icon nome="seta" tamanho={13} />
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      <div className="fg-grid-2 fg-inicio-baixo">
-        <section className="fg-card">
-          <div className="fg-cabeca-card">
-            <h2>
-              <Icon nome="calendario" tamanho={18} /> Próximo Prazo Relevante
-            </h2>
-            <span className="fg-pilula neutra">Cronograma</span>
-          </div>
-          {proximo?.proximo_prazo ? (
-            (() => {
-              const p = proximo.proximo_prazo;
-              const fonte = p.fonte ?? { codigo: proximo.codigo, versao: proximo.versao, secao: '' };
-              const destino = p.fonte ? url.documento(fonte.codigo, fonte.versao, fonte.secao || undefined) : url.ficha(proximo.codigo, proximo.versao);
-              return (
-                <>
-                  <p className="fg-valor" data-testid="inicio-proximo-prazo">
-                    {p.data.split('-').reverse().join('/')}
-                  </p>
-                  <p className="fg-texto">
-                    {p.evento} · {proximo.titulo}
-                  </p>
-                  <div className="fg-rodape-card">
-                    <FonteLink fonte={fonte} comSecao={!!p.fonte} />
-                    <a className="fg-link" href={destino} onClick={ir(destino)}>
-                      Ver detalhes <Icon nome="seta" tamanho={14} />
-                    </a>
-                  </div>
-                </>
-              );
-            })()
-          ) : erroPrazo ? (
-            <p className="fg-texto">Não conseguimos calcular o próximo prazo agora.</p>
-          ) : !prazos ? (
-            <p className="fg-texto" aria-busy="true">Calculando o próximo prazo…</p>
-          ) : (
-            <p className="fg-texto">Nenhum prazo futuro nos documentos em vigor.</p>
-          )}
-        </section>
-
-        <section className="fg-card">
-          <div className="fg-cabeca-card">
-            <h2>
-              <Icon nome="duvida" tamanho={18} /> Dúvidas Frequentes
-            </h2>
-            <span className="fg-sub" data-testid="resumo-avaliacoes">
-              Respostas avaliadas: <strong>{avaliacoes.length}</strong> · úteis: <strong>{avaliacoes.filter((a) => a.util).length}</strong>
-            </span>
-          </div>
-          <ul className="fg-lista">
-            {sugestoes.map((s) => (
-              <li key={s}>
-                <a className="fg-lista-item" href={url.perguntar(s)} onClick={ir(url.perguntar(s))}>
-                  {s}
-                  <Icon nome="seta" tamanho={14} />
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="fg-rodape-card">
-            <span className="fg-sub">Outra pergunta?</span>
-            <a className="fg-link" href={url.perguntar()} onClick={ir(url.perguntar())}>
-              Consultar assistente <span aria-hidden="true">→</span>
-            </a>
-          </div>
-        </section>
-      </div>
-
-      <ProximaAcao texto={radar && radar.length ? `Comece pelas ${radar.length} pendências do radar: veja o que mudou e decida o que encaminhar.` : 'Tire uma dúvida ou procure um documento.'}>
-        <a className="btn btn-primary btn-sm" href={url.radar()} onClick={ir(url.radar())}>
-          Ver pendências
-        </a>
-      </ProximaAcao>
     </div>
   );
 };

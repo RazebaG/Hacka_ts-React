@@ -1,12 +1,10 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, afterEach } from 'vitest';
-import { ApresentacaoView, montarCartoes } from '../components/ApresentacaoView';
 import { FilaAtencaoView } from '../components/FilaAtencaoView';
 import { FichaView } from '../components/FichaView';
 import { RadarView } from '../components/RadarView';
-import { mockFicha, mockTriagem } from '../mocks/ficha';
+import { mockTriagem } from '../mocks/ficha';
 import { acoes } from '../app/store';
-import { lerRota } from '../app/rotas';
 
 // O ambiente de teste não tem localStorage: um armazenamento em memória basta
 const memoria = new Map<string, string>();
@@ -25,38 +23,6 @@ if (!globalThis.localStorage) {
 afterEach(() => {
   acoes.definirPerfil(null);
   localStorage.clear();
-});
-
-describe('T16 · Modo apresentação (RF58)', () => {
-  it('monta até 8 cartões da ficha: capa primeiro, fontes por último, "hoje" na linha do tempo', () => {
-    const cartoes = montarCartoes(mockFicha('CTR_2026-012')!);
-    expect(cartoes.length).toBeLessThanOrEqual(8);
-    expect(cartoes[0].tipo).toBe('capa');
-    expect(cartoes[cartoes.length - 1].tipo).toBe('fontes');
-    const prazos = cartoes.find((c) => c.tipo === 'prazos')!;
-    expect(prazos.linhas.some((l) => l.hoje)).toBe(true);
-    expect(cartoes.reduce((t, c) => t + c.tempo_s, 0)).toBeLessThanOrEqual(300);
-  });
-
-  it('navega por botão e teclado, mostra "n de N" e o cronômetro de 5:00', async () => {
-    expect(lerRota({ pathname: '/documento/CTR_2026-012/apresentar', search: '', hash: '' }).tela).toBe('apresentar');
-    render(<ApresentacaoView codigo="CTR_2026-012" />);
-    const indicador = await screen.findByTestId('apresentacao-indicador');
-    expect(indicador).toHaveTextContent(/^1 de \d$/);
-    fireEvent.click(screen.getByTestId('apresentacao-proximo'));
-    expect(indicador).toHaveTextContent(/^2 de/);
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(indicador).toHaveTextContent(/^1 de/);
-    fireEvent.click(screen.getByText('Cronômetro 5:00'));
-    expect(screen.getByTestId('apresentacao-relogio')).toHaveTextContent('5:00');
-  });
-
-  it('a fonte de um cartão abre o trecho sem sair da apresentação', async () => {
-    render(<ApresentacaoView codigo="CTR_2026-012" cartaoInicial={2} />);
-    const cartao = await screen.findByTestId('apresentacao-cartao');
-    fireEvent.click(within(cartao).getAllByRole('button', { name: /Ver o trecho/ })[0]);
-    expect(screen.getByTestId('apresentacao-fonte')).toHaveTextContent('CTR_2026-012');
-  });
 });
 
 describe('T17 · Fila de atenção (RF69/RF70)', () => {

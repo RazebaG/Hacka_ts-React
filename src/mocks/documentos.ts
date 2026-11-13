@@ -1,4 +1,5 @@
 import { DocumentoDetalhe, DocumentoResumo } from '../api/types';
+import secoesReais from './secoes-reais.json';
 
 export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
   {
@@ -392,6 +393,16 @@ export const MOCK_DOCUMENTOS: DocumentoDetalhe[] = [
     ]
   }
 ];
+
+/**
+ * O contrato do acervo tem 43 seções; o mock abreviado tinha só 5. As 43 vêm do acervo real do backend
+ * (data/acervo/locacao/CTR_2026-012), para o mapa de calor e o pop-up da seção terem o texto de verdade.
+ */
+const REAIS = secoesReais as Record<string, { versao: string; secoes: { id: string; titulo: string; texto: string }[] }>;
+for (const d of MOCK_DOCUMENTOS) {
+  const r = REAIS[d.codigo];
+  if (r && r.versao === d.versao) d.secoes = r.secoes;
+}
 
 export function getDocumentoByCodigo(codigo: string, versao?: string): DocumentoDetalhe | undefined {
   if (versao) {

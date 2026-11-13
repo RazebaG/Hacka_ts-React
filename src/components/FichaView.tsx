@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AcaoFicha, CampoGov, FichaDocumento, ItemFicha } from '../api/types';
 import { SeloOrigem } from './FichaPecas';
-import { BotaoApresentar, MesaDocumento } from './MesaDocumento';
-import { podeApresentar } from '../ficha/cartoes';
+import { MesaDocumento } from './MesaDocumento';
 import { fetchFicha, isMockMode } from '../api/client';
 import { acoes as acoesEstado, useEstado } from '../app/store';
 import { PERFIS } from './perfis';
@@ -177,16 +176,13 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
 
   const versoes = MOCK_DOCUMENTOS.filter((d) => d.codigo === codigo);
 
-  // Atalhos da Ficha (FICHA §2.6): P apresenta, ? pergunta só neste documento
+  // Atalho da Ficha: ? pergunta só neste documento
   useEffect(() => {
     if (!ficha) return;
     const tecla = (e: KeyboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (e.ctrlKey || e.metaKey || e.altKey || (t && (['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName) || t.isContentEditable))) return;
-      if ((e.key === 'p' || e.key === 'P') && podeApresentar(ficha)) {
-        e.preventDefault();
-        navegar(url.apresentar(ficha.codigo, ficha.versao, undefined, { de: 'ficha' }));
-      } else if (e.key === '?') {
+      if (e.key === '?') {
         e.preventDefault();
         navegar(url.perguntar(undefined, [ficha.codigo]));
       }
@@ -530,7 +526,6 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
             >
               <Icon nome="documento" tamanho={16} /> Ler o texto completo
             </a>
-            <BotaoApresentar ficha={ficha} de="ficha" className="btn btn-outline btn-sm fg-largo" testId="ficha-apresentar" tamanho={16} />
             <button type="button" className="btn btn-outline btn-sm fg-largo" onClick={() => window.print()}>
               <Icon nome="baixar" tamanho={16} /> Exportar (PDF)
             </button>
@@ -550,7 +545,6 @@ export const FichaView: React.FC<{ codigo: string; versao?: string }> = ({ codig
         >
           <Icon nome="perguntar" tamanho={15} /> Perguntar
         </a>
-        <BotaoApresentar ficha={ficha} de="ficha" testId="ficha-apresentar-celular" />
       </nav>
     </div>
   );
