@@ -6,16 +6,28 @@ import popupTsx from '../components/PopupSecao.tsx?raw';
 import mesaTsx from '../components/MesaDocumento.tsx?raw';
 import resumoTs from '../ficha/resumoSecao.ts?raw';
 
+const partesMesa = import.meta.glob<string>('../components/mesa/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true });
+
 /**
  * Regras do GUIA-IMPLEMENTACAO-FRONTEND-v1 §2: só os tokens do projeto, nada de cor literal nem token copiado
  * de protótipo (prefixo mk), e nada de comparação com código de documento fora dos mocks.
  */
-const arquivos: Record<string, string> = { 'ui/mesa.css': mesaCss, 'components/PopupSecao.tsx': popupTsx, 'components/MesaDocumento.tsx': mesaTsx, 'ficha/resumoSecao.ts': resumoTs };
+const arquivos: Record<string, string> = {
+  'ui/mesa.css': mesaCss,
+  'components/PopupSecao.tsx': popupTsx,
+  'components/MesaDocumento.tsx': mesaTsx,
+  'ficha/resumoSecao.ts': resumoTs,
+  ...Object.fromEntries(Object.entries(partesMesa).map(([k, v]) => [k.replace('../', ''), v]))
+};
 const semComentarios = (t: string) => t.replace(/\/\*[\s\S]*?\*\//g, '');
 const PREFIXO_PROTOTIPO = new RegExp('--' + 'mk-');
 const TOKENS_DEFINIDOS = new Set([...(indexCss + figmaCss).matchAll(/^\s*(--[a-z0-9-]+)\s*:/gm)].map((m) => m[1]));
 
 describe('Design system (pop-up da seção e Mesa)', () => {
+  it('as partes da Mesa entram na conferência', () => {
+    expect(Object.keys(partesMesa).length).toBeGreaterThanOrEqual(5);
+  });
+
   it('não usa token de protótipo nem cor literal', () => {
     for (const [nome, texto] of Object.entries(arquivos)) {
       expect(texto, nome).not.toMatch(PREFIXO_PROTOTIPO);
@@ -30,7 +42,7 @@ describe('Design system (pop-up da seção e Mesa)', () => {
   });
 
   it('o código de um documento nunca é comparado fora dos mocks', () => {
-    for (const nome of ['components/PopupSecao.tsx', 'components/MesaDocumento.tsx', 'ficha/resumoSecao.ts']) {
+    for (const nome of Object.keys(arquivos).filter((n) => !n.endsWith('.css'))) {
       expect(arquivos[nome], nome).not.toMatch(/===?\s*'(CTR|NG|PX|NT|RG)_/);
     }
   });

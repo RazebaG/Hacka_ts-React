@@ -40,6 +40,10 @@ export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir 
     };
   }, [ficha.codigo, ficha.versao]);
 
+  // Seção aberta por último: se quem abriu o pop-up sumiu (ex.: aberto por ?secao=), o foco volta à célula dela
+  const ultimaSecao = useRef(secaoId);
+  ultimaSecao.current = secaoId;
+
   // Trava a rolagem da página, leva o foco para dentro e devolve ao fechar
   useEffect(() => {
     const anterior = document.body.style.overflow;
@@ -48,15 +52,34 @@ export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir 
     const alvo = origem.current;
     return () => {
       document.body.style.overflow = anterior;
-      alvo?.focus?.();
+      const valido = alvo && alvo !== document.body && alvo.isConnected;
+      const celula = Array.from(document.querySelectorAll<HTMLElement>('[data-secao]')).find((el) => el.dataset.secao === ultimaSecao.current);
+      (valido ? alvo : celula)?.focus?.();
     };
   }, []);
 
   const resumo = useMemo(() => (doc ? montarResumoSecao(ficha, doc, secaoId) : null), [ficha, doc, secaoId]);
+  // Título da seção já ao abrir (vem do mapa de calor), para o leitor de tela anunciar o nome completo
+  const tituloSecao = resumo?.secao.titulo ?? ficha.mapa_calor.find((c) => c.secao_id === secaoId)?.titulo ?? '';
+  const nomeSecao = tituloSecao && tituloSecao !== secaoId ? `${secaoId} · ${tituloSecao}` : secaoId;
 
+  // Trocou de seção (Anterior/Próxima, "Ligada a"): volta ao topo. O diálogo continua aberto e o leitor de tela
+  // não relê o título, então o novo nome vai para uma região viva. Se o botão usado ficou desativado
+  // (primeira ou última seção), o foco não se perde: vai para o próprio pop-up.
+  const [anuncio, setAnuncio] = useState('');
+  const navegou = useRef(false);
+  const secaoAnterior = useRef(secaoId);
   useEffect(() => {
+    if (secaoAnterior.current === secaoId) return;
+    secaoAnterior.current = secaoId;
+    navegou.current = true;
     corpo.current?.scrollTo?.({ top: 0 });
+    const focado = document.activeElement as HTMLButtonElement | null;
+    if (!caixa.current?.contains(focado) || focado?.disabled) caixa.current?.focus();
   }, [secaoId]);
+  useEffect(() => {
+    if (navegou.current) setAnuncio(`Seção aberta: ${nomeSecao}`);
+  }, [nomeSecao]);
 
   // Teclado: Esc fecha, setas trocam de seção (fora de campos), Tab fica preso no pop-up
   useEffect(() => {
@@ -118,17 +141,20 @@ export const PopupSecao: React.FC<Props> = ({ ficha, secaoId, onFechar, onAbrir 
   // Portal no body: o pop-up fica acima de qualquer contexto de empilhamento da página (barra superior, menus)
   return createPortal(
     <div className="popup-fundo" onMouseDown={(e) => e.target === e.currentTarget && onFechar()} data-testid="popup-fundo">
-      <div ref={caixa} className="popup" role="dialog" aria-modal="true" aria-labelledby="popup-titulo" tabIndex={-1} data-testid="popup-secao">
+      <div ref={caixa} className="popup" role="dialog" aria-modal="true" aria-labelledby="popup-titulo" aria-describedby="popup-eyebrow" tabIndex={-1} data-testid="popup-secao">
         <header className="popup-cab">
           <div className="popup-cab-texto">
-            <p className="popup-eyebrow">
+            <p id="popup-eyebrow" className="popup-eyebrow">
               {ficha.codigo}
               {resumo ? ` · seção ${resumo.posicao} de ${resumo.total}` : ''}
             </p>
             <h2 id="popup-titulo" className="popup-titulo">
               {secaoId}
-              {resumo?.secao.titulo && resumo.secao.titulo !== secaoId && <span> · {resumo.secao.titulo}</span>}
+              {tituloSecao && tituloSecao !== secaoId && <span> · {tituloSecao}</span>}
             </h2>
+            <p className="sr-only" aria-live="polite" data-testid="popup-anuncio">
+              {anuncio}
+            </p>
           </div>
           <button type="button" className="popup-fechar" onClick={onFechar} aria-label="Fechar o resumo" data-testid="popup-fechar">
             <Icon nome="fechar" tamanho={16} />
