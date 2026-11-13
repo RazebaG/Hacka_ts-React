@@ -70,7 +70,9 @@ export function navegar(url: string, substituir = false) {
   if (substituir) window.history.replaceState(null, '', url);
   else window.history.pushState(null, '', url);
   notificar();
-  if (!url.includes('#')) window.scrollTo?.({ top: 0 });
+  // Trocar de tela começa no topo. Atualizar a própria tela (filtro, valor da simulação)
+  // usa `substituir` e mantém a pessoa onde ela está.
+  if (!substituir && !url.includes('#')) window.scrollTo?.({ top: 0 });
 }
 
 export function useRota(): Rota {

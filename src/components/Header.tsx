@@ -146,16 +146,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ telaAtiva, documentoAtivoCodig
   );
 };
 
-/** Roteiro da apresentação (6 passos, ≈ 2 min). */
-const CENAS: { rotulo: string; destino: string }[] = [
-  { rotulo: 'Enviar a foto de um documento', destino: url.enviar() },
-  { rotulo: 'Perguntar o que mudou nas férias', destino: url.perguntar('Qual a antecedência mínima para solicitar férias?') },
-  { rotulo: 'Ver a regra antiga e a nova lado a lado', destino: url.radar({ item: 'ferias-antecedencia' }) },
-  { rotulo: 'Resumo financeiro: R$ 18.250,00', destino: url.painel('financeiro') },
-  { rotulo: 'Simular: e se forem 30 dias?', destino: url.ese('ferias_antecedencia_dias', 30) },
-  { rotulo: 'Montar o relatório', destino: url.relatorio({ selecao: true }) }
-];
-
 const TAMANHOS: { id: TamanhoTexto; rotulo: string; descricao: string }[] = [
   { id: 'normal', rotulo: 'A', descricao: 'Texto normal' },
   { id: 'grande', rotulo: 'A+', descricao: 'Texto grande' },
@@ -231,30 +221,6 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
         >
           <Icon nome="relatorio" tamanho={16} /> Meu relatório <span className="selecao-n">{nSelecao}</span>
         </a>
-
-        <details className="demo-menu">
-          <summary aria-label="Roteiro da apresentação" title="Roteiro da apresentação">
-            <Icon nome="apresentacao" tamanho={16} />
-            <span className="demo-label">Apresentação</span>
-          </summary>
-          <ol className="demo-list" aria-label="Passos da apresentação">
-            {CENAS.map((c, i) => (
-              <li key={c.rotulo}>
-                <a
-                  href={c.destino}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navegar(c.destino);
-                    e.currentTarget.closest('details')?.removeAttribute('open');
-                  }}
-                >
-                  <span className="demo-n">{i + 1}</span>
-                  {c.rotulo}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </details>
 
         <span className="avatar-topo" role="img" aria-label="Seu perfil" title="Seu perfil">
           <Icon nome="usuario" tamanho={16} />

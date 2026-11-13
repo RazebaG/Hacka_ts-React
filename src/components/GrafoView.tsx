@@ -496,20 +496,20 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
               <div className="detalhe-no-metas">
                 <div className="meta-linha">
-                  <span className="meta-k">Versão:</span>
+                  <span className="meta-k">Versão</span>
                   <span className="meta-v">
-                    {noSelecionado.versao ? `v${noSelecionado.versao}` : 'Documento Externo'}
+                    {noSelecionado.versao ? `v${noSelecionado.versao}` : 'Sem texto no arquivo'}
                   </span>
                 </div>
                 <div className="meta-linha">
-                  <span className="meta-k">Situação:</span>
+                  <span className="meta-k">Situação</span>
                   <span className="meta-v">
                     {noSelecionado.substituido ? (
-                      <span className="badge-aviso-tag">Versão Substituída</span>
+                      <span className="fg-pilula aviso ponto">Versão antiga</span>
                     ) : noSelecionado.existe_no_acervo ? (
-                      <span className="badge-ok-tag">Versão Vigente</span>
+                      <span className="fg-pilula ok ponto">Vigente</span>
                     ) : (
-                      <span className="badge-externo-tag">Não Ingerido (NG_012/010)</span>
+                      <span className="fg-pilula perigo ponto">Fora do acervo</span>
                     )}
                   </span>
                 </div>
@@ -517,9 +517,9 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
               {/* Relações Conectadas */}
               <div className="detalhe-relacoes">
-                <h3 className="relacoes-subtitulo">Conexões no Grafo:</h3>
+                <h3 className="relacoes-subtitulo">Ligações deste documento</h3>
                 {conexoesNoSelecionado.arestas.length === 0 ? (
-                  <p className="text-muted">Sem conexões diretas registradas.</p>
+                  <p className="fg-sub">Sem ligações diretas registradas.</p>
                 ) : (
                   <ul className="relacoes-lista">
                     {conexoesNoSelecionado.arestas.map((a, i) => {
@@ -528,16 +528,17 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                       return (
                         <li key={i} className="relacao-item">
                           <span className="relacao-tipo-tag">
-                            {a.tipo === 'vinculado_a' && 'Vinculado a'}
-                            {a.tipo === 'referencia' && 'Cita / Referencia'}
-                            {a.tipo === 'substitui' && 'Substitui'}
+                            {a.tipo === 'vinculado_a' && (ehOrigem ? 'Segue' : 'É seguido por')}
+                            {a.tipo === 'referencia' && (ehOrigem ? 'Cita' : 'É citado por')}
+                            {a.tipo === 'substitui' && (ehOrigem ? 'Substitui' : 'Substituído por')}
                           </span>
                           <button
                             type="button"
-                            className="btn-link relacao-outro-link"
+                            className="fg-link relacao-outro-link"
                             onClick={() => setNoSelecionadoId(outroId)}
+                            aria-label={`Selecionar ${outroId.replace('@', ', versão ')} no mapa`}
                           >
-                            {outroId}
+                            {outroId.replace('@', ' v')}
                           </button>
                         </li>
                       );
@@ -558,8 +559,8 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                 </button>
               ) : (
                 <div className="alerta alerta-info mt-4">
-                  <strong>Documento Externo:</strong> Referenciado em notas e contratos, porém não
-                  fornecido no acervo fechado da ACME.
+                  <strong>Documento fora do acervo.</strong> Outros documentos citam esta norma, mas o texto dela não está no
+                  Arquivo Central da ACME.
                 </div>
               )}
             </div>

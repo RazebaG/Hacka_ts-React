@@ -2662,3 +2662,222 @@ h3,
   box-shadow: 0 0 0 3px var(--color-focus-ring, var(--fg-azul-suave));
   color: var(--fg-azul);
 }
+
+/* Menu lateral: nada pode empurrar o conteúdo para o lado */
+.app-sidebar {
+  overflow-x: clip;
+  padding: 0 0 var(--space-4);
+}
+.side-brand {
+  margin: 0;
+  padding: 0 var(--space-5);
+}
+.side-nav {
+  padding: 0 var(--space-3);
+}
+
+/* Campo da conversa: texto centralizado na altura e rótulo em uma linha */
+.fg-chat-input textarea {
+  padding: 0.55rem 0 !important;
+  line-height: 1.5;
+  min-height: 0;
+  align-self: center;
+}
+.fg-chat-input {
+  padding-right: 4px;
+}
+.fg-perfil-chat span {
+  white-space: nowrap;
+}
+.fg-chat-form-rodape .fg-sub {
+  min-width: 220px;
+}
+
+/* ---------- Pequenos erros encontrados na varredura ---------- */
+
+/* Caixas de seleção da tabela: área de toque de 24px (WCAG 2.5.8) */
+.col-marcar input {
+  width: 22px;
+  height: 22px;
+  margin: 1px;
+  cursor: pointer;
+}
+
+/* Citação nunca passa da largura do cartão; o código fica inteiro e quebra entre palavras */
+.fonte-chip,
+.fonte-chip-btn {
+  max-width: 100%;
+}
+.fonte-chip-btn .sem-quebra {
+  white-space: normal;
+  overflow-wrap: normal;
+}
+
+/* Faixa da folha do relatório quebra em duas linhas no celular, em vez de cortar */
+.fg-folha-faixa {
+  flex-wrap: wrap;
+  row-gap: 2px;
+}
+
+/* Logo "A": cresce junto com o texto (A++), sem cortar a letra */
+.side-logo {
+  width: 1.875em;
+  height: 1.875em;
+  font-size: 1rem;
+  line-height: 1;
+  flex: none;
+}
+
+/* Valores grandes do Início: diminuem conforme a largura do cartão, não saem dele */
+.fg-area {
+  container-type: inline-size;
+}
+.fg-area .fg-valor {
+  font-size: min(1.875rem, 15cqi);
+}
+
+/* Ligações: painel do documento selecionado no mesmo padrão dos cartões */
+.detalhe-no-metas {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+.meta-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+.meta-k {
+  color: var(--fg-cinza);
+}
+.relacoes-subtitulo {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-cinza);
+  margin: 0 0 var(--space-2);
+}
+.relacoes-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.relacao-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 10px;
+  background: #f4f7fc;
+  font-size: var(--text-sm);
+}
+.relacao-tipo-tag {
+  color: #334155;
+}
+.col-marcar input {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+}
+
+/* Meu relatório: no celular o "Retirar" desce para baixo e o texto usa a largura toda */
+.item-selecao {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+}
+.item-selecao-corpo {
+  min-width: 0;
+}
+@media (max-width: 560px) {
+  .item-selecao {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .item-selecao > .btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+/* Regras: as citações ficam numa linha própria quando falta espaço */
+.fg-antes-depois-fontes {
+  flex: 1 1 100%;
+}
+
+/* Folha do relatório: o selo desce de linha em vez de cortar */
+.fg-folha-cabeca {
+  flex-wrap: wrap;
+}
+.fg-folha-cabeca > div {
+  min-width: 0;
+}
+
+/* Citação: nunca menor que o próprio código */
+.fonte-chip-btn {
+  min-width: min(100%, max-content);
+}
+
+/* Citação completa: nome em cima, código embaixo, ícone à esquerda (as duas linhas) */
+.fonte-chip-btn {
+  display: inline-grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 6px;
+  row-gap: 1px;
+  align-items: center;
+}
+.fonte-chip-btn > svg {
+  grid-row: span 2;
+}
+.fonte-chip-btn .fonte-nome,
+.fonte-chip-btn .fonte-codigo {
+  grid-column: 2;
+  min-width: 0;
+}
+
+/* Ligações: o nome do documento ligado desce de linha inteiro em telas estreitas */
+.relacao-item {
+  flex-wrap: wrap;
+}
+.relacao-outro-link {
+  white-space: nowrap;
+}
+
+/* Folha "Meu relatório": margem de impressão só em tela larga */
+@media (max-width: 860px) {
+  .folha-relatorio-executivo {
+    padding: var(--space-4);
+  }
+}
+/* Linha do tempo do resumo por área: o texto usa a largura disponível */
+.timeline-item {
+  flex-wrap: wrap;
+}
+.timeline-conteudo {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+/* Avisos de texto corrido (rótulo em negrito + frase): bloco normal, não colunas.
+ * Só .aviso-faixa e as faixas com ícone usam a linha flex. */
+.alerta,
+.documento-alerta-substituido {
+  display: block;
+}
+.alerta strong {
+  margin-right: 0.25em;
+}
+.documento-alerta-substituido .btn {
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
