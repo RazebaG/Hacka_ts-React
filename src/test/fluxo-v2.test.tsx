@@ -19,16 +19,6 @@ describe('FLUXO-DE-TELAS-v2: lacunas corrigidas', () => {
     expect(within(screen.getByTestId('resultado-pergunta')).getByText('O que fazer agora')).toBeInTheDocument();
   });
 
-  it('T1: cartões por assunto abrem T4 e T3 filtrados, e a tela termina com a próxima ação', async () => {
-    render(<VisaoGeralView />);
-    const ferias = await screen.findByTestId('assunto-ferias');
-    expect(ferias).toHaveTextContent(/Férias.*pontos? no radar/);
-    const hrefs = within(ferias).getAllByRole('link').map((a) => a.getAttribute('href'));
-    expect(hrefs).toContain('/radar?tema=ferias');
-    expect(hrefs).toContain('/painel?tema=ferias');
-    expect(screen.getByText('O que fazer agora')).toBeInTheDocument();
-  });
-
   it('T0: pergunta rápida no topo', () => {
     render(<Topbar telaAtiva="inicio" />);
     expect(screen.getByTestId('pergunta-rapida')).toHaveAttribute('placeholder', 'Pergunte ao acervo…');

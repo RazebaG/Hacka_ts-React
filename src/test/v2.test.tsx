@@ -151,13 +151,6 @@ describe('Avaliação (#12) e seleção para o relatório (#13)', () => {
     fireEvent.click(screen.getByTestId('btn-enviar-avaliacao'));
     expect(await screen.findByTestId('avaliacao-ok')).toHaveTextContent('Obrigado. Sua avaliação ajuda a melhorar as respostas.');
   });
-  it('a Visão geral resume as avaliações', async () => {
-    acoes.registrarAvaliacao({ resposta_id: 'x', util: true, canal: 'web' });
-    acoes.registrarAvaliacao({ resposta_id: 'x', util: false, canal: 'slack' });
-    render(<VisaoGeralView />);
-    expect(screen.getByTestId('resumo-avaliacoes')).toHaveTextContent('Respostas avaliadas: 2 · úteis: 1');
-    expect(await screen.findByText('3 pontos requerem análise')).toBeInTheDocument();
-  });
   it('relatório da seleção: vazio, itens, reordenar e aviso de fonte que mudou', async () => {
     const { rerender } = render(<RelatorioSelecao />);
     expect(screen.getByTestId('selecao-vazia')).toBeInTheDocument();

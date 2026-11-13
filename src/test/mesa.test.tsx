@@ -102,11 +102,14 @@ describe('Mesa de decisão (RF71–RF76)', () => {
     expect(screen.queryByTestId('mesa-detalhe')).not.toBeInTheDocument();
   });
 
-  it('RF08/RF31: próximo prazo calculado pela data de referência, citando o cronograma (Apêndice C)', async () => {
+  it('Tela inicial enxuta: topo, atalhos, lista de atenção e Mesa; sem radar, resumo por área, assuntos, prazo e dúvidas', async () => {
     render(<VisaoGeralView />);
-    expect(await screen.findByTestId('inicio-proximo-prazo')).toHaveTextContent('25/11/2026');
-    expect(screen.getAllByText(/Apêndice C/).length).toBeGreaterThan(0);
+    expect(await screen.findByTestId('mesa')).toBeInTheDocument();
     expect(screen.getByTestId('inicio-atencao')).toHaveTextContent('Perfil: todos');
+    expect(screen.getByRole('navigation', { name: 'Atalhos' })).toBeInTheDocument();
+    for (const removido of [/Resumo normativo por área/, /Próximo Prazo Relevante/, /Dúvidas Frequentes/, /pontos requerem análise/, /Por assunto/, /Ver pendências/]) {
+      expect(screen.queryByText(removido)).not.toBeInTheDocument();
+    }
   });
 
   it('Protótipo 13/11: cabeçalho com siglas, 43 células no mapa, detalhe sempre à vista e pergunta pela família', () => {

@@ -176,7 +176,7 @@ export function App() {
         <main className="app-main" id="conteudo" tabIndex={-1}>
           {conteudo}
         </main>
-        <Rodape ia={saude?.ia} dataReferencia={dataBR(saude?.data_referencia)} />
+        {rota.tela !== 'inicio' && <Rodape ia={saude?.ia} dataReferencia={dataBR(saude?.data_referencia)} />}
       </div>
 
       <DecisaoModal />
