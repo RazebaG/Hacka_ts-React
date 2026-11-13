@@ -9,7 +9,6 @@ import { EnviarView, lote } from '../components/EnviarView';
 import { RevisarView } from '../components/RevisarView';
 import { DecisaoModal } from '../components/DecisaoModal';
 import { RelatorioSelecao } from '../components/RelatorioSelecao';
-import { VisaoGeralView } from '../components/VisaoGeralView';
 import { PerguntarView } from '../components/PerguntarView';
 import { DocumentoView } from '../components/DocumentoView';
 import { CompararView } from '../components/CompararView';

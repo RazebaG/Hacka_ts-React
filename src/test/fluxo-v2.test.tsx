@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { PerguntarView } from '../components/PerguntarView';
-import { VisaoGeralView } from '../components/VisaoGeralView';
 import { CatalogoView } from '../components/CatalogoView';
 import { EnviarView, lote } from '../components/EnviarView';
 import { Topbar } from '../components/Header';
