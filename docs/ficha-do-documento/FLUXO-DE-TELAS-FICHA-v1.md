@@ -33,7 +33,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 
 ## 2. T14 · Ficha do Documento (tela principal da funcionalidade)
 
-> Os números do wireframe (33 seções, ~10 páginas) são os do CTR_2026-012 real do acervo. Para o pitch, o mesmo layout deve ser mostrado com o documento sintético de ~100 páginas (issue F-08), onde o ganho de tempo é de ~50 min para ~4 min.
+> Os números do wireframe (43 seções, ~10 páginas) são os do CTR_2026-012 real do acervo. Para o pitch, o mesmo layout deve ser mostrado com o documento sintético de ~100 páginas (issue F-08), onde o ganho de tempo é de ~50 min para ~4 min.
 
 **Objetivo:** em 10 segundos a pessoa sabe do que se trata e se deve se preocupar; em 2 minutos sabe o que fazer; em 5 minutos consegue explicar o documento a outra pessoa.
 **Perfis:** todos (RF59 muda a ênfase). **Dados:** `GET /api/documentos/{codigo}/ficha` (C22).
@@ -56,7 +56,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 │ │ Elaborado por: GCO · Aprovado por: DIRAF · Assinada em: não consta · Classificação: interna │ │
 │ │ Vinculado a: — · Referências: NT_2026-018, NG_012 (ausente no acervo ⚠)                     │ │
 │ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
-│ ┌ MAPA DO DOCUMENTO (33 seções · ~10 págs) ─ [Tudo][Prazo][Valor][Obrigação][Risco] ───────┐ │
+│ ┌ MAPA DO DOCUMENTO (43 seções · ~10 págs) ─ [Tudo][Prazo][Valor][Obrigação][Risco] ───────┐ │
 │ │ ▓▓░░▓▓▓░░░░▓░░░▓▓░░░░░░▓░░▓▓▓▓░░░░░░░░░▓░░░░░░░░░░░░░░░░▓░░░░░                          │ │
 │ │  ↑ clique numa célula: abre a seção · passe o mouse: título + sinais                       │ │
 │ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
@@ -69,7 +69,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 │ Pontos-chave  [Obrigações][Prazos][Valores][Riscos]…   │  › Quem paga o IPTU?                 │
 │  (cartões com selo de origem, fonte e "Incluir no      │ [Perguntar sobre este documento]     │
 │   relatório")                                          │ [Apresentar em 5 min] [Exportar]     │
-│ Cobertura: 33/33 seções · 31 itens verificados ·       │ Ler o texto completo (T8)            │
+│ Cobertura: 43/43 seções · 31 itens verificados ·       │ Ler o texto completo (T8)            │
 │ 0 descartados · modo: IA (Nova Pro)                    │                                      │
 └────────────────────────────────────────────────────────┴──────────────────────────────────────┘
 ```
@@ -85,7 +85,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 | **O que isso exige de mim** | ações: verbo + quem + prazo + consequência + fonte + selo de origem | Expandir mostra o trecho literal; "Incluir no relatório" | vazio: "Este documento não cria ações para você" |
 | **Pontos-chave** | abas por tema; cartões com valor, fonte, selo | Igual aos cartões do T3 (reaproveitar) | |
 | **Alertas** | itens do Radar sobre este documento; conflitos | Clique abre T4 filtrado (`?codigo=`) | |
-| **Cobertura** | "33/33 seções · 31 verificados · 0 descartados · modo IA/extrativo" | Descartados > 0: link "ver por que" (lista, sem texto do documento) | modo extrativo: aviso "IA indisponível; mostrando só o que se extrai por regra" |
+| **Cobertura** | "43/43 seções · 31 verificados · 0 descartados · modo IA/extrativo" | Descartados > 0: link "ver por que" (lista, sem texto do documento) | modo extrativo: aviso "IA indisponível; mostrando só o que se extrai por regra" |
 | **Ações laterais** | Perguntar sobre este documento (fixa escopo), Apresentar, Exportar, Ler texto completo | | |
 
 ### 2.3 Selo de origem (componente novo `SeloOrigem`)
@@ -102,7 +102,7 @@ Regra de microcopy: nunca "a IA garante". Usar "com fonte" / "resumo da IA, conf
 
 | Estado | O que aparece |
 |---|---|
-| `gerando` | Relance e governança já visíveis (extrativo); demais blocos em esqueleto com progresso por etapa: "Lendo seções 12/33", "Procurando prazos e valores", "Escrevendo o resumo", "Conferindo as fontes" |
+| `gerando` | Relance e governança já visíveis (extrativo); demais blocos em esqueleto com progresso por etapa: "Lendo seções 12/43", "Procurando prazos e valores", "Escrevendo o resumo", "Conferindo as fontes" |
 | `parcial` | Tudo menos BLUF/ações; aviso "Resumo da IA ainda a caminho"; atualiza sozinho (poll a cada 3 s, máx. 2 min) |
 | `pronta` | Completo |
 | `erro` | Relance extrativo + "Não consegui gerar o resumo agora" + [Tentar de novo] (`POST .../regenerar`) |
