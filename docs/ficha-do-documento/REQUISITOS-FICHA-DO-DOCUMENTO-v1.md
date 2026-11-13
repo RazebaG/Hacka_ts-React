@@ -46,7 +46,7 @@ Uma tela por documento, em **três profundidades**, sem trocar de página:
 |---|---|---|---|---|
 | D1 | **BLUF por perfil:** a mesma frase-resumo e a ênfase mudam entre Empregado, Gestor, Jurídico, Financeiro, RH e Diretoria | Responde ao que a pessoa precisa, não ao que o documento diz primeiro | P0 (frase única) · P1 (por perfil) | M |
 | D2 | **Selos de governança lidos do documento** (elaborou, aprovou, assinou, classificação, versão, vínculo) | Aproveita o que a empresa já tem; zero risco de alucinação | P0 | S |
-| D3 | **Mapa de calor do documento:** uma faixa horizontal que representa as 100 páginas, colorida por onde há prazo, valor, obrigação e risco; clicar leva à seção | É o "bater o olho" literal: mostra *onde* olhar sem ler | P0 | S (sem IA) |
+| D3 | **Mapa de calor do documento:** uma faixa horizontal com uma célula por seção (as 100 páginas de relance), **cinza ao abrir**; ao escolher um bloco, as seções dele acendem na cor do sinal; clicar numa seção abre o pop-up de resumo explicado | É o "bater o olho" literal: mostra *onde* cada informação está sem ler (decisão da equipe: começa sem cor) | P0 | S (sem IA) |
 | D4 | **"O que isso exige de mim":** lista de ações com quem, até quando e o que acontece se não fizer | Transforma resumo em decisão (a tese do desafio) | P0 | M |
 | D5 | **Origem de cada afirmação:** selo "Trecho literal", "Resumo da IA" ou "Calculado", com fonte clicável; o que não se verifica é descartado | Confiança e auditoria; diferencia de chatbots | P0 | S (já temos o verificador) |
 | D6 | **Cobertura declarada:** "li 47 de 47 seções; 3 pontos descartados por falta de fonte" | Honestidade sobre o que a IA fez e não fez | P0 | S |
@@ -115,7 +115,7 @@ Prioridade: **P0** = MVP · **P1** = se sobrar tempo · **P2** = depois do event
 | RF50 | **Pontos-chave por tema** (obrigações, prazos, valores, riscos, responsáveis, condições), cada um com fonte, selo de origem e botão "Incluir no relatório" (RF41) | P0 | T14 | C22 |
 | RF51 | **Selo de origem** em todo item: "Trecho literal", "Resumo da IA" ou "Calculado". Item sem fonte verificada **não é exibido** e entra na contagem de descartados | P0 | T14 | C22 |
 | RF52 | **Cobertura declarada:** seções lidas/total, itens verificados, itens descartados e modo (IA ou extrativo) | P0 | T14 | C22 |
-| RF53 | **Mapa de calor** do documento: faixa com uma célula por seção, proporcional ao tamanho, colorida por tipo de sinal (prazo, valor, obrigação, risco); passar o mouse mostra a seção; clicar abre o T8 na seção. Alternável por sinal | P0 | T14 | C22 |
+| RF53 | **Mapa de calor** do documento: faixa com uma célula por seção, proporcional ao tamanho, **cinza ao abrir (sem cor)**; ao escolher um bloco, as seções dele acendem na cor do sinal (prazo, valor, obrigação, risco); passar o mouse mostra o título e as contagens de sinais; **clicar numa seção abre o pop-up de resumo explicado (RF58)**. Alternativa em lista | P0 | T14 | C22 |
 | RF54 | **Tempo economizado:** páginas estimadas, tempo de leitura integral e tempo da ficha | P0 | T14 | C22 |
 | RF55 | **Perguntas sugeridas** (até 4) por documento; ao clicar, abre o T2 com o escopo fixado no documento (RF63) | P0 | T14 | C22 |
 | RF56 | **Alertas do documento:** itens do Radar (T4) que citam este documento (versão substituída, referência ausente) e conflitos com outras fontes | P0 | T14 | C22 |
@@ -175,7 +175,7 @@ Na lista de prioridades da seção 2.1, **RF71 a RF76 entram no P0 e substituem,
 1. **Relance em 10 segundos.** Dado `CTR_2026-012`, a pessoa abre a ficha e, sem rolar, identifica: contrato de locação de coworking, vigente até 29/04/2027, R$ 18.250,00 no total, aprovado pela DIRAF, classificação interna, próximo prazo (25/11/2026, vistoria).
 2. **Nada sem fonte.** Dado qualquer item exibido, ao clicar na fonte abre o T8 na seção e o trecho aparece destacado. Dado um item gerado cuja citação não existe na seção, ele não aparece e a cobertura mostra "1 descartado".
 3. **Governança sem IA.** Dado um documento sem "Assinada em", o selo mostra "não consta no documento" e o teste falha se a IA preencher.
-4. **Mapa de calor.** Dado um documento com 60 seções, a faixa tem 60 células; a cláusula "Valor" aparece com sinal de valor; clicar leva à seção.
+4. **Mapa de calor.** Dado um documento com 43 seções, a faixa tem 43 células **cinza ao abrir**; ao escolher "Quanto custa", só as seções desse bloco acendem; clicar numa seção abre o pop-up dela.
 5. **Documento grande.** Dado o documento sintético de ~100 páginas, a ficha fica `pronta` em até 90 s, e o relance extrativo aparece antes disso.
 6. **Sem IA.** Dado `LLM_PROVIDER=nenhum`, a ficha abre em modo extrativo, com o aviso, e os números e prazos corretos.
 7. **Fontes em evidência.** Dada a pergunta "Qual a antecedência mínima para pedir férias?", a resposta mostra "Respondido com 2 documentos", o painel lista `NG_111 v3.0.0` (citado) e destaca o aviso de que a v2 foi substituída.

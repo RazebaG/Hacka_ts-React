@@ -7,18 +7,18 @@
 
 ## 0. O que é, e o que NÃO é
 
-**É:** quando a pessoa **seleciona uma seção no mapa de calor**, abre um **pop-up com o resumo explicado daquela seção**: o que ela diz em palavras simples, os pontos principais dela, por que está em destaque no mapa, a que outras partes ela se liga e o texto original com os termos marcados.
+**É:** quando a pessoa **seleciona uma seção no mapa de calor**, abre um **pop-up com o resumo explicado daquela seção**: o que ela diz em palavras simples, os pontos principais dela, Sinais nesta seção no mapa, a que outras partes ela se liga e o texto original com os termos marcados.
 
 **Não é:** uma apresentação (pitch), um resumo do documento inteiro, um slide em tela cheia, nem uma tela com cronômetro, notas de apresentador ou cartões por tempo. A palavra "pitch" apareceu só como **exemplo de modelo de resposta** (um texto que traz os pontos principais de uma base de informação); não é uma funcionalidade. **Foi removido de vez:** modo apresentação, cronômetro, roteiro falado, rota própria `/apresentar`, endpoint `/apresentacao` e o botão "Apresentar em 5 min".
 
-O mapa de calor passa a ser a **porta de entrada**: cor e intensidade dizem *onde olhar*; o pop-up diz *o que aquela seção significa*.
+O mapa de calor passa a ser a **porta de entrada**: a faixa (cinza ao abrir, acendendo as seções do bloco escolhido) mostra *onde cada informação está*; o pop-up diz *o que aquela seção significa*.
 
 ## 1. Como abre e fecha
 
 | Ação | Resultado |
 |---|---|
 | Clicar (ou `Enter`/`Espaço` com foco) numa **célula do mapa**, na Mesa (T1) ou na Ficha (T14) | Abre o pop-up daquela seção. A célula fica contornada no mapa |
-| Clicar numa célula **sem sinal** | Abre igual; "Por que está em destaque" diz "Sem prazo, valor, obrigação ou risco: texto de apoio" |
+| Clicar numa célula **sem sinal** | Abre igual; "Sinais nesta seção" diz "Sem prazo, valor, obrigação ou risco: texto de apoio" |
 | Clicar num bloco da Mesa (ex.: "Quanto custa") | **Não** abre o pop-up; só acende as seções do bloco no mapa (comportamento atual). O pop-up é por seção |
 | Chip "Ligada a" dentro do pop-up | Troca o pop-up para a seção ligada (mantém o histórico para o botão "voltar") |
 | `×`, tecla `Esc` ou clique no **fundo desfocado** | Fecha; o foco volta para a célula que abriu; a Mesa continua no mesmo bloco |
@@ -62,7 +62,7 @@ Só os tokens do projeto (`--color-*`, `--fg-*`, `--space-*`, `--shadow-lg`); o 
 |---|---|---|---|
 | 1 | **Em palavras simples** (P1, IA) | 2 a 4 frases que explicam a seção como a um colega: o que ela diz e o que significa na prática, com os números e prazos em negrito. Selo "Resumo da IA · confira o trecho" e a cláusula | `explicacao` (C28) |
 | 2 | **O que ela diz, em pontos** | Até 5 itens com **selo grande** (`30 dias`, `1 aluguel`, `Sem multa`) e uma linha; a cor segue o sinal | `pontos[]` (C28): extração por regra (F-03), com fonte verificada |
-| 3 | **Por que está em destaque no mapa** | Selo com as contagens (`Prazo 3 · Risco 4`) e uma frase do motivo; aviso fixo "Sinais por palavra-chave: mostram onde olhar, não o que é mais importante" | `destaque` (C28) = a célula do `mapa_calor` (F-02) |
+| 3 | **Sinais nesta seção** | Selo com as contagens encontradas (`Prazo 3 · Risco 4`) e uma frase do que isso indica; aviso fixo "Sinais por palavra-chave: mostram onde olhar, não o que é mais importante" | `destaque` (C28) = a célula do `mapa_calor` (F-02) |
 | 4 | **Ligada a** | Até 4 chips com seções (e documentos) relacionados; clicar troca o pop-up | `relacionadas[]` (C28) |
 | 5 | **Texto original** | O trecho da seção, **com os termos de prazo, valor e risco marcados** (cores dos sinais) | `texto_original` (C28) |
 
@@ -82,7 +82,7 @@ Só os tokens do projeto (`--color-*`, `--fg-*`, `--space-*`, `--shadow-lg`); o 
 
 | Estado | Comportamento |
 |---|---|
-| Carregando (P1, IA) | O cabeçalho, "Por que está em destaque", "Texto original" e "Principais trechos" aparecem na hora (vêm do mapa e da extração); só a seção "Em palavras simples" mostra esqueleto com "Escrevendo a explicação…" |
+| Carregando (P1, IA) | O cabeçalho, "Sinais nesta seção", "Texto original" e "Principais trechos" aparecem na hora (vêm do mapa e da extração); só a seção "Em palavras simples" mostra esqueleto com "Escrevendo a explicação…" |
 | IA indisponível ou verificação falhou | "Principais trechos" no lugar da explicação, com o aviso "Sem IA: trechos do próprio documento" |
 | Erro ao carregar | "Não consegui abrir esta seção agora" + `Tentar de novo`; o botão `Abrir no texto completo` continua funcionando |
 | Seção muito longa (> 400 palavras) | O texto original fica **recolhido** com "Ver texto completo da seção" |
@@ -99,7 +99,7 @@ Só os tokens do projeto (`--color-*`, `--fg-*`, `--space-*`, `--shadow-lg`); o 
 
 ## 8. Aceite
 
-1. Clicar numa célula **colorida** do mapa abre o pop-up daquela seção; clicar numa **neutra** abre com "Sem sinais".
+1. Clicar numa célula do mapa (cinza ou acesa por um bloco escolhido) abre o pop-up daquela seção; uma seção sem sinais abre com "Sem sinais nesta seção".
 2. O pop-up mostra as seções 2 a 5 da tabela do item 3 com dados reais (sem IA); a seção 1 aparece como "Principais trechos" com o selo "Sem IA".
 3. Todo ponto tem fonte clicável; os termos do texto original estão marcados com as cores dos sinais.
 4. **Fundo desfocado** atrás (com o véu escuro como alternativa), página travada, `Esc`, `×` e clique no fundo fecham, e o foco volta à célula.

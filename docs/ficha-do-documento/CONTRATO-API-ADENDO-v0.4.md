@@ -60,7 +60,7 @@ Acao {
 CelulaMapa {
   secao_id, titulo, ordem: int, peso: float (0..1, tamanho relativo do texto),
   sinais: { prazo: int, valor: int, obrigacao: int, risco: int },   // contagens por regra
-  intensidade: float (0..1)                                          // para a cor "Tudo"
+  intensidade: float (0..1)                                          // só usada pelo botão opcional "Mostrar sinais" (P1); o mapa abre cinza
 }
 
 Alerta { tipo: "versao_substituida" | "referencia_ausente" | "divergencia" | "vigencia_proxima", titulo, explicacao, radar_id | null, fontes: [Fonte] }

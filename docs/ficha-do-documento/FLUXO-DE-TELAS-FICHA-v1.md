@@ -172,7 +172,7 @@ Ficha (T14) ─▶ "Perguntar sobre este documento" ─▶ T2 com escopo fixado
 | **Cabeçalho** | código, `BadgeStatus`, tipo/camada, classificação, seletor de perfil (RF59), seletor de versão | Trocar perfil refaz a ordem dos blocos (sem recarregar) | substituída: faixa âmbar "Esta é a v1; a vigente é a v2" + botão |
 | **Relance** | semáforo, contagem de dias, tempo de leitura × ficha, BLUF, 3 números | Clicar no número abre a fonte no T8 | `gerando`: esqueleto + "Estou lendo as seções (12/47)" |
 | **Governança** | selos: elaborado, aprovado, aprovado em, assinada em, classificação, vínculo, referências | Selo vazio = "não consta no documento" (cinza, nunca preenchido) | |
-| **Mapa de calor** | faixa de células, uma por seção, largura proporcional ao texto, cor por sinal; filtro por sinal | Hover: tooltip (título, sinais); clique: T8 na seção; teclado: setas entre células | Alternativa acessível: lista "Seções com mais sinais" |
+| **Mapa de calor** | faixa de células, uma por seção, largura proporcional ao texto; **cinza ao abrir**; ao escolher um bloco, as seções dele acendem na cor do sinal | Hover: dica (título, página, contagem de sinais); clique: abre o pop-up de resumo da seção; teclado: setas entre células | Alternativa acessível: lista "Seções com mais sinais" |
 | **O que isso exige de mim** | ações: verbo + quem + prazo + consequência + fonte + selo de origem | Expandir mostra o trecho literal; "Incluir no relatório" | vazio: "Este documento não cria ações para você" |
 | **Pontos-chave** | abas por tema; cartões com valor, fonte, selo | Igual aos cartões do T3 (reaproveitar) | |
 | **Alertas** | itens do Radar sobre este documento; conflitos | Clique abre T4 filtrado (`?codigo=`) | |
@@ -222,7 +222,7 @@ Cor nunca é o único sinal (semáforo tem ícone e texto); mapa de calor com al
 
 - **Abre** ao clicar (ou `Enter`) numa célula do mapa de calor, na Mesa ou na Ficha; a URL ganha `?secao=<id>`.
 - **Forma:** pop-up centralizado no desktop e **gaveta de baixo para cima no celular**, com o **fundo desfocado** (`backdrop-filter`) e escurecido; fecha por `×`, `Esc` ou clique no fundo.
-- **Conteúdo:** Em palavras simples (P1, IA) ou Principais trechos (sem IA) · O que ela diz, em pontos · Por que está em destaque no mapa · Ligada a · Texto original com os termos marcados.
+- **Conteúdo:** Em palavras simples (P1, IA) ou Principais trechos (sem IA) · O que ela diz, em pontos · Sinais nesta seção · Ligada a · Texto original com os termos marcados.
 - **Rodapé:** `← Anterior`, `Próxima →`, `Perguntar sobre esta seção` e `Abrir no texto completo`.
 - **Dados:** montado no cliente a partir da ficha e do texto da seção; endpoint C28 do backend (P1) para a explicação por IA.
 
