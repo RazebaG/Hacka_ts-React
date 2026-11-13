@@ -92,6 +92,25 @@ export const FonteChip: React.FC<{ fonte: Fonte; curto?: boolean; testId?: strin
   );
 };
 
+/** Fonte compacta do Figma: ícone + código (e item), em azul. O nome completo vai no aria-label. */
+export const FonteLink: React.FC<{ fonte: Fonte; comSecao?: boolean; testId?: string }> = ({ fonte, comSecao, testId }) => {
+  const nome = nomeDoDocumento(fonte.codigo);
+  const antiga = versaoVigente(fonte.codigo) && versaoVigente(fonte.codigo) !== fonte.versao;
+  return (
+    <button
+      type="button"
+      className="fonte-link"
+      onClick={() => navegar(url.documento(fonte.codigo, fonte.versao, fonte.secao))}
+      aria-label={`Abrir ${nome} (${fonte.codigo}, versão ${fonte.versao})${fonte.secao ? `, ${secaoLegivel(fonte.secao)}` : ''}`}
+      title={`${nome}${fonte.secao ? `, ${secaoLegivel(fonte.secao)}` : ''}`}
+      data-testid={testId}
+    >
+      <Icon nome="documento" tamanho={15} />
+      <SemQuebra texto={`${fonte.codigo}${antiga ? ` v${fonte.versao}` : ''}${comSecao && fonte.secao ? ` · ${fonte.secao}` : ''}`} />
+    </button>
+  );
+};
+
 /** Ajuda curta no topo de cada tela: o que dá para fazer aqui, em até 3 passos. */
 const AJUDA: Partial<Record<string, string[]>> = {
   inicio: [
@@ -133,8 +152,7 @@ const AJUDA: Partial<Record<string, string[]>> = {
     'O texto antigo aparece primeiro e o novo logo abaixo.'
   ],
   grafo: [
-    'Este desenho mostra quais documentos dependem de outros.',
-    'Prefere uma lista? Toque em “Ver como tabela”.'
+    'Este desenho mostra quais documentos dependem de outros.'
   ],
   relatorio: [
     'Monte um resumo para levar a uma reunião.',

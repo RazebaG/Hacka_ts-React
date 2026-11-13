@@ -9,7 +9,7 @@ describe('PerspectivasView', () => {
 
     // Aguarda carregar
     await waitFor(() => {
-      expect(screen.getByText('O que cada área precisa saber')).toBeInTheDocument();
+      expect(screen.getByText('Resumo por Área')).toBeInTheDocument();
     });
 
     // Hook da Cena 1: Antecedência mínima 45 dias

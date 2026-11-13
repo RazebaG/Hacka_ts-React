@@ -13,7 +13,7 @@ import { ESeView } from './components/ESeView';
 import { EnviarView } from './components/EnviarView';
 import { RevisarView } from './components/RevisarView';
 import { DecisaoModal } from './components/DecisaoModal';
-import { AjudaTela, CabecalhoTela } from './ui/componentes';
+import { CabecalhoTela } from './ui/componentes';
 import { navegar, url, useRota } from './app/rotas';
 import { acoes, useEstado } from './app/store';
 import { fetchSaude } from './api/client';
@@ -22,6 +22,7 @@ import './App.css';
 import './ui/shell.css';
 import './ui/telas-v2.css';
 import './ui/leitura.css';
+import './ui/figma.css';
 
 const dataBR = (iso?: string) => (iso ? iso.split('-').reverse().join('/') : '12/11/2026');
 
@@ -144,7 +145,6 @@ export function App() {
       <div className="app-body">
         <Topbar telaAtiva={rota.tela} />
         <main className="app-main" id="conteudo" tabIndex={-1}>
-          <AjudaTela tela={rota.tela} />
           {conteudo}
         </main>
         <Rodape ia={saude?.ia} dataReferencia={dataBR(saude?.data_referencia)} />

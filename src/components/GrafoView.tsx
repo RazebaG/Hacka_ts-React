@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { CabecalhoTela } from '../ui/componentes';
 import { GrafoAcervo, GrafoNo } from '../api/types';
 import { fetchGrafo } from '../api/client';
 import { Icon } from '../ui/Icon';
@@ -62,7 +63,6 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
   const [filtroTipo, setFiltroTipo] = useState<string>('todos');
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'vigente' | 'substituido'>('todos');
   const [termoBusca, setTermoBusca] = useState<string>('');
-  const [modoAcessivel, setModoAcessivel] = useState<boolean>(false);
 
   useEffect(() => {
     let ativo = true;
@@ -161,112 +161,120 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
   return (
     <div className="view-container grafo-view" data-testid="grafo-view">
-      <header className="view-header">
-        <div className="header-meta">
-          <span className="badge-tag">Ligações entre documentos</span>
-          <h1 className="view-title">Como os documentos se ligam</h1>
-        </div>
-        <p className="view-description">
-          Cada caixa é um documento. As linhas mostram qual documento segue outro, qual cita outro e
-          qual versão substituiu a anterior. Prefere uma lista? Use “Ver como tabela”.
-        </p>
-      </header>
+      <CabecalhoTela
+        titulo="Ligações entre Documentos"
+        descricao="Conexões e dependências entre normas, contratos e notas técnicas do acervo."
+        acoes={
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => { setTermoBusca(''); setFiltroTipo('todos'); setFiltroStatus('todos'); }}>
+            <Icon nome="atualizar" tamanho={16} /> Limpar filtros
+          </button>
+        }
+      />
 
-      {/* Barra de Filtros e Ferramentas */}
-      <div className="grafo-toolbar" role="search" aria-label="Filtros do Mapa">
-        <div className="toolbar-campo">
-          <label htmlFor="busca-grafo">Buscar:</label>
+      <div className="fg-grid-3 fg-stats">
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Acervo total</p>
+            <p className="fg-valor">{grafo?.nos.filter((n) => n.existe_no_acervo).length ?? 0}</p>
+            <p className="fg-sub">Versões de documentos no mapa</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true"><Icon nome="catalogo" tamanho={20} /></span>
+        </div>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Vínculos ativos</p>
+            <p className="fg-valor">{grafo?.arestas.length ?? 0}</p>
+            <p className="fg-sub">Ligações entre documentos</p>
+          </div>
+          <span className="fg-icone" aria-hidden="true"><Icon nome="mapa" tamanho={20} /></span>
+        </div>
+        <div className="fg-card fg-stat">
+          <div className="fg-stat-texto">
+            <p className="fg-rotulo">Fora do acervo</p>
+            <p className="fg-valor fg-valor-perigo">{grafo?.nos.filter((n) => !n.existe_no_acervo).length ?? 0}</p>
+            <p className="fg-sub">{grafo?.nos.filter((n) => !n.existe_no_acervo).map((n) => n.codigo).join(' · ') || 'Nenhum'}</p>
+          </div>
+          <span className="fg-icone perigo" aria-hidden="true"><Icon nome="alerta" tamanho={20} /></span>
+        </div>
+      </div>
+
+      {/* Barra de filtros: mesmo padrão de Documentos e Regras que mudaram */}
+      <div className="fg-card fg-barra-filtros" role="search" aria-label="Filtros do mapa">
+        <label className="fg-busca" htmlFor="busca-grafo">
+          <Icon nome="busca" tamanho={18} />
+          <span className="sr-only">Buscar documento</span>
           <input
             id="busca-grafo"
             type="search"
-            className="input-busca-small"
-            placeholder="Ex.: NG_111, CTR, 3.0.0..."
+            placeholder="Buscar norma ou código, ex.: NG_111"
             value={termoBusca}
             onChange={(e) => setTermoBusca(e.target.value)}
             data-testid="input-busca-grafo"
           />
-        </div>
+        </label>
 
-        <div className="toolbar-campo">
-          <label htmlFor="filtro-tipo-grafo">Tipo:</label>
-          <select
-            id="filtro-tipo-grafo"
-            className="select-small"
-            value={filtroTipo}
-            onChange={(e) => setFiltroTipo(e.target.value)}
-            data-testid="select-tipo-grafo"
-          >
-            <option value="todos">Todos os Tipos</option>
-            <option value="NG">NG — Normas Gerais</option>
-            <option value="PX">PX — Procedimentos</option>
-            <option value="FM">FM — Formulários</option>
-            <option value="TB">TB — Tabelas</option>
-            <option value="FL">FL — Fluxogramas</option>
-            <option value="CTR">CTR — Contratos</option>
-            <option value="NT">NT — Notas Técnicas</option>
-            <option value="RG">RG — Resoluções/Regulamentos</option>
-          </select>
-        </div>
+        <label htmlFor="filtro-tipo-grafo" className="sr-only">
+          Tipo de documento
+        </label>
+        <select id="filtro-tipo-grafo" className="fg-select" value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)} data-testid="select-tipo-grafo">
+          <option value="todos">Tipo: Todos</option>
+          <option value="NG">Tipo: Normas gerais (NG)</option>
+          <option value="PX">Tipo: Procedimentos (PX)</option>
+          <option value="FM">Tipo: Formulários (FM)</option>
+          <option value="TB">Tipo: Tabelas (TB)</option>
+          <option value="FL">Tipo: Fluxogramas (FL)</option>
+          <option value="CTR">Tipo: Contratos (CTR)</option>
+          <option value="NT">Tipo: Notas técnicas (NT)</option>
+          <option value="RG">Tipo: Regulamentos (RG)</option>
+        </select>
 
-        <div className="toolbar-campo">
-          <label htmlFor="filtro-status-grafo">Vigência:</label>
-          <select
-            id="filtro-status-grafo"
-            className="select-small"
-            value={filtroStatus}
-            onChange={(e) => setFiltroStatus(e.target.value as any)}
-            data-testid="select-status-grafo"
-          >
-            <option value="todos">Todas as Versões</option>
-            <option value="vigente">Apenas Vigentes</option>
-            <option value="substituido">Apenas Substituídas</option>
-          </select>
-        </div>
+        <label htmlFor="filtro-status-grafo" className="sr-only">
+          Vigência
+        </label>
+        <select
+          id="filtro-status-grafo"
+          className="fg-select"
+          value={filtroStatus}
+          onChange={(e) => setFiltroStatus(e.target.value as 'todos' | 'vigente' | 'substituido')}
+          data-testid="select-status-grafo"
+        >
+          <option value="todos">Vigência: Todas as versões</option>
+          <option value="vigente">Vigência: Só vigentes</option>
+          <option value="substituido">Vigência: Só versões antigas</option>
+        </select>
 
-        <div className="toolbar-toggle">
-          <button
-            type="button"
-            className="btn btn-outline btn-sm"
-            onClick={() => setModoAcessivel(!modoAcessivel)}
-            data-testid="btn-toggle-modo-acessivel"
-          >
-            <Icon nome={modoAcessivel ? 'mapa' : 'tabela'} tamanho={16} />
-            {modoAcessivel ? 'Ver grafo' : 'Ver como tabela'}
-          </button>
-        </div>
       </div>
 
       {/* Legenda do Mapa */}
       <div className="grafo-legenda" aria-label="Legenda das relações e convenções visuais">
         <div className="legenda-grupo">
-          <span className="legenda-titulo">Conexões:</span>
+          <span className="legenda-titulo">Ligações</span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-vinculado"></span> Vinculado a (subordinação)
+            <span className="linha-legenda linha-vinculado"></span> Segue outro documento
           </span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-referencia"></span> Referência / Citação
+            <span className="linha-legenda linha-referencia"></span> Cita outro documento
           </span>
           <span className="legenda-item">
-            <span className="linha-legenda linha-substitui"></span> Substitui (linha temporal)
+            <span className="linha-legenda linha-substitui"></span> Substitui a versão anterior
           </span>
         </div>
         <div className="legenda-grupo">
-          <span className="legenda-titulo">Convenções:</span>
+          <span className="legenda-titulo">Documentos</span>
           <span className="legenda-item">
-            <span className="amostra-no no-vigente"></span> Vigente no Acervo
+            <span className="amostra-no no-vigente"></span> Vigente
           </span>
           <span className="legenda-item">
-            <span className="amostra-no no-substituido"></span> Versão Substituída (Tracejado)
+            <span className="amostra-no no-substituido"></span> Versão antiga (tracejado)
           </span>
           <span className="legenda-item">
-            <span className="amostra-no no-externo"></span> Doc. Fora do Acervo (Externo)
+            <span className="amostra-no no-externo"></span> Fora do acervo
           </span>
         </div>
       </div>
 
       <div className="grafo-layout-grid">
         {/* Painel Central: Grafo SVG Interativo */}
-        {!modoAcessivel ? (
           <div className="grafo-canvas-container" data-testid="grafo-canvas">
             <svg
               className="grafo-svg"
@@ -470,60 +478,6 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
               </g>
             </svg>
           </div>
-        ) : (
-          /* MODO TABELA ACESSÍVEL */
-          <div className="grafo-tabela-acessivel" data-testid="grafo-tabela-acessivel">
-            <table className="tabela-dados">
-              <caption className="sr-only">Relações documentais do acervo da ACME</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Código</th>
-                  <th scope="col">Tipo</th>
-                  <th scope="col">Versão</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Disponibilidade</th>
-                  <th scope="col">Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                {nosFiltrados.map((no) => (
-                  <tr
-                    key={no.id}
-                    className={no.id === noSelecionadoId ? 'linha-selecionada' : ''}
-                    onClick={() => setNoSelecionadoId(no.id)}
-                  >
-                    <td>
-                      <strong>{no.codigo}</strong>
-                    </td>
-                    <td>{no.tipo}</td>
-                    <td>{no.versao ? `v${no.versao}` : '—'}</td>
-                    <td>
-                      {no.substituido ? (
-                        <span className="badge-status-substituido">Substituído</span>
-                      ) : (
-                        <span className="badge-status-vigente">Vigente</span>
-                      )}
-                    </td>
-                    <td>{no.existe_no_acervo ? 'No Acervo' : 'Referência Externa'}</td>
-                    <td>
-                      {no.existe_no_acervo ? (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline"
-                          onClick={() => handleAbrirLeitor(no)}
-                        >
-                          Ler
-                        </button>
-                      ) : (
-                        <span className="text-muted">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
 
         {/* Painel Lateral: Detalhes do Nó Selecionado */}
         <aside
@@ -542,20 +496,20 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
               <div className="detalhe-no-metas">
                 <div className="meta-linha">
-                  <span className="meta-k">Versão:</span>
+                  <span className="meta-k">Versão</span>
                   <span className="meta-v">
-                    {noSelecionado.versao ? `v${noSelecionado.versao}` : 'Documento Externo'}
+                    {noSelecionado.versao ? `v${noSelecionado.versao}` : 'Sem texto no arquivo'}
                   </span>
                 </div>
                 <div className="meta-linha">
-                  <span className="meta-k">Situação:</span>
+                  <span className="meta-k">Situação</span>
                   <span className="meta-v">
                     {noSelecionado.substituido ? (
-                      <span className="badge-aviso-tag">Versão Substituída</span>
+                      <span className="fg-pilula aviso ponto">Versão antiga</span>
                     ) : noSelecionado.existe_no_acervo ? (
-                      <span className="badge-ok-tag">Versão Vigente</span>
+                      <span className="fg-pilula ok ponto">Vigente</span>
                     ) : (
-                      <span className="badge-externo-tag">Não Ingerido (NG_012/010)</span>
+                      <span className="fg-pilula perigo ponto">Fora do acervo</span>
                     )}
                   </span>
                 </div>
@@ -563,9 +517,9 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
 
               {/* Relações Conectadas */}
               <div className="detalhe-relacoes">
-                <h3 className="relacoes-subtitulo">Conexões no Grafo:</h3>
+                <h3 className="relacoes-subtitulo">Ligações deste documento</h3>
                 {conexoesNoSelecionado.arestas.length === 0 ? (
-                  <p className="text-muted">Sem conexões diretas registradas.</p>
+                  <p className="fg-sub">Sem ligações diretas registradas.</p>
                 ) : (
                   <ul className="relacoes-lista">
                     {conexoesNoSelecionado.arestas.map((a, i) => {
@@ -574,16 +528,17 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                       return (
                         <li key={i} className="relacao-item">
                           <span className="relacao-tipo-tag">
-                            {a.tipo === 'vinculado_a' && 'Vinculado a'}
-                            {a.tipo === 'referencia' && 'Cita / Referencia'}
-                            {a.tipo === 'substitui' && 'Substitui'}
+                            {a.tipo === 'vinculado_a' && (ehOrigem ? 'Segue' : 'É seguido por')}
+                            {a.tipo === 'referencia' && (ehOrigem ? 'Cita' : 'É citado por')}
+                            {a.tipo === 'substitui' && (ehOrigem ? 'Substitui' : 'Substituído por')}
                           </span>
                           <button
                             type="button"
-                            className="btn-link relacao-outro-link"
+                            className="fg-link relacao-outro-link"
                             onClick={() => setNoSelecionadoId(outroId)}
+                            aria-label={`Selecionar ${outroId.replace('@', ', versão ')} no mapa`}
                           >
-                            {outroId}
+                            {outroId.replace('@', ' v')}
                           </button>
                         </li>
                       );
@@ -604,8 +559,8 @@ export const GrafoView: React.FC<GrafoViewProps> = ({ onNavegarDocumento }) => {
                 </button>
               ) : (
                 <div className="alerta alerta-info mt-4">
-                  <strong>Documento Externo:</strong> Referenciado em notas e contratos, porém não
-                  fornecido no acervo fechado da ACME.
+                  <strong>Documento fora do acervo.</strong> Outros documentos citam esta norma, mas o texto dela não está no
+                  Arquivo Central da ACME.
                 </div>
               )}
             </div>

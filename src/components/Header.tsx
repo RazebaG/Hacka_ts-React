@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { isMockMode, getApiBaseUrl } from '../api/client';
 import { PerfilUsuario } from '../api/types';
 import { navegar, Tela, url } from '../app/rotas';
@@ -24,17 +24,17 @@ const GRUPOS: { titulo: string; itens: ItemNav[] }[] = [
   {
     titulo: 'Começar',
     itens: [
-      { id: 'inicio', rotulo: 'Início', icone: 'painel', destino: url.inicio() },
-      { id: 'perguntar', rotulo: 'Tirar uma dúvida', icone: 'perguntar', destino: url.perguntar() }
+      { id: 'inicio', rotulo: 'Início', icone: 'inicio', destino: url.inicio() },
+      { id: 'perguntar', rotulo: 'Tirar uma dúvida', icone: 'duvida', destino: url.perguntar() }
     ]
   },
   {
     titulo: 'Consultar',
     itens: [
-      { id: 'catalogo', rotulo: 'Documentos', icone: 'catalogo', destino: url.catalogo() },
-      { id: 'radar', rotulo: 'Regras que mudaram', icone: 'alerta', destino: url.radar() },
+      { id: 'catalogo', rotulo: 'Documentos', icone: 'documento', destino: url.catalogo() },
+      { id: 'radar', rotulo: 'Regras que mudaram', icone: 'regras', destino: url.radar() },
       { id: 'comparar', rotulo: 'Comparar versões', icone: 'comparar', destino: url.comparar() },
-      { id: 'perspectivas', rotulo: 'Resumo por área', icone: 'gestao', destino: url.painel() },
+      { id: 'perspectivas', rotulo: 'Resumo por área', icone: 'resumo', destino: url.painel() },
       { id: 'grafo', rotulo: 'Ligações entre documentos', icone: 'mapa', destino: url.mapa() }
     ]
   },
@@ -73,7 +73,6 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ telaAtiva, documentoAtivoCodigo }) => {
   const ativa = MAPA_ATIVO[telaAtiva] ?? telaAtiva;
-  const recolhido = useEstado((e) => e.menuRecolhido);
   const aberto = useEstado((e) => e.menuAberto);
   const ir = (destino: string) => {
     acoes.abrirMenu(false);
@@ -104,21 +103,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ telaAtiva, documentoAtivoCodig
       <div className={`menu-fundo ${aberto ? 'aberto' : ''}`} onClick={() => acoes.abrirMenu(false)} aria-hidden="true" />
       <aside
         id="menu-principal"
-        className={`app-sidebar print-hidden ${recolhido ? 'recolhido' : ''} ${aberto ? 'aberto' : ''}`}
+        className={`app-sidebar print-hidden ${aberto ? 'aberto' : ''}`}
         data-testid="menu-lateral"
         onKeyDown={(e) => e.key === 'Escape' && acoes.abrirMenu(false)}
       >
-        <button
-          type="button"
-          className="side-toggle"
-          onClick={() => acoes.alternarMenu()}
-          aria-expanded={!recolhido}
-          aria-label={recolhido ? 'Mostrar os nomes do menu' : 'Esconder os nomes do menu'}
-          title={recolhido ? 'Mostrar os nomes do menu' : 'Esconder os nomes do menu'}
-          data-testid="btn-recolher-menu"
-        >
-          <Icon nome={recolhido ? 'seta' : 'recolher'} tamanho={16} />
-        </button>
         <a
           href="/"
           className="side-brand"
@@ -129,11 +117,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ telaAtiva, documentoAtivoCodig
           aria-label="Arquivo Central de Normas, ir para o início"
         >
           <span className="side-logo" aria-hidden="true">
-            ACME
+            A
           </span>
           <span className="side-brand-text">
-            <strong>Arquivo Central</strong>
-            <small>de Normas</small>
+            <strong>ACME</strong>
           </span>
         </a>
 
@@ -154,21 +141,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ telaAtiva, documentoAtivoCodig
           )}
         </nav>
 
-        <p className="side-foot">HACKA/TS 2026 · Desafio 2</p>
       </aside>
     </>
   );
 };
-
-/** Roteiro da apresentação (6 passos, ≈ 2 min). */
-const CENAS: { rotulo: string; destino: string }[] = [
-  { rotulo: 'Enviar a foto de um documento', destino: url.enviar() },
-  { rotulo: 'Perguntar o que mudou nas férias', destino: url.perguntar('Qual a antecedência mínima para solicitar férias?') },
-  { rotulo: 'Ver a regra antiga e a nova lado a lado', destino: url.radar({ item: 'ferias-antecedencia' }) },
-  { rotulo: 'Resumo financeiro: R$ 18.250,00', destino: url.painel('financeiro') },
-  { rotulo: 'Simular: e se forem 30 dias?', destino: url.ese('ferias_antecedencia_dias', 30) },
-  { rotulo: 'Montar o relatório', destino: url.relatorio({ selecao: true }) }
-];
 
 const TAMANHOS: { id: TamanhoTexto; rotulo: string; descricao: string }[] = [
   { id: 'normal', rotulo: 'A', descricao: 'Texto normal' },
@@ -181,7 +157,6 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
   const nSelecao = useEstado((e) => e.selecao.length);
   const tamanho = useEstado((e) => e.tamanhoTexto);
   const menuAberto = useEstado((e) => e.menuAberto);
-  const [pergunta, setPergunta] = useState('');
 
   return (
     <header className="app-topbar print-hidden">
@@ -196,27 +171,9 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
         <Icon nome="menu" tamanho={18} /> Menu
       </button>
 
-      <nav className="crumbs" aria-label="Você está em">
-        <span>Arquivo Central</span>
-        <Icon nome="seta" tamanho={14} />
-        <span aria-current="page">{TITULOS[telaAtiva]}</span>
-      </nav>
-
-      <form
-        className="busca-topo"
-        role="search"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!pergunta.trim()) return;
-          navegar(url.perguntar(pergunta.trim()));
-          setPergunta('');
-        }}
-      >
-        <label htmlFor="busca-topo" className="sr-only">
-          Escreva sua dúvida
-        </label>
-        <input id="busca-topo" type="search" placeholder="Escreva sua dúvida e tecle Enter" value={pergunta} onChange={(e) => setPergunta(e.target.value)} />
-      </form>
+      <span className="sr-only" aria-live="polite">
+        Você está em {TITULOS[telaAtiva]}
+      </span>
 
       <div className="topbar-actions">
         <div className="tamanho-texto" role="group" aria-label="Tamanho do texto">
@@ -262,32 +219,12 @@ export const Topbar: React.FC<{ telaAtiva: Tela }> = ({ telaAtiva }) => {
           aria-label={`Meu relatório: ${nSelecao} ${nSelecao === 1 ? 'item guardado' : 'itens guardados'}`}
           data-testid="contador-selecao"
         >
-          Meu relatório <span className="selecao-n">{nSelecao}</span>
+          <Icon nome="relatorio" tamanho={16} /> Meu relatório <span className="selecao-n">{nSelecao}</span>
         </a>
 
-        <details className="demo-menu">
-          <summary aria-label="Roteiro da apresentação" title="Roteiro da apresentação">
-            <Icon nome="play" tamanho={14} />
-            <span className="demo-label">Apresentação</span>
-          </summary>
-          <ol className="demo-list" aria-label="Passos da apresentação">
-            {CENAS.map((c, i) => (
-              <li key={c.rotulo}>
-                <a
-                  href={c.destino}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    navegar(c.destino);
-                    e.currentTarget.closest('details')?.removeAttribute('open');
-                  }}
-                >
-                  <span className="demo-n">{i + 1}</span>
-                  {c.rotulo}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </details>
+        <span className="avatar-topo" role="img" aria-label="Seu perfil" title="Seu perfil">
+          <Icon nome="usuario" tamanho={16} />
+        </span>
       </div>
     </header>
   );

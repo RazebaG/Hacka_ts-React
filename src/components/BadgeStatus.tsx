@@ -24,7 +24,7 @@ export const BadgeStatus: React.FC<BadgeStatusProps> = ({ substituido, fase }) =
       className="badge badge-vigente"
       title="Esta é a versão que vale hoje"
     >
-      {fase && fase !== 'Vigente' ? fase : 'Em vigor'}
+      {fase && fase !== 'Vigente' ? fase : 'Vigente'}
     </span>
   );
 };

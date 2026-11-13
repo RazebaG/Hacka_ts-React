@@ -7,7 +7,7 @@ describe('PerguntarView', () => {
     const onNavegar = vi.fn();
     render(<PerguntarView onNavegarDocumento={onNavegar} />);
 
-    expect(screen.getByText('Tire sua dúvida')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Tirar uma Dúvida/ })).toBeInTheDocument();
     expect(screen.getByTestId('input-pergunta')).toBeInTheDocument();
     expect(screen.getByTestId('select-perfil')).toBeInTheDocument();
     expect(screen.getByTestId('btn-enviar-pergunta')).toBeInTheDocument();

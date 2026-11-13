@@ -64,7 +64,7 @@ describe('T4 Radar e T5 Lado a lado (#5)', () => {
     expect(await screen.findByTestId('contador-substituida')).toHaveTextContent('Regras que mudaram: 2');
     expect(screen.getByTestId('contador-ausente')).toHaveTextContent('Documentos que faltam: 1');
     const item = screen.getByTestId('radar-item-ferias-antecedencia');
-    expect(item).toHaveTextContent(/item 2\.3.*NG_111 · versão antiga 2\.0\.0/);
+    expect(item).toHaveTextContent(/v2\.0\.0, item 2\.3.*v3\.0\.0, item 4\.3/);
     expect(item).toHaveTextContent(/item 4\.3/);
     expect(screen.getByText('NG_012 citada por 5 documentos, não está no acervo.')).toBeInTheDocument();
   });
@@ -156,7 +156,7 @@ describe('Avaliação (#12) e seleção para o relatório (#13)', () => {
     acoes.registrarAvaliacao({ resposta_id: 'x', util: false, canal: 'slack' });
     render(<VisaoGeralView />);
     expect(screen.getByTestId('resumo-avaliacoes')).toHaveTextContent('Respostas avaliadas: 2 · úteis: 1');
-    expect(await screen.findByText('3 pontos pedem sua atenção.')).toBeInTheDocument();
+    expect(await screen.findByText('3 pontos requerem análise')).toBeInTheDocument();
   });
   it('relatório da seleção: vazio, itens, reordenar e aviso de fonte que mudou', async () => {
     const { rerender } = render(<RelatorioSelecao />);
